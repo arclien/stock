@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import krx from "krx-stock-api";
-import axios from "axios";
-import XMLParser from "react-xml-parser";
 import ReactEcharts from "echarts-for-react";
+
+import { readString, CSVReader } from "react-papaparse";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
+
 import "./App.css";
 
 const getOptions = () => ({
@@ -41,69 +43,87 @@ function App() {
   const [stock, setStock] = useState(null);
   const [dailyPrices, setDailyPrices] = useState([]);
   const [option, setOption] = useState(getOptions());
+  const [tabIndex, setTabIndex] = useState(0);
+  const [chartInstance, setChartInstance] = useState(null);
 
-  let xml = new XMLParser();
+  const aa = (index) => {
+    setTabIndex(index);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      await axios
-        .get(
-          "https://cors-anywhere.herokuapp.com/http://asp1.krx.co.kr/servlet/krx.asp.XMLSiseEng?code=005930",
-          {
-            "Content-Type": "application/xml; charset=utf-8",
-          }
-        )
-        .then((res) => {
-          const { children } = xml.parseFromString(res.data);
-          console.log(children);
-          console.log(children[0].children);
-          setStock(children[2].attributes);
-          setDailyPrices(children[0].children);
-          const data = children[0].children.map((el) =>
-            parseInt(el.attributes.day_EndPrice.replace(",", ""), 10)
-          );
-          const interval = Math.floor(
-            (Math.max(...data) - Math.min(...data) + 10000) / 5
-          );
+    async function getData() {
+      console.log(chartInstance);
 
-          setOption({
-            ...option,
-            xAxis: {
-              ...option.xAxis,
-              data: children[0].children
-                .map((el) => el.attributes.day_Date)
-                .reverse(),
-            },
-            yAxis: {
-              ...option.yAxis,
-              min: Math.min(...data) - interval,
-              max: Math.max(...data) + interval,
-              interval: interval,
-            },
-            series: {
-              ...option.series,
-              data: children[0].children
-                .map((el) =>
-                  parseInt(el.attributes.day_EndPrice.replace(",", ""), 10)
-                )
-                .reverse(),
-            },
-          });
-        });
-    };
-    fetchData();
-  }, []);
+      // if (chartInstance) {
+      //   chartInstance.dispose();
+      // }
+
+      // if (chartInstance) chartInstance.getEchartsInstance().clear();
+      const response = await fetch("./stock/data/000720.csv");
+      const reader = response.body.getReader();
+      const result = await reader.read(); // raw array
+      const decoder = new TextDecoder("utf-8");
+      const csv = decoder.decode(result.value); // the csv text
+      const results = readString(csv);
+      console.log("---------------------------");
+      console.log(results);
+      console.log("---------------------------");
+      setDailyPrices(results.data);
+
+      const length = results.data.length;
+      const data = results.data
+        .slice(1, length - 1)
+        .map((el, i) => parseInt(el[4], 10));
+      const interval = Math.floor(
+        (Math.max(...data) - Math.min(...data) + 10000) / 5
+      );
+      console.log(option);
+      setOption({
+        ...option,
+        xAxis: {
+          ...option.xAxis,
+          data: results.data.slice(1, length - 1).map((el) => el[0]),
+        },
+        yAxis: {
+          ...option.yAxis,
+          min: Math.min(...data) - interval,
+          max: Math.max(...data) + interval,
+          interval: interval,
+        },
+        series: {
+          ...option.series,
+          data: results.data
+            .slice(1, length - 1)
+            .map((el) => parseInt(el[4], 10)),
+        },
+      });
+    }
+    getData();
+  }, [tabIndex]);
   return (
     <div className="App">
       {stock && <div>{stock.JongName}</div>}
-      {dailyPrices &&
-        dailyPrices.map((el) => (
-          <div key={el.attributes.day_Volume}>
-            <span> {el.attributes.day_Date}</span>
-            <span> {el.attributes.day_EndPrice}</span>
-          </div>
-        ))}
-      {dailyPrices && <ReactEcharts option={option} />}
-      {option && JSON.stringify(option)}
+
+      {/*<Tabs onSelect={aa}>
+        <TabList>
+          <Tab>Title 1</Tab>
+          <Tab>Title 2</Tab>
+        </TabList>
+
+        <TabPanel>
+          {dailyPrices && (
+            <ReactEcharts ref={(e) => setChartInstance(e)} option={option} />
+          )}
+        </TabPanel>
+        <TabPanel>
+          <h2>Any content 2</h2>
+        </TabPanel>
+      </Tabs>
+
+      */}
+
+      {dailyPrices && (
+        <ReactEcharts ref={(e) => setChartInstance(e)} option={option} />
+      )}
     </div>
   );
 }
