@@ -10,10 +10,12 @@ df_list = [fdr.DataReader(ticker, '2020-01-01') for ticker in tiker_list]
 if os.path.exists("./data")==False:
   os.mkdir("./data")
 
+print(os.path.exists("./data"))
 
 length = len(df_list) 
 for i in range(length):
   df_list[i].to_csv("./data/{}.csv".format(tiker_list[i]))
+  print(df_list[i])
 
 
 # https://tariat.tistory.com/955
