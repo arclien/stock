@@ -58,7 +58,9 @@ function App() {
       // }
 
       // if (chartInstance) chartInstance.getEchartsInstance().clear();
-      const response = await fetch("./stock/data/000720.csv");
+      const response = await fetch(
+        `${window.location.origin}/stock/data/000720.csv`
+      );
       const reader = response.body.getReader();
       const result = await reader.read(); // raw array
       const decoder = new TextDecoder("utf-8");
