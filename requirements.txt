@@ -1,1 +1,11 @@
 finance_datareader==0.9.10
+beautifulsoup4==4.8.2
+requests==2.23.0
+bs4==0.0.1
+certifi==2019.11.28
+chardet==3.0.4
+idna==2.9
+ruamel.yaml==0.16.10
+ruamel.yaml.clib==0.2.0
+soupsieve==2.0
+urllib3==1.25.8
