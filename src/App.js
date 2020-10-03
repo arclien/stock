@@ -6,8 +6,19 @@ import "react-tabs/style/react-tabs.css";
 
 import "./App.css";
 
-const stock_list = ["005930", "066570", "005490", "000720", "068760"];
+const stock_list = ["005930", "066570", "005490", "035720", "293490", "068760"];
+const stockName_list = [
+  "삼성전자",
+  "LG전자",
+  "POSCO",
+  "카카오",
+  "카카오게임즈",
+  "셀트리온제약",
+];
 const getOptions = () => ({
+  legend: {
+    data: stock_list,
+  },
   tooltip: {
     trigger: "axis",
     axisPointer: {
@@ -123,7 +134,10 @@ function App() {
   }, []);
   return (
     <div className="App">
-      {stock && <div>{stock.JongName}</div>}
+      {stock_list &&
+        stock_list.map((el, i) => (
+          <div>{`종목이름 :${stockName_list[i]} // 종목코드 : ${el}`}</div>
+        ))}
       {isLoaded && (
         <ReactEcharts
           style={{ height: "700px", width: "100%" }}
