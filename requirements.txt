@@ -1,1 +1,1 @@
-FinanceDataReader==0.9.10
+finance_datareader==0.9.10
