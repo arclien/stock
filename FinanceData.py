@@ -4,7 +4,7 @@ import os
 
 
 
-tiker_list = ['005930', '066570', '005490'] 
+tiker_list = ['005930', '066570', '005490', '000720'] 
 df_list = [fdr.DataReader(ticker, '2020-01-01') for ticker in tiker_list]
 
 if os.path.exists("./data")==False:
