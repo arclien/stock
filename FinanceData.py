@@ -6,7 +6,7 @@ import os
 
 __DIR__ = "./public/data";
 
-stock_list = constants.STOCK_LIST
+stock_list = [n["code"] for n in constants.STOCK_LIST]
 df_list = [fdr.DataReader(ticker, '2015-01-01') for ticker in stock_list]
 
 if os.path.exists(__DIR__)==False:
@@ -22,3 +22,6 @@ for i in range(length):
 # https://github.com/charlesdong1991/StockInsider
 # https://github.com/FinanceData/FinanceDataReader
 # https://github.com/sw-yx/gh-action-data-scraping
+# https://github.com/choosunsick/Korea_Stocks
+# https://github.com/zzsza/github-action-with-python
+# https://blog.naver.com/PostView.nhn?blogId=ji0eeeee&logNo=221527166066

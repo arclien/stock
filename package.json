@@ -15,7 +15,6 @@
     "react-dom": "^16.13.1",
     "react-papaparse": "^3.8.0",
     "react-scripts": "3.4.3",
-    "react-tabs": "^3.1.1",
     "react-xml-parser": "^1.1.6"
   },
   "scripts": {
