@@ -24,3 +24,6 @@ jobs:
       - name: Run Crawler with python
         run: |
           python "FinanceData.py"
+      - uses: mikeal/publish-to-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub sets this for you

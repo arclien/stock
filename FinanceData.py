@@ -21,3 +21,4 @@ for i in range(length):
 # https://tariat.tistory.com/955
 # https://github.com/charlesdong1991/StockInsider
 # https://github.com/FinanceData/FinanceDataReader
+# https://github.com/sw-yx/gh-action-data-scraping
