@@ -15,7 +15,6 @@ if os.path.exists(__DIR__)==False:
 length = len(df_list) 
 for i in range(length):
   df_list[i].to_csv("{}/{}.csv".format(__DIR__, stock_list[i]))
-  # print(df_list[i])
 
 
 # https://tariat.tistory.com/955
