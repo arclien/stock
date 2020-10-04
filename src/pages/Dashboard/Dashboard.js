@@ -5,7 +5,7 @@ import { chartOption } from 'constants/chart';
 import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 
-import { Container, StockList, StockItem } from './Dashboard.styles';
+import { Container } from './Dashboard.styles';
 
 const Dashboard = () => {
   const [isLoaded, setLoaded] = useState(false);
@@ -72,18 +72,8 @@ const Dashboard = () => {
     });
   }, []);
 
-  // useEffect(() => {
-
-  // }, [fetchAllData, stockData, stockDataHigh, stockDataLow]);
-
   return (
     <Container>
-      <StockList>
-        {stockList &&
-          stockList.map((el) => (
-            <StockItem key={el.code}>{`${el.name} (${el.code})`}</StockItem>
-          ))}
-      </StockList>
       {isLoaded && <StockChart chartData={optionHigh} />}
       {isLoaded && <StockChart chartData={option} />}
       {isLoaded && <StockChart chartData={optionLow} />}
