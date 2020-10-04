@@ -20,6 +20,12 @@ const Stock = () => {
   const [optionPercent, setOptionPercent] = useState({
     ...chartOption,
   });
+  const [percentTargetDate, setPercentTargetDate] = useState('2015-01-02');
+
+  const onChartClick = (params) => {
+    const { name } = params;
+    setPercentTargetDate(name);
+  };
 
   useEffect(() => {
     const getData = async () => {
@@ -28,6 +34,11 @@ const Stock = () => {
       const { data: stock } = await fetchStockDataFromCsv(stockCode);
 
       const { length } = stock;
+
+      const targetDateValue = parseInt(
+        stock.find((el) => el[0] === percentTargetDate)[4],
+        10
+      );
 
       stockData.xAxis = {
         ...stockData.xAxis,
@@ -64,7 +75,7 @@ const Stock = () => {
           data: stock
             .slice(1, length - 1)
             .map((el) =>
-              getRelativePercent(parseInt(stock[1][4], 10), parseInt(el[4], 10))
+              getRelativePercent(targetDateValue, parseInt(el[4], 10))
             ),
           type: 'line',
           name: `${
@@ -79,21 +90,31 @@ const Stock = () => {
     };
 
     getData();
-  }, [stockCode]);
+  }, [percentTargetDate, stockCode]);
 
   return (
     <Container>
       {isLoaded && (
-        <StockChart
-          chartData={option}
-          style={{ height: '300px', width: '100%' }}
-        />
+        <>
+          종가 그래프
+          <StockChart
+            chartData={option}
+            style={{ height: '300px', width: '100%' }}
+          />
+        </>
       )}
       {isLoaded && (
-        <StockChart
-          chartData={optionPercent}
-          style={{ height: '300px', width: '100%' }}
-        />
+        <>
+          {percentTargetDate}일( 기준일 = 0% ) 대비 상승/하락 률 ( 그래프 클릭
+          날짜 변경 )
+          <StockChart
+            chartData={optionPercent}
+            onEvents={{
+              click: onChartClick,
+            }}
+            style={{ height: '300px', width: '100%' }}
+          />
+        </>
       )}
     </Container>
   );

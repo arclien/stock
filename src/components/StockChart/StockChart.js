@@ -35,7 +35,7 @@ const defaultOption = {
   series: [],
 };
 
-const StockChart = ({ chartData, style = { ...chartStyle } }) => {
+const StockChart = ({ chartData, onEvents, style = { ...chartStyle } }) => {
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({ ...defaultOption });
 
@@ -60,7 +60,13 @@ const StockChart = ({ chartData, style = { ...chartStyle } }) => {
     setLoaded(true);
   }, [chartData]);
 
-  return <>{isLoaded && <ReactEcharts style={style} option={option} />}</>;
+  return (
+    <>
+      {isLoaded && (
+        <ReactEcharts style={style} option={option} onEvents={onEvents} />
+      )}
+    </>
+  );
 };
 
 export default StockChart;
