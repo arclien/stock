@@ -13,8 +13,16 @@ export const fetchStockDataFromCsv = async (stockNumber) => {
   return readString(csv);
 };
 
-export const getRelativePercent = (target, value) => {
+export const getPercent = (target, value) => {
   return getRoundTwoPrecision(
     ((parseInt(value, 10) - parseInt(target, 10)) / parseInt(target, 10)) * 100
+  );
+};
+
+export const getRelative = (maxValue, minValue, value) => {
+  return getRoundTwoPrecision(
+    ((parseInt(value, 10) - parseInt(minValue, 10)) /
+      (parseInt(maxValue, 10) - parseInt(minValue, 10))) *
+      100
   );
 };
