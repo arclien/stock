@@ -1,6 +1,8 @@
 import { readString } from 'react-papaparse';
 
-export async function fetchStockDataFromCsv(stockNumber) {
+import { getRoundTwoPrecision } from 'utils/utils';
+
+export const fetchStockDataFromCsv = async (stockNumber) => {
   const response = await fetch(
     `${window.location.origin}/stock/data/${stockNumber}.csv`
   );
@@ -9,4 +11,10 @@ export async function fetchStockDataFromCsv(stockNumber) {
   const decoder = new TextDecoder('utf-8');
   const csv = decoder.decode(result.value); // the csv text
   return readString(csv);
-}
+};
+
+export const getRelativePercent = (target, value) => {
+  return getRoundTwoPrecision(
+    ((parseInt(value, 10) - parseInt(target, 10)) / parseInt(target, 10)) * 100
+  );
+};
