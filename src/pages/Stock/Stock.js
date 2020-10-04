@@ -71,6 +71,8 @@ const Stock = () => {
       // y축
       stockData.yAxis = {
         ...stockData.yAxis,
+        min: minValue,
+        max: maxValue,
       };
       stockDataPercent.yAxis = {
         ...stockDataPercent.yAxis,
@@ -146,6 +148,7 @@ const Stock = () => {
   };
   return (
     <Container>
+      <>시작 날짜가 휴일인 경우에는 그래프가 비어 보입니다.(TODO)</>
       <MaskingInput
         mask={[
           /[0-9]/,
@@ -167,10 +170,11 @@ const Stock = () => {
         label="시작 날짜"
         placeholder="8자리 숫자 입력(2015-01-02)"
       />
-
+      <br />
+      <br />
       {isLoaded && (
         <>
-          종가 그래프
+          종가 그래프( Y축 : 기간 내 최저가 ~ 최고가)
           <StockChart
             chartData={option}
             style={{ height: '300px', width: '100%' }}
@@ -192,8 +196,7 @@ const Stock = () => {
       )}
       {isLoaded && (
         <>
-          {percentTargetDate}일( 기준일 = 0% ) 대비 상승/하락 원 ( 그래프 클릭
-          날짜 변경 )
+          최저가(0%) / 최고가(100%) 대비 그래프
           <StockChart
             chartData={optionRelative}
             style={{ height: '300px', width: '100%' }}

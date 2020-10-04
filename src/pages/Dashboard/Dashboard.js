@@ -15,6 +15,9 @@ const Dashboard = () => {
   const [optionHigh, setOptionHigh] = useState({
     ...chartOption,
   });
+  const [optionExtraHigh, setOptionExtraHigh] = useState({
+    ...chartOption,
+  });
   const [optionLow, setOptionLow] = useState({
     ...chartOption,
   });
@@ -22,6 +25,7 @@ const Dashboard = () => {
   useEffect(() => {
     const stockData = { ...chartOption };
     const stockDataHigh = { ...chartOption };
+    const stockDataExtraHigh = { ...chartOption };
     const stockDataLow = { ...chartOption };
     const fetchAllData = [];
 
@@ -41,9 +45,12 @@ const Dashboard = () => {
         const mean = (Math.min(...priceList) + Math.max(...priceList)) / 2;
         const ref =
           // eslint-disable-next-line no-nested-ternary
-          mean > 200000
+          mean > 400000
+            ? stockDataExtraHigh
+            : // eslint-disable-next-line no-nested-ternary
+            mean > 200000
             ? stockDataHigh
-            : mean < 100000
+            : mean < 50000
             ? stockDataLow
             : stockData;
 
@@ -67,6 +74,7 @@ const Dashboard = () => {
       });
       setOption(stockData);
       setOptionHigh(stockDataHigh);
+      setOptionExtraHigh(stockDataExtraHigh);
       setOptionLow(stockDataLow);
       setLoaded(true);
     });
@@ -74,6 +82,7 @@ const Dashboard = () => {
 
   return (
     <Container>
+      {isLoaded && <StockChart chartData={optionExtraHigh} />}
       {isLoaded && <StockChart chartData={optionHigh} />}
       {isLoaded && <StockChart chartData={option} />}
       {isLoaded && <StockChart chartData={optionLow} />}
