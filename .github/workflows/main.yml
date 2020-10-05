@@ -5,8 +5,8 @@ name: Stock Crawler
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-    #- cron: "0 7 * * *" # 주기적으로 실행하기 위한 스케줄링 - cron 설정 16 - 9 = 7 시 (UTC적용)
+    # - cron: '*/5 * * * *' # 5분 단위로 크론 잡 생성
+    - cron: '0 7 * * *' # 주기적으로 실행하기 위한 스케줄링 - cron 설정 16 - 9 = 7 시 (UTC적용)
 
 jobs:
   build:
