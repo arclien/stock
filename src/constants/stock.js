@@ -23,6 +23,7 @@ export const stockList = [
   { name: '농심', code: '004370' },
   { name: '휴비스', code: '079980' },
   { name: '하이트진로', code: '000080' },
+  { name: 'LG디스플레이', code: '034220' },
   { name: '일진머터리얼즈', code: '020150' },
   { name: '에프에스티', code: '036810' },
   { name: '삼영엠텍', code: '054540' },
