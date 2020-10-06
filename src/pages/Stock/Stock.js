@@ -26,6 +26,7 @@ const Stock = () => {
     ...chartOption,
   });
   const [startDate, setStartDate] = useState('2020-01-02');
+  const [endDate, setEndDate] = useState('2020-10-06');
   const [percentTargetDate, setPercentTargetDate] = useState(startDate);
 
   useEffect(() => {
@@ -35,32 +36,34 @@ const Stock = () => {
       const stockDataRelative = { ...chartOption };
 
       const { data: stockAll } = await fetchStockDataFromCsv(stockCode);
-      const stockIndex = stockAll.findIndex((el) => el[0] === startDate);
 
-      const stock = [stockAll[0], ...stockAll.slice(stockIndex)];
-      const { length } = stock;
+      const startDateIndex = stockAll.findIndex((el) => el[0] === startDate);
+      const endDateIndex = stockAll.findIndex((el) => el[0] === endDate);
+      console.log(stockAll, endDateIndex);
+      const stock = [
+        stockAll[0],
+        ...stockAll.slice(startDateIndex, endDateIndex + 1),
+      ];
 
       const targetDateValue = stock.find((el) => el[0] === percentTargetDate)
         ? parseInt(stock.find((el) => el[0] === percentTargetDate)[4], 10)
-        : stock[1][4];
+        : stock[1]
+        ? stock[1][4]
+        : null;
 
       const minValue = parseInt(
-        Math.min(
-          ...stock.slice(1, length - 1).map((el) => parseInt(el[4], 10))
-        ),
+        Math.min(...stock.slice(1).map((el) => parseInt(el[4], 10))),
         10
       );
       const maxValue = parseInt(
-        Math.max(
-          ...stock.slice(1, length - 1).map((el) => parseInt(el[4], 10))
-        ),
+        Math.max(...stock.slice(1).map((el) => parseInt(el[4], 10))),
         10
       );
 
       // x축
       stockData.xAxis = {
         ...stockData.xAxis,
-        data: stock.slice(1, length - 1).map((el) => el[0]),
+        data: stock.slice(1).map((el) => el[0]),
       };
       stockDataPercent.xAxis = {
         ...stockData.xAxis,
@@ -89,7 +92,7 @@ const Stock = () => {
       stockData.series = [
         ...stockData.series,
         {
-          data: stock.slice(1, length - 1).map((el) => parseInt(el[4], 10)),
+          data: stock.slice(1).map((el) => parseInt(el[4], 10)),
           type: 'line',
           name: `${
             stockList.find((el) => el.code === stockCode).name
@@ -100,7 +103,7 @@ const Stock = () => {
         ...stockDataPercent.series,
         {
           data: stock
-            .slice(1, length - 1)
+            .slice(1)
             .map((el) => getPercent(targetDateValue, parseInt(el[4], 10))),
           type: 'line',
           name: `${
@@ -112,7 +115,7 @@ const Stock = () => {
         ...stockDataRelative.series,
         {
           data: stock
-            .slice(1, length - 1)
+            .slice(1)
             .map((el) => getRelative(maxValue, minValue, parseInt(el[4], 10))),
           type: 'line',
           name: `${
@@ -128,7 +131,7 @@ const Stock = () => {
     };
 
     getData();
-  }, [percentTargetDate, startDate, stockCode]);
+  }, [percentTargetDate, startDate, endDate, stockCode]);
 
   const onChartClick = (params) => {
     const { name } = params;
@@ -138,7 +141,12 @@ const Stock = () => {
 
   return (
     <Container>
-      <StockCalendar startDate={startDate} setStartDate={setStartDate} />
+      <StockCalendar
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
       {isLoaded && (
         <>
           종가 그래프( Y축 : 기간 내 최저가 ~ 최고가)

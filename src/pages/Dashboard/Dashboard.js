@@ -23,6 +23,7 @@ const Dashboard = () => {
     ...chartOption,
   });
   const [startDate, setStartDate] = useState('2020-01-02');
+  const [endDate, setEndDate] = useState('2020-10-06');
 
   useEffect(() => {
     const stockData = { ...chartOption };
@@ -39,13 +40,15 @@ const Dashboard = () => {
 
     Promise.all(fetchAllData).then((data) => {
       data.forEach(({ data: stockAll }, index) => {
-        const stockIndex = stockAll.findIndex((el) => el[0] === startDate);
-        const stock = [stockAll[0], ...stockAll.slice(stockIndex)];
+        const startDateIndex = stockAll.findIndex((el) => el[0] === startDate);
+        const endDateIndex = stockAll.findIndex((el) => el[0] === endDate);
 
-        const { length } = stock;
-        const priceList = stock
-          .slice(1, length - 1)
-          .map((el) => parseInt(el[4], 10));
+        const stock = [
+          stockAll[0],
+          ...stockAll.slice(startDateIndex, endDateIndex + 1),
+        ];
+
+        const priceList = stock.slice(1).map((el) => parseInt(el[4], 10));
 
         const mean = (Math.min(...priceList) + Math.max(...priceList)) / 2;
         const ref =
@@ -61,7 +64,7 @@ const Dashboard = () => {
 
         ref.xAxis = {
           ...ref.xAxis,
-          data: stock.slice(1, length - 1).map((el) => el[0]),
+          data: stock.slice(1).map((el) => el[0]),
         };
 
         ref.yAxis = {
@@ -71,7 +74,7 @@ const Dashboard = () => {
         ref.series = [
           ...ref.series,
           {
-            data: stock.slice(1, length - 1).map((el) => parseInt(el[4], 10)),
+            data: stock.slice(1).map((el) => parseInt(el[4], 10)),
             type: 'line',
             name: `${stockList[index].name}/${stockList[index].code}`,
           },
@@ -83,11 +86,16 @@ const Dashboard = () => {
       setOptionLow(stockDataLow);
       setLoaded(true);
     });
-  }, [startDate]);
+  }, [startDate, endDate]);
 
   return (
     <Container>
-      <StockCalendar startDate={startDate} setStartDate={setStartDate} />
+      <StockCalendar
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
       {isLoaded && <StockChart chartData={optionExtraHigh} />}
       {isLoaded && <StockChart chartData={optionHigh} />}
       {isLoaded && <StockChart chartData={option} />}
