@@ -17,3 +17,7 @@ export const OffsetContainer = styled.div`
 `;
 
 export const OffsetDate = styled(Radio)``;
+
+export const Cursor = styled.div`
+  cursor: pointer;
+`;

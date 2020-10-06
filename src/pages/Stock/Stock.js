@@ -39,7 +39,6 @@ const Stock = () => {
 
       const startDateIndex = stockAll.findIndex((el) => el[0] === startDate);
       const endDateIndex = stockAll.findIndex((el) => el[0] === endDate);
-      console.log(stockAll, endDateIndex);
       const stock = [
         stockAll[0],
         ...stockAll.slice(startDateIndex, endDateIndex + 1),

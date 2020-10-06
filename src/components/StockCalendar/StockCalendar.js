@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-import { chartStartDate } from 'constants/chart';
+import {
+  defaultOffset,
+  OffsetList,
+  chartStartDate,
+  CalendarFormat,
+} from 'constants/calendar';
+import dayjs from 'dayjs';
 
 import {
   DateInput,
   Container,
   OffsetContainer,
   OffsetDate,
+  Cursor,
 } from './StockCalendar.styles';
 
 const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
-  const [radioId, setRadioId] = React.useState(1);
-  const setRadio = (id) => setRadioId(id);
+  const [calendarOffset, setCalendarOffset] = useState(defaultOffset);
 
   const handleChange = (e) => {
     const target = e.target.name;
@@ -24,8 +30,35 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
       }
     }
   };
+
+  const handleCalendarOffset = (offset, offsetValue) => {
+    console.log(offset);
+    let date = dayjs(endDate, CalendarFormat);
+    date = date.subtract(offsetValue, 'month');
+    setCalendarOffset(offset);
+    setStartDate(dayjs(date).format(CalendarFormat));
+  };
+
+  const handleDateByOffset = (dir) => {
+    let _endDate = dayjs(endDate, CalendarFormat);
+    let _startDate = dayjs(startDate, CalendarFormat);
+    const offsetValue = OffsetList.find((el) => el.name === calendarOffset)
+      .value;
+    if (dir === 'next') {
+      _endDate = _endDate.add(offsetValue, 'month');
+      _startDate = _startDate.add(offsetValue, 'month');
+    } else if (dir === 'prev') {
+      _endDate = _endDate.subtract(offsetValue, 'month');
+      _startDate = _startDate.subtract(offsetValue, 'month');
+    }
+
+    setEndDate(dayjs(_endDate).format(CalendarFormat));
+    setStartDate(dayjs(_startDate).format(CalendarFormat));
+  };
+
   return (
     <Container>
+      <Cursor onClick={() => handleDateByOffset('prev')}>{'<'}</Cursor>
       <DateInput
         mask={[
           /[0-9]/,
@@ -67,11 +100,18 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
         onChange={handleChange}
         placeholder="8자리 숫자 입력(2015-01-02)"
       />
+      <Cursor onClick={() => handleDateByOffset('next')}>{'>'}</Cursor>
       <OffsetContainer>
-        <OffsetDate isChecked={radioId === 1} onClick={() => setRadio(1)} />
-        <span>옵션1</span>
-        <OffsetDate isChecked={radioId === 2} onClick={() => setRadio(2)} />
-        <span>옵션2</span>
+        {OffsetList &&
+          OffsetList.map((el) => (
+            <>
+              <OffsetDate
+                isChecked={calendarOffset === el.name}
+                onClick={() => handleCalendarOffset(el.name, el.value)}
+              />
+              <span>{el.name}</span>
+            </>
+          ))}
       </OffsetContainer>
     </Container>
   );
