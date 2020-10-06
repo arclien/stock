@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
-import { MaskingInput } from 'remember-ui';
 
 import { stockList } from 'constants/stock';
-import { chartOption, chartStartDate } from 'constants/chart';
+import { chartOption } from 'constants/chart';
 import { fetchStockDataFromCsv, getPercent, getRelative } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockTable from 'components/StockTable/StockTable';
+import StockCalendar from 'components/StockCalendar/StockCalendar';
 
 import { Container } from './Stock.styles';
 
@@ -132,47 +132,13 @@ const Stock = () => {
 
   const onChartClick = (params) => {
     const { name } = params;
+    console.log(name);
     setPercentTargetDate(name);
   };
 
-  const handleChange = (e) => {
-    const date = e.target.value;
-    if (date.length === 10) {
-      const newDate = new Date(date);
-      const today = new Date();
-      const _chartStartDate = new Date(chartStartDate);
-      if (+newDate >= +_chartStartDate && +newDate <= +today) {
-        setPercentTargetDate(date);
-        setStartDate(date);
-      }
-    }
-  };
   return (
     <Container>
-      <>시작 날짜가 휴일인 경우에는 그래프가 비어 보입니다.(TODO)</>
-      <MaskingInput
-        mask={[
-          /[0-9]/,
-          /[0-9]/,
-          /[0-9]/,
-          /[0-9]/,
-          '-',
-          /[0-9]/,
-          /[0-9]/,
-          '-',
-          /[0-9]/,
-          /[0-9]/,
-        ]}
-        type="text"
-        name="startDate"
-        value={startDate}
-        required
-        onChange={handleChange}
-        label="시작 날짜"
-        placeholder="8자리 숫자 입력(2015-01-02)"
-      />
-      <br />
-      <br />
+      <StockCalendar startDate={startDate} setStartDate={setStartDate} />
       {isLoaded && (
         <>
           종가 그래프( Y축 : 기간 내 최저가 ~ 최고가)
