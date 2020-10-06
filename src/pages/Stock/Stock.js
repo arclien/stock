@@ -6,6 +6,7 @@ import { stockList } from 'constants/stock';
 import { chartOption, chartStartDate } from 'constants/chart';
 import { fetchStockDataFromCsv, getPercent, getRelative } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
+import StockTable from 'components/StockTable/StockTable';
 
 import { Container } from './Stock.styles';
 
@@ -203,6 +204,7 @@ const Stock = () => {
           />
         </>
       )}
+      {isLoaded && <StockTable stockCode={stockCode} startDate={startDate} />}
     </Container>
   );
 };

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
+import { MaskingInput } from 'remember-ui';
 import { stockList } from 'constants/stock';
-import { chartOption } from 'constants/chart';
+import { chartOption, chartStartDate } from 'constants/chart';
 import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 
@@ -21,6 +22,7 @@ const Dashboard = () => {
   const [optionLow, setOptionLow] = useState({
     ...chartOption,
   });
+  const [startDate, setStartDate] = useState('2020-01-02');
 
   useEffect(() => {
     const stockData = { ...chartOption };
@@ -36,7 +38,10 @@ const Dashboard = () => {
       });
 
     Promise.all(fetchAllData).then((data) => {
-      data.forEach(({ data: stock }, index) => {
+      data.forEach(({ data: stockAll }, index) => {
+        const stockIndex = stockAll.findIndex((el) => el[0] === startDate);
+        const stock = [stockAll[0], ...stockAll.slice(stockIndex)];
+
         const { length } = stock;
         const priceList = stock
           .slice(1, length - 1)
@@ -78,10 +83,46 @@ const Dashboard = () => {
       setOptionLow(stockDataLow);
       setLoaded(true);
     });
-  }, []);
+  }, [startDate]);
+
+  const handleChange = (e) => {
+    const date = e.target.value;
+    if (date.length === 10) {
+      const newDate = new Date(date);
+      const today = new Date();
+      const _chartStartDate = new Date(chartStartDate);
+      if (+newDate >= +_chartStartDate && +newDate <= +today) {
+        setStartDate(date);
+      }
+    }
+  };
 
   return (
     <Container>
+      <>시작 날짜가 휴일인 경우에는 그래프가 비어 보입니다.(TODO)</>
+      <MaskingInput
+        mask={[
+          /[0-9]/,
+          /[0-9]/,
+          /[0-9]/,
+          /[0-9]/,
+          '-',
+          /[0-9]/,
+          /[0-9]/,
+          '-',
+          /[0-9]/,
+          /[0-9]/,
+        ]}
+        type="text"
+        name="startDate"
+        value={startDate}
+        required
+        onChange={handleChange}
+        label="시작 날짜"
+        placeholder="8자리 숫자 입력(2015-01-02)"
+      />
+      <br />
+      <br />
       {isLoaded && <StockChart chartData={optionExtraHigh} />}
       {isLoaded && <StockChart chartData={optionHigh} />}
       {isLoaded && <StockChart chartData={option} />}
