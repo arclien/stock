@@ -6,7 +6,7 @@ import {
   CalendarFormat,
 } from 'constants/calendar';
 import dayjs from 'dayjs';
-import { isWeekend, getAdjustDateToWeekDay } from 'utils/day';
+import { isWeekend, getAdjustDateToWeekDay, getTodayDate } from 'utils/day';
 
 import {
   DateInput,
@@ -50,9 +50,18 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
     if (dir === 'next') {
       _endDate = _endDate.add(offsetValue, 'month');
       _startDate = _startDate.add(offsetValue, 'month');
+      if (dayjs(_endDate).isAfter(getTodayDate())) {
+        alert('오늘 이후의 날짜는 선택할 수 없습니다.');
+        return;
+      }
     } else if (dir === 'prev') {
       _endDate = _endDate.subtract(offsetValue, 'month');
       _startDate = _startDate.subtract(offsetValue, 'month');
+
+      if (dayjs(_startDate).isBefore(chartStartDate)) {
+        alert(`${chartStartDate} 이전의 날짜는 선택할 수 없습니다.`);
+        return;
+      }
     }
 
     if (isWeekend(_endDate)) {
