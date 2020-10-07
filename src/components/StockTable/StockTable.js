@@ -22,7 +22,7 @@ const StockTable = ({ stockCode, startDate }) => {
         });
     };
     fetchData();
-  }, [stockCode, xml]);
+  }, [stockCode]);
 
   return <>{stock && <div>{stock}</div>}</>;
 };

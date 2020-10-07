@@ -6,6 +6,7 @@ import {
   CalendarFormat,
 } from 'constants/calendar';
 import dayjs from 'dayjs';
+import { isWeekend, getAdjustDateToWeekDay } from 'utils/day';
 
 import {
   DateInput,
@@ -32,10 +33,12 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
   };
 
   const handleCalendarOffset = (offset, offsetValue) => {
-    console.log(offset);
     let date = dayjs(endDate, CalendarFormat);
     date = date.subtract(offsetValue, 'month');
     setCalendarOffset(offset);
+    if (isWeekend(date)) {
+      date = getAdjustDateToWeekDay(date);
+    }
     setStartDate(dayjs(date).format(CalendarFormat));
   };
 
@@ -52,6 +55,12 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
       _startDate = _startDate.subtract(offsetValue, 'month');
     }
 
+    if (isWeekend(_endDate)) {
+      _endDate = getAdjustDateToWeekDay(_endDate);
+    }
+    if (isWeekend(_startDate)) {
+      _startDate = getAdjustDateToWeekDay(_startDate);
+    }
     setEndDate(dayjs(_endDate).format(CalendarFormat));
     setStartDate(dayjs(_startDate).format(CalendarFormat));
   };

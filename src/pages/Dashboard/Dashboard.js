@@ -5,6 +5,9 @@ import { chartOption } from 'constants/chart';
 import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
+import { getTodayDate } from 'utils/day';
+import dayjs from 'dayjs';
+import { CalendarFormat } from 'constants/calendar';
 
 import { Container } from './Dashboard.styles';
 
@@ -23,8 +26,8 @@ const Dashboard = () => {
     ...chartOption,
   });
   const [startDate, setStartDate] = useState('2020-01-02');
-  const [endDate, setEndDate] = useState('2020-10-06');
-
+  const [endDate, setEndDate] = useState(getTodayDate());
+  console.log(getTodayDate());
   useEffect(() => {
     const stockData = { ...chartOption };
     const stockDataHigh = { ...chartOption };
@@ -40,8 +43,31 @@ const Dashboard = () => {
 
     Promise.all(fetchAllData).then((data) => {
       data.forEach(({ data: stockAll }, index) => {
-        const startDateIndex = stockAll.findIndex((el) => el[0] === startDate);
-        const endDateIndex = stockAll.findIndex((el) => el[0] === endDate);
+        let startDateIndex;
+        let _index = 0;
+        while (
+          !startDateIndex ||
+          (startDateIndex < 0 && _index++ <= stockAll.length)
+        ) {
+          startDateIndex = stockAll.findIndex(
+            (el) =>
+              el[0] ===
+              dayjs(startDate).subtract(_index, 'day').format(CalendarFormat)
+          );
+        }
+
+        let endDateIndex;
+        _index = 0;
+        while (
+          !endDateIndex ||
+          (endDateIndex < 0 && _index++ <= stockAll.length)
+        ) {
+          endDateIndex = stockAll.findIndex(
+            (el) =>
+              el[0] ===
+              dayjs(endDate).subtract(_index, 'day').format(CalendarFormat)
+          );
+        }
 
         const stock = [
           stockAll[0],

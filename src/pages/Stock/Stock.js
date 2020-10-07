@@ -7,6 +7,9 @@ import { fetchStockDataFromCsv, getPercent, getRelative } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockTable from 'components/StockTable/StockTable';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
+import { getTodayDate } from 'utils/day';
+import dayjs from 'dayjs';
+import { CalendarFormat } from 'constants/calendar';
 
 import { Container } from './Stock.styles';
 
@@ -26,7 +29,7 @@ const Stock = () => {
     ...chartOption,
   });
   const [startDate, setStartDate] = useState('2020-01-02');
-  const [endDate, setEndDate] = useState('2020-10-06');
+  const [endDate, setEndDate] = useState(getTodayDate());
   const [percentTargetDate, setPercentTargetDate] = useState(startDate);
 
   useEffect(() => {
@@ -37,12 +40,37 @@ const Stock = () => {
 
       const { data: stockAll } = await fetchStockDataFromCsv(stockCode);
 
-      const startDateIndex = stockAll.findIndex((el) => el[0] === startDate);
-      const endDateIndex = stockAll.findIndex((el) => el[0] === endDate);
+      let startDateIndex;
+      let index = 0;
+      while (
+        !startDateIndex ||
+        (startDateIndex < 0 && index++ <= stockAll.length)
+      ) {
+        startDateIndex = stockAll.findIndex(
+          (el) =>
+            el[0] ===
+            dayjs(startDate).subtract(index, 'day').format(CalendarFormat)
+        );
+      }
+
+      let endDateIndex;
+      index = 0;
+      while (
+        !endDateIndex ||
+        (endDateIndex < 0 && index++ <= stockAll.length)
+      ) {
+        endDateIndex = stockAll.findIndex(
+          (el) =>
+            el[0] ===
+            dayjs(endDate).subtract(index, 'day').format(CalendarFormat)
+        );
+      }
+
       const stock = [
         stockAll[0],
         ...stockAll.slice(startDateIndex, endDateIndex + 1),
       ];
+      // console.log(startDateIndex, endDateIndex);
 
       const targetDateValue = stock.find((el) => el[0] === percentTargetDate)
         ? parseInt(stock.find((el) => el[0] === percentTargetDate)[4], 10)
