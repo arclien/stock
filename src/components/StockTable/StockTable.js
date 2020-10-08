@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-
 import axios from 'axios';
 import XMLParser from 'react-xml-parser';
+
 const StockTable = ({ stockCode, startDate }) => {
   const [stock, setStock] = useState('');
 
-  let xml = new XMLParser();
   useEffect(() => {
     const fetchData = async () => {
       await axios
@@ -16,8 +15,8 @@ const StockTable = ({ stockCode, startDate }) => {
           }
         )
         .then((res) => {
+          const xml = new XMLParser();
           const { children } = xml.parseFromString(res.data);
-          console.log(children);
           setStock(JSON.stringify(children));
         });
     };

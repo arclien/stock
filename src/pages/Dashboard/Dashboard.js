@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 
 import { stockList } from 'constants/stock';
 import { chartOption } from 'constants/chart';
@@ -6,7 +7,6 @@ import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
-import dayjs from 'dayjs';
 import { CalendarFormat } from 'constants/calendar';
 
 import { Container } from './Dashboard.styles';
@@ -27,7 +27,7 @@ const Dashboard = () => {
   });
   const [startDate, setStartDate] = useState('2020-01-02');
   const [endDate, setEndDate] = useState(getTodayDate());
-  console.log(getTodayDate());
+
   useEffect(() => {
     const stockData = { ...chartOption };
     const stockDataHigh = { ...chartOption };
@@ -47,9 +47,11 @@ const Dashboard = () => {
         let _index = 0;
         while (
           !startDateIndex ||
+          // eslint-disable-next-line no-plusplus
           (startDateIndex < 0 && _index++ <= stockAll.length)
         ) {
           startDateIndex = stockAll.findIndex(
+            // eslint-disable-next-line no-loop-func
             (el) =>
               el[0] ===
               dayjs(startDate).subtract(_index, 'day').format(CalendarFormat)
@@ -60,9 +62,11 @@ const Dashboard = () => {
         _index = 0;
         while (
           !endDateIndex ||
+          // eslint-disable-next-line no-plusplus
           (endDateIndex < 0 && _index++ <= stockAll.length)
         ) {
           endDateIndex = stockAll.findIndex(
+            // eslint-disable-next-line no-loop-func
             (el) =>
               el[0] ===
               dayjs(endDate).subtract(_index, 'day').format(CalendarFormat)

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 import { stockList } from 'constants/stock';
 import { chartOption } from 'constants/chart';
@@ -8,7 +9,6 @@ import StockChart from 'components/StockChart/StockChart';
 import StockTable from 'components/StockTable/StockTable';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
-import dayjs from 'dayjs';
 import { CalendarFormat } from 'constants/calendar';
 
 import { Container } from './Stock.styles';
@@ -44,9 +44,11 @@ const Stock = () => {
       let index = 0;
       while (
         !startDateIndex ||
+        // eslint-disable-next-line no-plusplus
         (startDateIndex < 0 && index++ <= stockAll.length)
       ) {
         startDateIndex = stockAll.findIndex(
+          // eslint-disable-next-line no-loop-func
           (el) =>
             el[0] ===
             dayjs(startDate).subtract(index, 'day').format(CalendarFormat)
@@ -57,9 +59,11 @@ const Stock = () => {
       index = 0;
       while (
         !endDateIndex ||
+        // eslint-disable-next-line no-plusplus
         (endDateIndex < 0 && index++ <= stockAll.length)
       ) {
         endDateIndex = stockAll.findIndex(
+          // eslint-disable-next-line no-loop-func
           (el) =>
             el[0] ===
             dayjs(endDate).subtract(index, 'day').format(CalendarFormat)
