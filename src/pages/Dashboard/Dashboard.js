@@ -43,35 +43,12 @@ const Dashboard = () => {
 
     Promise.all(fetchAllData).then((data) => {
       data.forEach(({ data: stockAll }, index) => {
-        let startDateIndex;
-        let _index = 0;
-        while (
-          !startDateIndex ||
-          // eslint-disable-next-line no-plusplus
-          (startDateIndex < 0 && _index++ <= stockAll.length)
-        ) {
-          startDateIndex = stockAll.findIndex(
-            // eslint-disable-next-line no-loop-func
-            (el) =>
-              el[0] ===
-              dayjs(startDate).subtract(_index, 'day').format(CalendarFormat)
-          );
-        }
-
-        let endDateIndex;
-        _index = 0;
-        while (
-          !endDateIndex ||
-          // eslint-disable-next-line no-plusplus
-          (endDateIndex < 0 && _index++ <= stockAll.length)
-        ) {
-          endDateIndex = stockAll.findIndex(
-            // eslint-disable-next-line no-loop-func
-            (el) =>
-              el[0] ===
-              dayjs(endDate).subtract(_index, 'day').format(CalendarFormat)
-          );
-        }
+        const startDateIndex = stockAll.findIndex(
+          (el) => el[0] === dayjs(startDate).format(CalendarFormat)
+        );
+        const endDateIndex = stockAll.findIndex(
+          (el) => el[0] === dayjs(endDate).format(CalendarFormat)
+        );
 
         const stock = [
           stockAll[0],

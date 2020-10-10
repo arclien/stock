@@ -4,11 +4,12 @@ import dayjs from 'dayjs';
 
 import { stockList } from 'constants/stock';
 import { chartOption } from 'constants/chart';
-import { fetchStockDataFromCsv, getPercent, getRelative } from 'services/stock';
+import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockTable from 'components/StockTable/StockTable';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
+import { getPercent, getRelative } from 'utils/chart';
 import { CalendarFormat } from 'constants/calendar';
 
 import { Container } from './Stock.styles';
