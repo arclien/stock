@@ -4,7 +4,7 @@
 
 ## 링크 (Links)
 
-- [Trello 카드 링크](http://jira.dramancompany.com/browse/API-1)
+- [Trello 카드 링크](https://trello.com/c/W72e6iCE)
 
 ## 기타 사항 (Etc)
 
