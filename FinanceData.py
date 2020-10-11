@@ -1,4 +1,3 @@
-import constants
 import FinanceDataReader as fdr
 import os
 import csv
