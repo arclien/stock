@@ -7,6 +7,7 @@ from datetime import timedelta, datetime, date
 
 __DIR__ = "./public/data/"
 STOCK_LIST = "stock_list.csv"
+STOCK_LIST_HEADER = ["code","name","nation","user_id","created_at","updated_at","tag_list"]
 START_DATE = "2015-01-02"
 DATE_FORMAT = "%Y-%m-%d"
 
@@ -18,7 +19,7 @@ f = open(__DIR__ + STOCK_LIST, "r", encoding="utf-8", newline="")
 rdr = csv.reader(f)
 
 # stock_list csv를 새롭게 업데이트 하기 위한 list
-new_stock_list = [["code","name","nation","user_id","created_at","updated_at","tag_list"]]
+new_stock_list = [STOCK_LIST_HEADER]
 # 오늘 날짜로 updated_at 갱신하기 위해 오늘 날짜를 string 형태로 갖고있다
 today = date.today().strftime(DATE_FORMAT)
 

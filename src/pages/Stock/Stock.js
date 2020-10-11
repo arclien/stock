@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import dayjs from 'dayjs';
 
-import { stockList } from 'constants/stock';
 import { chartOption } from 'constants/chart';
 import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
@@ -14,7 +13,7 @@ import { CalendarFormat } from 'constants/calendar';
 
 import { Container } from './Stock.styles';
 
-const Stock = () => {
+const Stock = ({ stockList }) => {
   const {
     params: { code: stockCode },
   } = useRouteMatch();
@@ -91,6 +90,7 @@ const Stock = () => {
         Math.max(...stock.slice(1).map((el) => parseInt(el[4], 10))),
         10
       );
+      const currentStock = stockList.find((el) => el[0] === stockCode);
 
       // x축
       stockData.xAxis = {
@@ -126,9 +126,7 @@ const Stock = () => {
         {
           data: stock.slice(1).map((el) => parseInt(el[4], 10)),
           type: 'line',
-          name: `${
-            stockList.find((el) => el.code === stockCode).name
-          }/${stockCode}`,
+          name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
         },
       ];
       stockDataPercent.series = [
@@ -138,9 +136,7 @@ const Stock = () => {
             .slice(1)
             .map((el) => getPercent(targetDateValue, parseInt(el[4], 10))),
           type: 'line',
-          name: `${
-            stockList.find((el) => el.code === stockCode).name
-          }/${stockCode}`,
+          name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
         },
       ];
       stockDataRelative.series = [
@@ -150,9 +146,7 @@ const Stock = () => {
             .slice(1)
             .map((el) => getRelative(maxValue, minValue, parseInt(el[4], 10))),
           type: 'line',
-          name: `${
-            stockList.find((el) => el.code === stockCode).name
-          }/${stockCode}`,
+          name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
         },
       ];
 
@@ -163,7 +157,7 @@ const Stock = () => {
     };
 
     getData();
-  }, [percentTargetDate, startDate, endDate, stockCode]);
+  }, [percentTargetDate, startDate, endDate, stockCode, stockList]);
 
   const onChartClick = (params) => {
     const { name } = params;
@@ -183,6 +177,7 @@ const Stock = () => {
         <>
           종가 그래프( Y축 : 기간 내 최저가 ~ 최고가)
           <StockChart
+            stockList={stockList}
             chartData={option}
             style={{ height: '300px', width: '100%' }}
           />
@@ -193,6 +188,7 @@ const Stock = () => {
           {percentTargetDate}일( 기준일 = 0% ) 대비 상승/하락 률 ( 그래프 클릭
           날짜 변경 )
           <StockChart
+            stockList={stockList}
             chartData={optionPercent}
             onEvents={{
               click: onChartClick,
@@ -205,6 +201,7 @@ const Stock = () => {
         <>
           최저가(0%) / 최고가(100%) 대비 그래프
           <StockChart
+            stockList={stockList}
             chartData={optionRelative}
             style={{ height: '300px', width: '100%' }}
           />

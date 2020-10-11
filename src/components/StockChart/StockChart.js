@@ -2,40 +2,44 @@ import React, { useEffect, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 
 import { chartStyle } from 'constants/chart';
-import { stockList } from 'constants/stock';
 
-const defaultOption = {
-  legend: {
-    data: stockList.map((el) => `${el.name}/${el.code}`),
-  },
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'cross',
-      animation: false,
+const StockChart = ({
+  chartData,
+  onEvents,
+  stockList,
+  style = { ...chartStyle },
+}) => {
+  const defaultOption = {
+    legend: {
+      data: stockList.map((el) => `${el[1]}/${el[0]}`),
     },
-    // formatter: function (params) {
-    //   console.log(params);
-    //   return `날짜 : ${params[0].name} <br> 가격 : ${params[0].value} <br> 종목 :  ${params[0].seriesName}`;
-    // },
-  },
-  xAxis: {
-    type: 'category',
-    data: [],
-  },
-  yAxis: {
-    type: 'value',
-    axisLabel: {
-      formatter: '{value} 원',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'cross',
+        animation: false,
+      },
+      // formatter: function (params) {
+      //   console.log(params);
+      //   return `날짜 : ${params[0].name} <br> 가격 : ${params[0].value} <br> 종목 :  ${params[0].seriesName}`;
+      // },
     },
-    // min: 0,
-    // max: 0,
-    // interval: 0,
-  },
-  series: [],
-};
+    xAxis: {
+      type: 'category',
+      data: [],
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: '{value} 원',
+      },
+      // min: 0,
+      // max: 0,
+      // interval: 0,
+    },
+    series: [],
+  };
 
-const StockChart = ({ chartData, onEvents, style = { ...chartStyle } }) => {
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({ ...defaultOption });
 
@@ -58,7 +62,14 @@ const StockChart = ({ chartData, onEvents, style = { ...chartStyle } }) => {
       series: [...defaultOption.series, ...chartData.series],
     });
     setLoaded(true);
-  }, [chartData]);
+  }, [
+    chartData,
+    defaultOption.legend,
+    defaultOption.series,
+    defaultOption.tooltip,
+    defaultOption.xAxis,
+    defaultOption.yAxis,
+  ]);
 
   return (
     <>

@@ -1,12 +1,11 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { stockList } from 'constants/stock';
 import Routes from 'routers//routes';
 
 import { Container, StockList, StockItem, StockText } from './Navbar.styles';
 
-const NavBar = () => {
+const NavBar = ({ stockList }) => {
   const { pathname } = useLocation();
   const { stock, root } = Routes;
 
@@ -20,9 +19,9 @@ const NavBar = () => {
         </StockItem>
         {stockList &&
           stockList.map((el) => (
-            <StockItem key={el.code} to={`${stock.url}${el.code}`}>
-              <StockText active={pathname === `${stock.url}${el.code}`}>
-                {`${el.name} (${el.code})`}
+            <StockItem key={el[0]} to={`${stock.url}${el[0]}`}>
+              <StockText active={pathname === `${stock.url}${el[0]}`}>
+                {`${el[1]} (${el[0]})`}
               </StockText>
             </StockItem>
           ))}

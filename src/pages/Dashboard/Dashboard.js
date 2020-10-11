@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
-import { stockList } from 'constants/stock';
 import { chartOption } from 'constants/chart';
 import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
@@ -11,7 +10,7 @@ import { CalendarFormat } from 'constants/calendar';
 
 import { Container } from './Dashboard.styles';
 
-const Dashboard = () => {
+const Dashboard = ({ stockList }) => {
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({
     ...chartOption,
@@ -36,7 +35,7 @@ const Dashboard = () => {
     const fetchAllData = [];
 
     stockList
-      .map((el) => el.code)
+      .map((el) => el[0])
       .forEach(async (number) => {
         fetchAllData.push(fetchStockDataFromCsv(number));
       });
@@ -83,7 +82,7 @@ const Dashboard = () => {
           {
             data: stock.slice(1).map((el) => parseInt(el[4], 10)),
             type: 'line',
-            name: `${stockList[index].name}/${stockList[index].code}`,
+            name: `${stockList[index][1]}/${stockList[index][0]}`,
           },
         ];
       });
@@ -93,7 +92,7 @@ const Dashboard = () => {
       setOptionLow(stockDataLow);
       setLoaded(true);
     });
-  }, [startDate, endDate]);
+  }, [startDate, endDate, stockList]);
 
   return (
     <Container>
@@ -103,10 +102,12 @@ const Dashboard = () => {
         endDate={endDate}
         setEndDate={setEndDate}
       />
-      {isLoaded && <StockChart chartData={optionExtraHigh} />}
-      {isLoaded && <StockChart chartData={optionHigh} />}
-      {isLoaded && <StockChart chartData={option} />}
-      {isLoaded && <StockChart chartData={optionLow} />}
+      {isLoaded && (
+        <StockChart stockList={stockList} chartData={optionExtraHigh} />
+      )}
+      {isLoaded && <StockChart stockList={stockList} chartData={optionHigh} />}
+      {isLoaded && <StockChart stockList={stockList} chartData={option} />}
+      {isLoaded && <StockChart stockList={stockList} chartData={optionLow} />}
     </Container>
   );
 };

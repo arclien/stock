@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Redirect, Switch } from 'react-router-dom';
 import { GlobalTheme } from 'remember-ui';
 
@@ -7,23 +7,32 @@ import CommonRoute from 'routers/CommonRoute';
 import NavBar from 'components/NavBar/NavBar';
 import Stock from 'pages/Stock/Stock';
 import Dashboard from 'pages/Dashboard/Dashboard';
+import { fetchStockListFromCsv } from 'services/stock';
 
 import { AppBody } from './App.styles';
 
 function App() {
   const { root, stock } = Routes;
+  const [stockList, setStockList] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await fetchStockListFromCsv();
+      setStockList(data.slice(1));
+    })();
+  }, []);
 
   return (
     <BrowserRouter>
       <AppBody>
         <GlobalTheme />
-        <NavBar />
+        <NavBar stockList={stockList} />
         <Switch>
           <CommonRoute path={stock.path}>
-            <Stock />
+            <Stock stockList={stockList} />
           </CommonRoute>
           <CommonRoute path={root.path}>
-            <Dashboard />
+            <Dashboard stockList={stockList} />
           </CommonRoute>
           <Redirect to={root.path} />
         </Switch>
