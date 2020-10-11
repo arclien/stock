@@ -3,6 +3,7 @@ import os
 import csv
 import time
 from datetime import timedelta, datetime, date
+from pytz import timezone
 
 __DIR__ = "./public/data/"
 STOCK_LIST = "stock_list.csv"
@@ -12,7 +13,7 @@ DATE_FORMAT = "%Y-%m-%d"
 # stock_list csv를 새롭게 업데이트 하기 위한 list
 new_stock_list = [STOCK_LIST_HEADER]
 # 오늘 날짜로 updated_at 갱신하기 위해 오늘 날짜를 string 형태로 갖고있다
-TODAY = date.today().strftime(DATE_FORMAT)
+TODAY = datetime.now(timezone('Asia/Seoul')).strftime(DATE_FORMAT)
 
 # populate all date between two dates
 def daterange(start_date, end_date):
