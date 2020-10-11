@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
+import { useHistory } from 'react-router';
 import dayjs from 'dayjs';
 
+import Routes from 'routers/routes';
 import { chartOption } from 'constants/chart';
 import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
@@ -19,6 +21,9 @@ const Tag = ({ stockList }) => {
     params: { tag: tagName },
   } = useRouteMatch();
 
+  const history = useHistory();
+  const { root } = Routes;
+
   const [tagStockList, setTagStockList] = useState([]);
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({
@@ -28,7 +33,10 @@ const Tag = ({ stockList }) => {
   const [endDate, setEndDate] = useState(getTodayDate());
 
   useEffect(() => {
-    const _tagStockList = getStockListByTag(stockList, tagName) || [];
+    const _tagStockList = getStockListByTag(stockList, tagName);
+    if (stockList.length > 0 && _tagStockList.length === 0)
+      history.replace(root.path);
+
     setTagStockList(_tagStockList);
     const stockData = { ...chartOption };
     const fetchAllData = [];
@@ -91,7 +99,7 @@ const Tag = ({ stockList }) => {
       setOption(stockData);
       setLoaded(true);
     });
-  }, [startDate, endDate, stockList, tagName]);
+  }, [startDate, endDate, stockList, tagName, history, root.path]);
 
   return (
     <Container>
