@@ -83,11 +83,28 @@ const Stock = ({ stockList }) => {
         : null;
 
       const minValue = parseInt(
-        Math.min(...stock.slice(1).map((el) => parseInt(el[4], 10))),
+        Math.min(
+          ...stock
+            .slice(1)
+            .map((el) => {
+              if (el[4] !== '0') return parseInt(el[4], 10);
+              return null;
+            })
+            .filter((el) => el)
+        ),
         10
       );
+
       const maxValue = parseInt(
-        Math.max(...stock.slice(1).map((el) => parseInt(el[4], 10))),
+        Math.max(
+          ...stock
+            .slice(1)
+            .map((el) => {
+              if (el[4] !== '0') return parseInt(el[4], 10);
+              return null;
+            })
+            .filter((el) => el)
+        ),
         10
       );
       const currentStock = stockList.find((el) => el[0] === stockCode);
@@ -124,28 +141,39 @@ const Stock = ({ stockList }) => {
       stockData.series = [
         ...stockData.series,
         {
-          data: stock.slice(1).map((el) => parseInt(el[4], 10)),
+          data: stock.slice(1).map((el) => {
+            if (el[4] !== '0') return parseInt(el[4], 10);
+            return null;
+          }),
           type: 'line',
+          connectNulls: true,
           name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
         },
       ];
       stockDataPercent.series = [
         ...stockDataPercent.series,
         {
-          data: stock
-            .slice(1)
-            .map((el) => getPercent(targetDateValue, parseInt(el[4], 10))),
+          data: stock.slice(1).map((el) => {
+            if (el[4] !== '0')
+              return getPercent(targetDateValue, parseInt(el[4], 10));
+            return null;
+          }),
           type: 'line',
+          connectNulls: true,
           name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
         },
       ];
       stockDataRelative.series = [
         ...stockDataRelative.series,
         {
-          data: stock
-            .slice(1)
-            .map((el) => getRelative(maxValue, minValue, parseInt(el[4], 10))),
+          data: stock.slice(1).map((el) => {
+            if (el[4] !== '0') {
+              return getRelative(maxValue, minValue, parseInt(el[4], 10));
+            }
+            return null;
+          }),
           type: 'line',
+          connectNulls: true,
           name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
         },
       ];
@@ -157,11 +185,10 @@ const Stock = ({ stockList }) => {
     };
 
     getData();
-  }, [percentTargetDate, startDate, endDate, stockCode, stockList]);
+  }, [endDate, percentTargetDate, startDate, stockCode, stockList]);
 
   const onChartClick = (params) => {
     const { name } = params;
-    console.log(name);
     setPercentTargetDate(name);
   };
 

@@ -54,7 +54,13 @@ const Dashboard = ({ stockList }) => {
           ...stockAll.slice(startDateIndex, endDateIndex + 1),
         ];
 
-        const priceList = stock.slice(1).map((el) => parseInt(el[4], 10));
+        const priceList = stock
+          .slice(1)
+          .map((el) => {
+            if (el[4] !== '0') return parseInt(el[4], 10);
+            return null;
+          })
+          .filter((el) => el);
 
         const mean = (Math.min(...priceList) + Math.max(...priceList)) / 2;
         const ref =
@@ -80,8 +86,12 @@ const Dashboard = ({ stockList }) => {
         ref.series = [
           ...ref.series,
           {
-            data: stock.slice(1).map((el) => parseInt(el[4], 10)),
+            data: stock.slice(1).map((el) => {
+              if (el[4] !== '0') return parseInt(el[4], 10);
+              return null;
+            }),
             type: 'line',
+            connectNulls: true,
             name: `${stockList[index][1]}/${stockList[index][0]}`,
           },
         ];

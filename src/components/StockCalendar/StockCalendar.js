@@ -123,13 +123,13 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
       <OffsetContainer>
         {OffsetList &&
           OffsetList.map((el) => (
-            <>
+            <div key={el.value}>
               <OffsetDate
                 isChecked={calendarOffset === el.name}
                 onClick={() => handleCalendarOffset(el.name, el.value)}
               />
               <span>{el.name}</span>
-            </>
+            </div>
           ))}
       </OffsetContainer>
     </Container>
