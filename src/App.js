@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Redirect, Switch } from 'react-router-dom';
 import { GlobalTheme } from 'remember-ui';
 
-import Routes from 'routers//routes';
+import Routes from 'routers/routes';
 import CommonRoute from 'routers/CommonRoute';
 import NavBar from 'components/NavBar/NavBar';
 import Stock from 'pages/Stock/Stock';

@@ -3,7 +3,7 @@ import { useRouteMatch } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import dayjs from 'dayjs';
 
-import Routes from 'routers//routes';
+import Routes from 'routers/routes';
 import { chartOption } from 'constants/chart';
 import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
