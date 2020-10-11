@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
+import { useHistory } from 'react-router';
 import dayjs from 'dayjs';
 
+import Routes from 'routers//routes';
 import { chartOption } from 'constants/chart';
 import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
@@ -19,6 +21,9 @@ const Stock = ({ stockList }) => {
     params: { code: stockCode },
   } = useRouteMatch();
 
+  const history = useHistory();
+  const { root } = Routes;
+
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({
     ...chartOption,
@@ -33,6 +38,9 @@ const Stock = ({ stockList }) => {
 
   useEffect(() => {
     const getData = async () => {
+      const currentStock = stockList.find((el) => el[0] === stockCode);
+      if (!currentStock) history.replace(root.path);
+
       const stockData = { ...chartOption };
       const stockDataPercent = { ...chartOption };
 
@@ -83,7 +91,6 @@ const Stock = ({ stockList }) => {
         ),
         10
       );
-      const currentStock = stockList.find((el) => el[0] === stockCode);
 
       // x축
       stockData.xAxis = {
@@ -152,7 +159,15 @@ const Stock = ({ stockList }) => {
     };
 
     getData();
-  }, [endDate, percentTargetDate, startDate, stockCode, stockList]);
+  }, [
+    endDate,
+    history,
+    percentTargetDate,
+    root.path,
+    startDate,
+    stockCode,
+    stockList,
+  ]);
 
   const onChartClick = (params) => {
     const { name } = params;
