@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
 import { chartOption } from 'constants/chart';
+import { CalendarFormat } from 'constants/calendar';
+import { LOCALE } from 'constants/locale';
 import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
-import { CalendarFormat } from 'constants/calendar';
+import { getCurrency } from 'utils/chart';
 
 import { Container } from './Dashboard.styles';
 
@@ -24,6 +26,9 @@ const Dashboard = ({ stockList }) => {
   const [optionLow, setOptionLow] = useState({
     ...chartOption,
   });
+  const [optionUs, setOptionUs] = useState({
+    ...chartOption,
+  });
   const [startDate, setStartDate] = useState('2020-01-02');
   const [endDate, setEndDate] = useState(getTodayDate());
 
@@ -32,6 +37,7 @@ const Dashboard = ({ stockList }) => {
     const stockDataHigh = { ...chartOption };
     const stockDataExtraHigh = { ...chartOption };
     const stockDataLow = { ...chartOption };
+    const stockDataUs = { ...chartOption };
     const fetchAllData = [];
 
     stockList
@@ -42,6 +48,8 @@ const Dashboard = ({ stockList }) => {
 
     Promise.all(fetchAllData).then((data) => {
       data.forEach(({ data: stockAll }, index) => {
+        const currentStock = stockList[index];
+        const currency = (currentStock && currentStock[2]) || LOCALE.KO;
         const startDateIndex = stockAll.findIndex(
           (el) => el[0] === dayjs(startDate).format(CalendarFormat)
         );
@@ -65,7 +73,10 @@ const Dashboard = ({ stockList }) => {
         const mean = (Math.min(...priceList) + Math.max(...priceList)) / 2;
         const ref =
           // eslint-disable-next-line no-nested-ternary
-          mean > 400000
+          currency === LOCALE.US
+            ? stockDataUs
+            : // eslint-disable-next-line no-nested-ternary
+            mean > 400000
             ? stockDataExtraHigh
             : // eslint-disable-next-line no-nested-ternary
             mean > 200000
@@ -81,18 +92,29 @@ const Dashboard = ({ stockList }) => {
 
         ref.yAxis = {
           ...ref.yAxis,
+          axisLabel: {
+            formatter: `{value} ${getCurrency(currentStock)}`,
+          },
         };
 
         ref.series = [
           ...ref.series,
           {
             data: stock.slice(1).map((el) => {
-              if (el[4] !== '0') return parseInt(el[4], 10);
+              if (el[4] !== '0') {
+                if (currentStock && currentStock[2] === LOCALE.KO) {
+                  return parseInt(el[4], 10);
+                }
+                if (currentStock && currentStock[2] === LOCALE.US) {
+                  return parseFloat(el[4]);
+                }
+                return parseInt(el[4], 10);
+              }
               return null;
             }),
             type: 'line',
             connectNulls: true,
-            name: `${stockList[index][1]}/${stockList[index][0]}`,
+            name: `${currentStock[1]}/${currentStock[0]}`,
           },
         ];
       });
@@ -100,6 +122,7 @@ const Dashboard = ({ stockList }) => {
       setOptionHigh(stockDataHigh);
       setOptionExtraHigh(stockDataExtraHigh);
       setOptionLow(stockDataLow);
+      setOptionUs(stockDataUs);
       setLoaded(true);
     });
   }, [startDate, endDate, stockList]);
@@ -118,6 +141,7 @@ const Dashboard = ({ stockList }) => {
       {isLoaded && <StockChart stockList={stockList} chartData={optionHigh} />}
       {isLoaded && <StockChart stockList={stockList} chartData={option} />}
       {isLoaded && <StockChart stockList={stockList} chartData={optionLow} />}
+      {isLoaded && <StockChart stockList={stockList} chartData={optionUs} />}
     </Container>
   );
 };
