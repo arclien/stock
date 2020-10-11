@@ -3,13 +3,14 @@ import { useRouteMatch } from 'react-router-dom';
 import dayjs from 'dayjs';
 
 import { chartOption } from 'constants/chart';
+import { CalendarFormat } from 'constants/calendar';
+import { LOCALE } from 'constants/locale';
 import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
-import StockTable from 'components/StockTable/StockTable';
+// import StockTable from 'components/StockTable/StockTable';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
-import { getPercent, getRelative } from 'utils/chart';
-import { CalendarFormat } from 'constants/calendar';
+import { getCurrency, getPercent } from 'utils/chart';
 
 import { Container } from './Stock.styles';
 
@@ -25,9 +26,7 @@ const Stock = ({ stockList }) => {
   const [optionPercent, setOptionPercent] = useState({
     ...chartOption,
   });
-  const [optionRelative, setOptionRelative] = useState({
-    ...chartOption,
-  });
+
   const [startDate, setStartDate] = useState('2020-01-02');
   const [endDate, setEndDate] = useState(getTodayDate());
   const [percentTargetDate, setPercentTargetDate] = useState(startDate);
@@ -36,7 +35,6 @@ const Stock = ({ stockList }) => {
     const getData = async () => {
       const stockData = { ...chartOption };
       const stockDataPercent = { ...chartOption };
-      const stockDataRelative = { ...chartOption };
 
       const { data: stockAll } = await fetchStockDataFromCsv(stockCode);
 
@@ -76,6 +74,7 @@ const Stock = ({ stockList }) => {
       ];
       // console.log(startDateIndex, endDateIndex);
 
+      // eslint-disable-next-line no-nested-ternary
       const targetDateValue = stock.find((el) => el[0] === percentTargetDate)
         ? parseInt(stock.find((el) => el[0] === percentTargetDate)[4], 10)
         : stock[1]
@@ -117,15 +116,15 @@ const Stock = ({ stockList }) => {
       stockDataPercent.xAxis = {
         ...stockData.xAxis,
       };
-      stockDataRelative.xAxis = {
-        ...stockData.xAxis,
-      };
 
       // y축
       stockData.yAxis = {
         ...stockData.yAxis,
         min: minValue,
         max: maxValue,
+        axisLabel: {
+          formatter: `{value} ${getCurrency(currentStock)}`,
+        },
       };
       stockDataPercent.yAxis = {
         ...stockDataPercent.yAxis,
@@ -133,16 +132,21 @@ const Stock = ({ stockList }) => {
           formatter: '{value} %',
         },
       };
-      stockDataRelative.yAxis = {
-        ...stockDataPercent.yAxis,
-      };
 
       // series Data
       stockData.series = [
         ...stockData.series,
         {
           data: stock.slice(1).map((el) => {
-            if (el[4] !== '0') return parseInt(el[4], 10);
+            if (el[4] !== '0') {
+              if (currentStock && currentStock[2] === LOCALE.KO) {
+                return parseInt(el[4], 10);
+              }
+              if (currentStock && currentStock[2] === LOCALE.US) {
+                return parseFloat(el[4]);
+              }
+              return parseInt(el[4], 10);
+            }
             return null;
           }),
           type: 'line',
@@ -150,6 +154,7 @@ const Stock = ({ stockList }) => {
           name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
         },
       ];
+
       stockDataPercent.series = [
         ...stockDataPercent.series,
         {
@@ -163,24 +168,9 @@ const Stock = ({ stockList }) => {
           name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
         },
       ];
-      stockDataRelative.series = [
-        ...stockDataRelative.series,
-        {
-          data: stock.slice(1).map((el) => {
-            if (el[4] !== '0') {
-              return getRelative(maxValue, minValue, parseInt(el[4], 10));
-            }
-            return null;
-          }),
-          type: 'line',
-          connectNulls: true,
-          name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
-        },
-      ];
 
       setOption(stockData);
       setOptionPercent(stockDataPercent);
-      setOptionRelative(stockDataRelative);
       setLoaded(true);
     };
 
@@ -224,17 +214,8 @@ const Stock = ({ stockList }) => {
           />
         </>
       )}
-      {isLoaded && (
-        <>
-          최저가(0%) / 최고가(100%) 대비 그래프
-          <StockChart
-            stockList={stockList}
-            chartData={optionRelative}
-            style={{ height: '300px', width: '100%' }}
-          />
-        </>
-      )}
-      {isLoaded && <StockTable stockCode={stockCode} startDate={startDate} />}
+
+      {/* {isLoaded && <StockTable stockCode={stockCode} startDate={startDate} />} */}
     </Container>
   );
 };

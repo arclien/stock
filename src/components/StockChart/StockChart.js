@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 
 import { chartStyle } from 'constants/chart';
+import { CURRENCY } from 'constants/locale';
 
 const defaultOption = {
   legend: {
@@ -25,7 +26,7 @@ const defaultOption = {
   yAxis: {
     type: 'value',
     axisLabel: {
-      formatter: '{value} 원',
+      formatter: `{value} ${CURRENCY.KO}`,
     },
     // min: 0,
     // max: 0,
