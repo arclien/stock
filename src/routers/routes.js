@@ -10,7 +10,14 @@ const stock = {
   description: 'Stock Page',
 };
 
+const tag = {
+  path: '/stock/tag/:tag',
+  url: '/stock/tag/',
+  description: 'Tag Page',
+};
+
 export default {
   root,
   stock,
+  tag,
 };

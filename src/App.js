@@ -7,12 +7,13 @@ import CommonRoute from 'routers/CommonRoute';
 import NavBar from 'components/NavBar/NavBar';
 import Stock from 'pages/Stock/Stock';
 import Dashboard from 'pages/Dashboard/Dashboard';
+import Tag from 'pages/Tag/Tag';
 import { fetchStockListFromCsv } from 'services/stock';
 
 import { AppBody } from './App.styles';
 
 function App() {
-  const { root, stock } = Routes;
+  const { root, stock, tag } = Routes;
   const [stockList, setStockList] = useState([]);
 
   useEffect(() => {
@@ -30,6 +31,9 @@ function App() {
         <Switch>
           <CommonRoute path={stock.path}>
             <Stock stockList={stockList} />
+          </CommonRoute>
+          <CommonRoute path={tag.path}>
+            <Tag stockList={stockList} />
           </CommonRoute>
           <CommonRoute path={root.path}>
             <Dashboard stockList={stockList} />

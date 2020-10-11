@@ -38,41 +38,18 @@ const Stock = ({ stockList }) => {
 
       const { data: stockAll } = await fetchStockDataFromCsv(stockCode);
 
-      let startDateIndex;
-      let index = 0;
-      while (
-        !startDateIndex ||
-        // eslint-disable-next-line no-plusplus
-        (startDateIndex < 0 && index++ <= stockAll.length)
-      ) {
-        startDateIndex = stockAll.findIndex(
-          // eslint-disable-next-line no-loop-func
-          (el) =>
-            el[0] ===
-            dayjs(startDate).subtract(index, 'day').format(CalendarFormat)
-        );
-      }
+      const startDateIndex = stockAll.findIndex(
+        (el) => el[0] === dayjs(startDate).format(CalendarFormat)
+      );
 
-      let endDateIndex;
-      index = 0;
-      while (
-        !endDateIndex ||
-        // eslint-disable-next-line no-plusplus
-        (endDateIndex < 0 && index++ <= stockAll.length)
-      ) {
-        endDateIndex = stockAll.findIndex(
-          // eslint-disable-next-line no-loop-func
-          (el) =>
-            el[0] ===
-            dayjs(endDate).subtract(index, 'day').format(CalendarFormat)
-        );
-      }
+      const endDateIndex = stockAll.findIndex(
+        (el) => el[0] === dayjs(endDate).format(CalendarFormat)
+      );
 
       const stock = [
         stockAll[0],
         ...stockAll.slice(startDateIndex, endDateIndex + 1),
       ];
-      // console.log(startDateIndex, endDateIndex);
 
       // eslint-disable-next-line no-nested-ternary
       const targetDateValue = stock.find((el) => el[0] === percentTargetDate)
