@@ -19,7 +19,7 @@ function App() {
   useEffect(() => {
     (async () => {
       const { data } = await fetchStockListFromCsv();
-      setStockList(data.slice(1));
+      setStockList(data.slice(1).filter((el) => el.length > 1));
     })();
   }, []);
 
