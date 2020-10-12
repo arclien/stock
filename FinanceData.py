@@ -9,11 +9,15 @@ __DIR__ = "./public/data/"
 STOCK_LIST = "stock_list.csv"
 STOCK_LIST_HEADER = ["code","name","nation","user_id","created_at","updated_at","tag_list"]
 START_DATE = "2015-01-02"
+AUTO_CRAWLING_TIME = "16"
 DATE_FORMAT = "%Y-%m-%d"
 # stock_list csv를 새롭게 업데이트 하기 위한 list
 new_stock_list = [STOCK_LIST_HEADER]
 # 오늘 날짜로 updated_at 갱신하기 위해 오늘 날짜를 string 형태로 갖고있다
 TODAY = datetime.now(timezone('Asia/Seoul')).strftime(DATE_FORMAT)
+# 16시에 git action으로 자동으로 크롤링이 돌 때에만, stock_list.csv update_at을 올려주기 위해.
+# 그 외의 시간에 updated_at을 업데이트 하면, 오후 4시에 장이 마감 후 데이터 받을 수 없는 경우가 생긴다.( updated_at이 TODAY가 아닐 경우에만 stock data fetch 하기 떄문)
+CURRENT_TIME = datetime.now(timezone('Asia/Seoul')).strftime("%H")
 
 # populate all date between two dates
 def daterange(start_date, end_date):
@@ -48,22 +52,29 @@ for i, line in enumerate(rdr):
   if i == 0:
     continue
 
+  HAS_AUTO_CRAWLED = False 
   ###### START 각 종목에 대해 데이터 가져올 날짜 정의
-
+ 
   # 처음 추가된 종목은 created_at(line[4]) 정보가 없다.
   if not line[4]:
     start_date = START_DATE
-    # created_at, updated_at을 오늘 날짜로 업데이트
-    line[4] = line[5] = TODAY
+    if CURRENT_TIME == AUTO_CRAWLING_TIME:
+      # created_at, updated_at을 오늘 날짜로 업데이트
+      line[4] = line[5] = TODAY
+      HAS_AUTO_CRAWLED = True
+    else:
+      line[4] = TODAY
     new_stock_list.append(line)
   
   # 이전에 추가된 종목은, 처음 추가 될때 created_at을 업데이트 해주며, updated_at + 1에 해당하는 날짜를 받는다
   else:
     start_date = (datetime.strptime(line[5], DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
-    # updated_at을 오늘 날짜로 업데이트
-    line[5] = TODAY
+    if CURRENT_TIME == AUTO_CRAWLING_TIME:
+      # updated_at을 오늘 날짜로 업데이트
+      line[5] = TODAY
+      HAS_AUTO_CRAWLED = True
     new_stock_list.append(line)
-  
+    
   ###### END 각 종목에 대해 데이터 가져올 날짜 정의
 
 
@@ -73,9 +84,9 @@ for i, line in enumerate(rdr):
 
   ###### START 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
   csv_file = "{}/{}.csv".format(__DIR__, line[0])
-
+  # print(has_already_appended_today(csv_file))
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다 
-  if has_already_appended_today(csv_file) == True:
+  if HAS_AUTO_CRAWLED and has_already_appended_today(csv_file) == True:
     continue
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다   
 
