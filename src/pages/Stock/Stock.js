@@ -50,9 +50,20 @@ const Stock = ({ stockList }) => {
         (el) => el[0] === dayjs(startDate).format(CalendarFormat)
       );
 
-      const endDateIndex = stockAll.findIndex(
-        (el) => el[0] === dayjs(endDate).format(CalendarFormat)
-      );
+      let endDateIndex;
+      let index = 0;
+      while (
+        !endDateIndex ||
+        // eslint-disable-next-line no-plusplus
+        (endDateIndex < 0 && index++ <= stockAll.length)
+      ) {
+        endDateIndex = stockAll.findIndex(
+          // eslint-disable-next-line no-loop-func
+          (el) =>
+            el[0] ===
+            dayjs(endDate).subtract(index, 'day').format(CalendarFormat)
+        );
+      }
 
       const stock = [
         stockAll[0],
