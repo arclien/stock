@@ -52,7 +52,6 @@ for i, line in enumerate(rdr):
   if i == 0:
     continue
 
-  HAS_AUTO_CRAWLED = False 
   ###### START 각 종목에 대해 데이터 가져올 날짜 정의
  
   # 처음 추가된 종목은 created_at(line[4]) 정보가 없다.
@@ -61,7 +60,6 @@ for i, line in enumerate(rdr):
     if CURRENT_TIME == AUTO_CRAWLING_TIME:
       # created_at, updated_at을 오늘 날짜로 업데이트
       line[4] = line[5] = TODAY
-      HAS_AUTO_CRAWLED = True
     else:
       line[4] = TODAY
     new_stock_list.append(line)
@@ -72,7 +70,6 @@ for i, line in enumerate(rdr):
     if CURRENT_TIME == AUTO_CRAWLING_TIME:
       # updated_at을 오늘 날짜로 업데이트
       line[5] = TODAY
-      HAS_AUTO_CRAWLED = True
     new_stock_list.append(line)
     
   ###### END 각 종목에 대해 데이터 가져올 날짜 정의
@@ -86,7 +83,7 @@ for i, line in enumerate(rdr):
   csv_file = "{}/{}.csv".format(__DIR__, line[0])
   # print(has_already_appended_today(csv_file))
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다 
-  if HAS_AUTO_CRAWLED and has_already_appended_today(csv_file) == True:
+  if has_already_appended_today(csv_file) == True:
     continue
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다   
 
