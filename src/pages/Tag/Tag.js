@@ -11,7 +11,7 @@ import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
-import { getCurrency } from 'utils/chart';
+import { getCurrency, getPercent } from 'utils/chart';
 import { getStockListByTag } from 'utils/tag';
 
 import { Container } from './Tag.styles';
@@ -29,8 +29,16 @@ const Tag = ({ stockList }) => {
   const [option, setOption] = useState({
     ...chartOption,
   });
+  const [optionUs, setOptionUs] = useState({
+    ...chartOption,
+  });
+  const [optionPercent, setOptionPercent] = useState({
+    ...chartOption,
+  });
+
   const [startDate, setStartDate] = useState('2020-01-02');
   const [endDate, setEndDate] = useState(getTodayDate());
+  const [percentTargetDate, setPercentTargetDate] = useState(startDate);
 
   useEffect(() => {
     const _tagStockList = getStockListByTag(stockList, tagName);
@@ -39,6 +47,8 @@ const Tag = ({ stockList }) => {
 
     setTagStockList(_tagStockList);
     const stockData = { ...chartOption };
+    const stockDataUs = { ...chartOption };
+    const stockDataPercent = { ...chartOption };
     const fetchAllData = [];
 
     _tagStockList
@@ -50,7 +60,7 @@ const Tag = ({ stockList }) => {
     Promise.all(fetchAllData).then((data) => {
       data.forEach(({ data: stockAll }, index) => {
         const currentStock = _tagStockList[index];
-
+        const currency = (currentStock && currentStock[2]) || LOCALE.KO;
         const startDateIndex = stockAll.findIndex(
           (el) => el[0] === dayjs(startDate).format(CalendarFormat)
         );
@@ -65,20 +75,38 @@ const Tag = ({ stockList }) => {
           ...stockAll.slice(startDateIndex, endDateIndex + 1),
         ];
 
-        stockData.xAxis = {
-          ...stockData.xAxis,
+        // eslint-disable-next-line no-nested-ternary
+        const targetDateValue = stock.find((el) => el[0] === percentTargetDate)
+          ? parseInt(stock.find((el) => el[0] === percentTargetDate)[4], 10)
+          : stock[1]
+          ? stock[1][4]
+          : null;
+
+        const ref = currency === LOCALE.US ? stockDataUs : stockData;
+
+        ref.xAxis = {
+          ...ref.xAxis,
           data: stock.slice(1).map((el) => el[0]),
         };
+        stockDataPercent.xAxis = {
+          ...ref.xAxis,
+        };
 
-        stockData.yAxis = {
-          ...stockData.yAxis,
+        ref.yAxis = {
+          ...ref.yAxis,
           axisLabel: {
             formatter: `{value} ${getCurrency(currentStock)}`,
           },
         };
+        stockDataPercent.yAxis = {
+          ...stockDataPercent.yAxis,
+          axisLabel: {
+            formatter: '{value} %',
+          },
+        };
 
-        stockData.series = [
-          ...stockData.series,
+        ref.series = [
+          ...ref.series,
           {
             data: stock.slice(1).map((el) => {
               if (el[4] !== '0') {
@@ -97,11 +125,40 @@ const Tag = ({ stockList }) => {
             name: `${currentStock[1]}/${currentStock[0]}`,
           },
         ];
+
+        stockDataPercent.series = [
+          ...stockDataPercent.series,
+          {
+            data: stock.slice(1).map((el) => {
+              if (el[4] !== '0')
+                return getPercent(targetDateValue, parseInt(el[4], 10));
+              return null;
+            }),
+            type: 'line',
+            connectNulls: true,
+            name: `${currentStock[1]}/${currentStock[0]}`,
+          },
+        ];
       });
       setOption(stockData);
+      setOptionUs(stockDataUs);
+      setOptionPercent(stockDataPercent);
       setLoaded(true);
     });
-  }, [startDate, endDate, stockList, tagName, history, root.path]);
+  }, [
+    startDate,
+    endDate,
+    stockList,
+    tagName,
+    history,
+    root.path,
+    percentTargetDate,
+  ]);
+
+  const onChartClick = (params) => {
+    const { name } = params;
+    setPercentTargetDate(name);
+  };
 
   return (
     <Container>
@@ -112,6 +169,23 @@ const Tag = ({ stockList }) => {
         setEndDate={setEndDate}
       />
       {isLoaded && <StockChart stockList={tagStockList} chartData={option} />}
+
+      {isLoaded && tagStockList.find((el) => el[2] === LOCALE.US) && (
+        <StockChart stockList={tagStockList} chartData={optionUs} />
+      )}
+      {isLoaded && (
+        <>
+          {percentTargetDate}일( 기준일 = 0% ) 대비 상승/하락 률 ( 그래프 클릭
+          날짜 변경 )
+          <StockChart
+            stockList={tagStockList}
+            chartData={optionPercent}
+            onEvents={{
+              click: onChartClick,
+            }}
+          />
+        </>
+      )}
     </Container>
   );
 };

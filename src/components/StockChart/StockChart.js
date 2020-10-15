@@ -44,17 +44,9 @@ const StockChart = ({
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({ ...defaultOption });
   const [EchartsReact, setEchartsReact] = useState(null);
-  const [echartInstance, setEchartInstance] = useState(null);
-  useEffect(() => {
-    setEchartInstance(EchartsReact?.getEchartsInstance());
-  }, [EchartsReact]);
 
   useEffect(() => {
-    if (echartInstance) echartInstance.clear();
-  }, [chartData, echartInstance]);
-
-  useEffect(() => {
-    setOption({
+    const _option = {
       legend: {
         ...defaultOption.legend,
         data: stockList.map((el) => `${el[1]}/${el[0]}`),
@@ -71,9 +63,17 @@ const StockChart = ({
         ...chartData.yAxis,
       },
       series: [...defaultOption.series, ...chartData.series],
-    });
+    };
+    setOption(_option);
+
+    const instance = EchartsReact?.getEchartsInstance();
+    if (instance) {
+      instance.clear();
+      instance.setOption(_option);
+    }
+
     setLoaded(true);
-  }, [chartData, stockList]);
+  }, [EchartsReact, chartData, stockList]);
 
   return (
     <>
