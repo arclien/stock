@@ -50,26 +50,14 @@ const Stock = ({ stockList }) => {
         (el) => el[0] === dayjs(startDate).format(CalendarFormat)
       );
 
-      let endDateIndex;
-      let index = 0;
-      while (
-        !endDateIndex ||
-        // eslint-disable-next-line no-plusplus
-        (endDateIndex < 0 && index++ <= stockAll.length)
-      ) {
-        endDateIndex = stockAll.findIndex(
-          // eslint-disable-next-line no-loop-func
-          (el) =>
-            el[0] ===
-            dayjs(endDate).subtract(index, 'day').format(CalendarFormat)
-        );
-      }
-
+      let endDateIndex = stockAll.findIndex(
+        (el) => el[0] === dayjs(endDate).format(CalendarFormat)
+      );
+      endDateIndex = endDateIndex <= 0 ? stockAll.length - 1 : endDateIndex;
       const stock = [
         stockAll[0],
         ...stockAll.slice(startDateIndex, endDateIndex + 1),
       ];
-
       // eslint-disable-next-line no-nested-ternary
       const targetDateValue = stock.find((el) => el[0] === percentTargetDate)
         ? parseInt(stock.find((el) => el[0] === percentTargetDate)[4], 10)

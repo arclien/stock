@@ -43,6 +43,15 @@ const StockChart = ({
 }) => {
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({ ...defaultOption });
+  const [EchartsReact, setEchartsReact] = useState(null);
+  const [echartInstance, setEchartInstance] = useState(null);
+  useEffect(() => {
+    setEchartInstance(EchartsReact?.getEchartsInstance());
+  }, [EchartsReact]);
+
+  useEffect(() => {
+    if (echartInstance) echartInstance.clear();
+  }, [chartData, echartInstance]);
 
   useEffect(() => {
     setOption({
@@ -69,7 +78,14 @@ const StockChart = ({
   return (
     <>
       {isLoaded && (
-        <ReactEcharts style={style} option={option} onEvents={onEvents} />
+        <ReactEcharts
+          ref={(e) => {
+            setEchartsReact(e);
+          }}
+          style={style}
+          option={option}
+          onEvents={onEvents}
+        />
       )}
     </>
   );
