@@ -34,4 +34,4 @@ code,name,nation,user_id,created_at,updated_at,tag_list
 AAPL,APPLE,us,1,2020-10-11,2020-10-14,"IT, 핸드폰"
 TSLA,TESLA,us,1,2020-10-11,2020-10-14,전기차
 EEM,EEM,us,1,2020-10-11,2020-10-14,
-086390,유니테스트,ko,1,2020-10-15,,
+086390,유니테스트,ko,1,,,
