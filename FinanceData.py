@@ -81,7 +81,7 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, start_date):
   ###### END 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
 
 
-def calc_stock_volume(raw_csv_file, calc_csv_file, start_date):
+def calc_stock_volume(raw_csv_file, calc_csv_file):
   if os.path.exists(raw_csv_file):
     
     # 새로운 종목의 경우 파일 만들고, headaer 생성
@@ -99,13 +99,15 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, start_date):
       row_count = len(data)
     # 공휴일을 제외하고 VOLUME_CALC_LENGTH일 의 데이터를 가져오기 위해 csv에서 2배수로 데이터를 읽는다.
     df = pd.read_csv(raw_csv_file, names=["Date","Open","High","Low","Close","Volume","Change"], skiprows = row_count - VOLUME_CALC_LENGTH*2)
+    
     # 오늘 날짜를 제외
     df = df[:-1]
+    
     # 주식시장이 열리지 않는 날은 값이 0 이므로, 해당 값이 있을 경우 drop 하고, VOLUME_CALC_LENGTH 만큼의 최신 데이터를 가져온다.
     df = df[~(df[["Open","High","Low","Close","Volume"]] == 0).any(axis=1)].tail(VOLUME_CALC_LENGTH)
     
-    temp_row = ([start_date, df.describe().loc['mean']['Volume'], df.describe().loc['max']['Volume'], df.describe().loc['min']['Volume']])
-   
+    temp_row = ([TODAY, math.ceil(df.describe().loc['mean']['Volume']), math.ceil(df.describe().loc['max']['Volume']), math.ceil(df.describe().loc['min']['Volume'])])
+
     df_len = len(df)
     # dataframe 정렬 by volume
     df = df.sort_values(['Volume'],ascending=True)
@@ -113,13 +115,18 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, start_date):
     df.drop(df.tail( math.ceil(df_len * 0.05) ).index,  inplace = True)
     df.drop(df.head( math.ceil(df_len * 0.05) ).index,  inplace = True)
     # print(df.describe())
-    temp_row.append(df.describe().loc['mean']['Volume'])
-    # print(temp_row)
+    temp_row.append(math.ceil(df.describe().loc['mean']['Volume']))
 
     # 파일에 데이터 추가
     with open(calc_csv_file, "a") as csvfile:
       writer = csv.writer(csvfile)
       writer.writerow(temp_row)
+
+
+
+
+
+
 
 # 매일 정해진 시간에만 크롤링 하도록 한다. 개발 하면서 자꾸 크롤링을 해버려서 복잡해짐
 if CURRENT_TIME == AUTO_CRAWLING_TIME:
@@ -181,7 +188,7 @@ if CURRENT_TIME == AUTO_CRAWLING_TIME:
 
     fetch_and_generate_stock_csv(raw_csv_file, line[0], start_date)
 
-    calc_stock_volume(raw_csv_file, calc_csv_file, start_date)
+    calc_stock_volume(raw_csv_file, calc_csv_file)
     
   f.close()
 
