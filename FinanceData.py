@@ -28,7 +28,7 @@ CURRENT_TIME = datetime.now(timezone('Asia/Seoul')).strftime("%H")
 CRAWLING_RESULT_MSG = f'{datetime.now()}\n크롤러 결과============================================\n\n\n\n'
 
 # 슬랙 생성
-SLACK_TOKEN = 'xoxb-215950307813-1427910396197-7gDZcFVfOfJjC7g5lqTxsGjV'
+SLACK_TOKEN =  os.getenv('SLACK_BOT_TOKEN')
 SLACK_CHANNEL = 'noti_stock_volume_calculate'
 SLACK_SENDER_NAME = 'StockCrawler'
 slack = Slacker(token=SLACK_TOKEN)
@@ -133,9 +133,10 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code):
       writer = csv.writer(csvfile)
       writer.writerow(temp_row)
 
-    if df_today.iloc[0]['Volume'] < temp_row[2]:
+    if df_today.iloc[0]['Volume'] > temp_row[2]:
       return f'{stock_code} 최대 거래량 갱신 // Volume: {df_today.iloc[0]["Volume"]} // Price: {df_today.iloc[0]["Close"]}\n'
-
+    else:
+      return ''
     
 
 
