@@ -7,6 +7,7 @@ import csv
 import time
 from datetime import timedelta, datetime, date
 from pytz import timezone
+from slacker import Slacker
 
 __DIR__ = "./public/data/"
 __CALC_DIR__ = "./public/data/calculate/"
@@ -23,6 +24,16 @@ TODAY = datetime.now(timezone('Asia/Seoul')).strftime(DATE_FORMAT)
 # 16시에 git action으로 자동으로 크롤링이 돌 때에만, stock_list.csv update_at을 올려주기 위해.
 # 그 외의 시간에 updated_at을 업데이트 하면, 오후 4시에 장이 마감 후 데이터 받을 수 없는 경우가 생긴다.( updated_at이 TODAY가 아닐 경우에만 stock data fetch 하기 떄문)
 CURRENT_TIME = datetime.now(timezone('Asia/Seoul')).strftime("%H")
+
+CRAWLING_RESULT_MSG = f'{datetime.now()}\n크롤러 결과============================================\n\n\n\n'
+
+# 슬랙 생성
+SLACK_TOKEN = 'xoxb-215950307813-1427910396197-7gDZcFVfOfJjC7g5lqTxsGjV'
+SLACK_CHANNEL = 'noti_stock_volume_calculate'
+SLACK_SENDER_NAME = 'StockCrawler'
+slack = Slacker(token=SLACK_TOKEN)
+
+
 
 # populate all date between two dates
 def daterange(start_date, end_date):
@@ -81,7 +92,7 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, start_date):
   ###### END 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
 
 
-def calc_stock_volume(raw_csv_file, calc_csv_file):
+def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code):
   if os.path.exists(raw_csv_file):
     
     # 새로운 종목의 경우 파일 만들고, headaer 생성
@@ -99,7 +110,7 @@ def calc_stock_volume(raw_csv_file, calc_csv_file):
       row_count = len(data)
     # 공휴일을 제외하고 VOLUME_CALC_LENGTH일 의 데이터를 가져오기 위해 csv에서 2배수로 데이터를 읽는다.
     df = pd.read_csv(raw_csv_file, names=["Date","Open","High","Low","Close","Volume","Change"], skiprows = row_count - VOLUME_CALC_LENGTH*2)
-    
+    df_today = df.tail(1)
     # 오늘 날짜를 제외
     df = df[:-1]
     
@@ -122,6 +133,10 @@ def calc_stock_volume(raw_csv_file, calc_csv_file):
       writer = csv.writer(csvfile)
       writer.writerow(temp_row)
 
+    if df_today.iloc[0]['Volume'] < temp_row[2]:
+      return f'{stock_code} 최대 거래량 갱신 // Volume: {df_today.iloc[0]["Volume"]} // Price: {df_today.iloc[0]["Close"]}\n'
+
+    
 
 
 
@@ -188,8 +203,10 @@ if CURRENT_TIME == AUTO_CRAWLING_TIME:
 
     fetch_and_generate_stock_csv(raw_csv_file, line[0], start_date)
 
-    calc_stock_volume(raw_csv_file, calc_csv_file)
-    
+    CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, line[0])
+
+
+
   f.close()
 
   # stock_list csv를 새롭게 업데이트
@@ -197,3 +214,13 @@ if CURRENT_TIME == AUTO_CRAWLING_TIME:
     for item in new_stock_list:
       writer = csv.writer(file_write)
       writer.writerow(item)
+
+
+  
+  CRAWLING_RESULT_MSG += '====================================================='
+
+  slack.chat.post_message(
+            channel=SLACK_CHANNEL, 
+            username=SLACK_SENDER_NAME,
+            text=CRAWLING_RESULT_MSG
+          )
