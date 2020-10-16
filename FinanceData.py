@@ -220,8 +220,8 @@ if CURRENT_TIME == AUTO_CRAWLING_TIME:
   
   CRAWLING_RESULT_MSG += '====================================================='
 
-  slack.chat.post_message(
-            channel=SLACK_CHANNEL, 
-            username=SLACK_SENDER_NAME,
-            text=CRAWLING_RESULT_MSG
-          )
+  # slack.chat.post_message(
+  #           channel=SLACK_CHANNEL, 
+  #           username=SLACK_SENDER_NAME,
+  #           text=CRAWLING_RESULT_MSG
+  #         )
