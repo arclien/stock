@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import dayjs from 'dayjs';
 
 import { chartOption } from 'constants/chart';
 import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
-import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
 import { getCurrency } from 'utils/chart';
+import { StockContext } from 'context/StockContext';
 
 import { Container } from './Dashboard.styles';
 
-const Dashboard = ({ stockList }) => {
+const Dashboard = () => {
+  const {
+    state: { stockList },
+    actions: { getStockData },
+  } = useContext(StockContext);
+
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({
     ...chartOption,
@@ -43,11 +48,11 @@ const Dashboard = ({ stockList }) => {
     stockList
       .map((el) => el[0])
       .forEach(async (number) => {
-        fetchAllData.push(fetchStockDataFromCsv(number));
+        fetchAllData.push(getStockData(number));
       });
 
     Promise.all(fetchAllData).then((data) => {
-      data.forEach(({ data: stockAll }, index) => {
+      data.forEach((stockAll, index) => {
         const currentStock = stockList[index];
         const currency = (currentStock && currentStock[2]) || LOCALE.KO;
         const startDateIndex = stockAll.findIndex(
@@ -127,7 +132,7 @@ const Dashboard = ({ stockList }) => {
       setOptionUs(stockDataUs);
       setLoaded(true);
     });
-  }, [startDate, endDate, stockList]);
+  }, [startDate, endDate, stockList, getStockData]);
 
   return (
     <Container>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import dayjs from 'dayjs';
@@ -7,19 +7,22 @@ import Routes from 'routers/routes';
 import { chartOption } from 'constants/chart';
 import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
-import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
-// import StockTable from 'components/StockTable/StockTable';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
 import { getCurrency, getPercent } from 'utils/chart';
+import { StockContext } from 'context/StockContext';
 
 import { Container } from './Stock.styles';
 
-const Stock = ({ stockList }) => {
+const Stock = () => {
   const {
     params: { code: stockCode },
   } = useRouteMatch();
+  const {
+    state: { stockList },
+    actions: { getStockData },
+  } = useContext(StockContext);
 
   const history = useHistory();
   const { root } = Routes;
@@ -44,7 +47,7 @@ const Stock = ({ stockList }) => {
       const stockData = { ...chartOption };
       const stockDataPercent = { ...chartOption };
 
-      const { data: stockAll } = await fetchStockDataFromCsv(stockCode);
+      const stockAll = await getStockData(stockCode);
 
       const startDateIndex = stockAll.findIndex(
         (el) => el[0] === dayjs(startDate).format(CalendarFormat)
@@ -160,6 +163,7 @@ const Stock = ({ stockList }) => {
     getData();
   }, [
     endDate,
+    getStockData,
     history,
     percentTargetDate,
     root.path,
