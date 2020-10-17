@@ -58,16 +58,22 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, start_date):
   # start_date 기준으로 stock_code(종목코드)에 대한 데이터를 불러옴
   df_list = fdr.DataReader(stock_code, start_date)
 
+  if not CURRENT_TIME == AUTO_CRAWLING_TIME:
+    df_list = df_list[:-1]
+    
   with open(raw_csv_file, "a") as csvfile:
     writer = csv.writer(csvfile)
     # csv 파일 저장 로직
     if start_date == START_DATE:
       # 종목 코드에 해당하는 csv 파일 생성
-      # df_list.to_csv(raw_csv_file)
 
       # TODO n^2 퍼포먼스. 개선하기
       for single_date in daterange(datetime.strptime(START_DATE, DATE_FORMAT), datetime.strptime(TODAY, DATE_FORMAT)):
         _today = single_date.strftime(DATE_FORMAT)
+        if not CURRENT_TIME == AUTO_CRAWLING_TIME:
+          if _today == TODAY:
+            continue
+       
         has_data = False
         for item in df_list.reset_index().values.tolist():
           item[0] = item[0].strftime(DATE_FORMAT)
@@ -79,15 +85,16 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, start_date):
           writer.writerow([_today, 0,0,0,0,0,0])
       
     else:
-    # 기존 csv 파일에 append 하기
-      # 공휴일 등으로 주식시장 데이터가 없을 경우, 해당 날짜에 대한 row를 강제로 csv에 추가
-      if len(df_list) == 0:
-        writer.writerow([TODAY, 0,0,0,0,0,0])
-      # fetch 된 데이터가 있으면 해당 내용 append
-      else:
-        for item in df_list.reset_index().values.tolist():
-          item[0] = item[0].strftime(DATE_FORMAT)
-          writer.writerow(item)
+      if CURRENT_TIME == AUTO_CRAWLING_TIME:
+        # 기존 csv 파일에 append 하기
+        # 공휴일 등으로 주식시장 데이터가 없을 경우, 해당 날짜에 대한 row를 강제로 csv에 추가
+        if len(df_list) == 0:
+          writer.writerow([TODAY, 0,0,0,0,0,0])
+        # fetch 된 데이터가 있으면 해당 내용 append
+        else:
+          for item in df_list.reset_index().values.tolist():
+            item[0] = item[0].strftime(DATE_FORMAT)
+            writer.writerow(item)
   
   ###### END 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
 
@@ -134,7 +141,7 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code):
       writer.writerow(temp_row)
 
     if df_today.iloc[0]['Volume'] > temp_row[2]:
-      return f'{stock_code} 최대 거래량 갱신 // Volume: {df_today.iloc[0]["Volume"]} // Price: {df_today.iloc[0]["Close"]}\n'
+      return f'>{stock_code} 최대 거래량 갱신 // Volume: {df_today.iloc[0]["Volume"]} // Price: {df_today.iloc[0]["Close"]}\n'
     else:
       return ''
     
@@ -144,84 +151,82 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code):
 
 
 
-# 매일 정해진 시간에만 크롤링 하도록 한다. 개발 하면서 자꾸 크롤링을 해버려서 복잡해짐
-if CURRENT_TIME == AUTO_CRAWLING_TIME:
-    
-
-  # 폴더가 없으면 만든다
-  if os.path.exists(__DIR__) == False:
-    os.mkdir(__DIR__)
-  if os.path.exists(__CALC_DIR__) == False:
-    os.mkdir(__CALC_DIR__)
-
-  f = open(__DIR__ + STOCK_LIST, "r", encoding="utf-8", newline="")
-  rdr = csv.reader(f)
-
-  # stock_list(종목 리스트 및 해당 종목 페치 정보, 태그 정보).csv
-  for i, line in enumerate(rdr):
-    # 첫 줄(head) skip
-    if i == 0:
-      continue
-
-    ###### START 각 종목에 대해 데이터 가져올 날짜 정의
   
-    # 처음 추가된 종목은 created_at(line[4]) 정보가 없다.
-    if not line[4]:
-      start_date = START_DATE
-      if CURRENT_TIME == AUTO_CRAWLING_TIME:
-        # created_at, updated_at을 오늘 날짜로 업데이트
-        line[4] = line[5] = TODAY
-      else:
-        line[4] = TODAY
-      new_stock_list.append(line)
-    
-    # 이전에 추가된 종목은, 처음 추가 될때 created_at을 업데이트 해주며, updated_at + 1에 해당하는 날짜를 받는다
+
+# 폴더가 없으면 만든다
+if os.path.exists(__DIR__) == False:
+  os.mkdir(__DIR__)
+if os.path.exists(__CALC_DIR__) == False:
+  os.mkdir(__CALC_DIR__)
+
+f = open(__DIR__ + STOCK_LIST, "r", encoding="utf-8", newline="")
+rdr = csv.reader(f)
+
+# stock_list(종목 리스트 및 해당 종목 페치 정보, 태그 정보).csv
+for i, line in enumerate(rdr):
+  # 첫 줄(head) skip
+  if i == 0:
+    continue
+
+  ###### START 각 종목에 대해 데이터 가져올 날짜 정의
+
+  # 처음 추가된 종목은 created_at(line[4]) 정보가 없다.
+  if not line[4]:
+    start_date = START_DATE
+    if CURRENT_TIME == AUTO_CRAWLING_TIME:
+      # created_at, updated_at을 오늘 날짜로 업데이트
+      line[4] = line[5] = TODAY
     else:
-      if not line[5]:
-        start_date = TODAY
-      else:
-        start_date = (datetime.strptime(line[5], DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
-
-      if CURRENT_TIME == AUTO_CRAWLING_TIME:
-        # updated_at을 오늘 날짜로 업데이트
-        line[5] = TODAY
-      new_stock_list.append(line)
-      
-    ###### END 각 종목에 대해 데이터 가져올 날짜 정의
-
-
-
-
-
-
-    ###### START 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
-    raw_csv_file = "{}/{}.csv".format(__DIR__, line[0])
-    calc_csv_file = "{}/{}.csv".format(__CALC_DIR__, line[0])
-    # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다 
-    if has_already_appended_today(raw_csv_file) == True:
-      continue
-    # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다   
-
-    fetch_and_generate_stock_csv(raw_csv_file, line[0], start_date)
-
-    CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, line[0])
-
-
-
-  f.close()
-
-  # stock_list csv를 새롭게 업데이트
-  with open(__DIR__ + STOCK_LIST, "w", encoding="utf-8", newline="") as file_write: 
-    for item in new_stock_list:
-      writer = csv.writer(file_write)
-      writer.writerow(item)
-
-
+      line[4] = TODAY
+    new_stock_list.append(line)
   
-  CRAWLING_RESULT_MSG += '====================================================='
+  # 이전에 추가된 종목은, 처음 추가 될때 created_at을 업데이트 해주며, updated_at + 1에 해당하는 날짜를 받는다
+  else:
+    if not line[5]:
+      start_date = TODAY
+    else:
+      start_date = (datetime.strptime(line[5], DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
 
-  # slack.chat.post_message(
-  #           channel=SLACK_CHANNEL, 
-  #           username=SLACK_SENDER_NAME,
-  #           text=CRAWLING_RESULT_MSG
-  #         )
+    if CURRENT_TIME == AUTO_CRAWLING_TIME:
+      # updated_at을 오늘 날짜로 업데이트
+      line[5] = TODAY
+    new_stock_list.append(line)
+    
+  ###### END 각 종목에 대해 데이터 가져올 날짜 정의
+
+
+
+
+
+
+  ###### START 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
+  raw_csv_file = "{}/{}.csv".format(__DIR__, line[0])
+  calc_csv_file = "{}/{}.csv".format(__CALC_DIR__, line[0])
+  # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다 
+  if has_already_appended_today(raw_csv_file) == True:
+    continue
+  # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다   
+
+  fetch_and_generate_stock_csv(raw_csv_file, line[0], start_date)
+
+  CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, line[0])
+
+
+
+f.close()
+
+# stock_list csv를 새롭게 업데이트
+with open(__DIR__ + STOCK_LIST, "w", encoding="utf-8", newline="") as file_write: 
+  for item in new_stock_list:
+    writer = csv.writer(file_write)
+    writer.writerow(item)
+
+
+
+CRAWLING_RESULT_MSG += '====================================================='
+
+# slack.chat.post_message(
+#           channel=SLACK_CHANNEL, 
+#           username=SLACK_SENDER_NAME,
+#           text=CRAWLING_RESULT_MSG
+#         )
