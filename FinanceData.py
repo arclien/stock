@@ -209,7 +209,8 @@ for i, line in enumerate(rdr):
 
   fetch_and_generate_stock_csv(raw_csv_file, line[0], start_date)
 
-  CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, line[0])
+  if CURRENT_TIME == AUTO_CRAWLING_TIME:
+    CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, line[0])
 
 
 
@@ -224,9 +225,9 @@ with open(__DIR__ + STOCK_LIST, "w", encoding="utf-8", newline="") as file_write
 
 
 CRAWLING_RESULT_MSG += '====================================================='
-
-# slack.chat.post_message(
-#           channel=SLACK_CHANNEL, 
-#           username=SLACK_SENDER_NAME,
-#           text=CRAWLING_RESULT_MSG
-#         )
+if CURRENT_TIME == AUTO_CRAWLING_TIME:
+  slack.chat.post_message(
+            channel=SLACK_CHANNEL, 
+            username=SLACK_SENDER_NAME,
+            text=CRAWLING_RESULT_MSG
+          )
