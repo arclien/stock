@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import dayjs from 'dayjs';
@@ -7,19 +7,23 @@ import Routes from 'routers/routes';
 import { chartOption } from 'constants/chart';
 import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
-import { fetchStockDataFromCsv } from 'services/stock';
 import StockChart from 'components/StockChart/StockChart';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
 import { getCurrency, getPercent } from 'utils/chart';
 import { getStockListByTag } from 'utils/tag';
+import { StockContext } from 'context/StockContext';
 
 import { Container } from './Tag.styles';
 
-const Tag = ({ stockList }) => {
+const Tag = () => {
   const {
     params: { tag: tagName },
   } = useRouteMatch();
+  const {
+    state: { stockList },
+    actions: { getStockData },
+  } = useContext(StockContext);
 
   const history = useHistory();
   const { root } = Routes;
@@ -54,11 +58,11 @@ const Tag = ({ stockList }) => {
     _tagStockList
       .map((el) => el[0])
       .forEach(async (number) => {
-        fetchAllData.push(fetchStockDataFromCsv(number));
+        fetchAllData.push(getStockData(number));
       });
 
     Promise.all(fetchAllData).then((data) => {
-      data.forEach(({ data: stockAll }, index) => {
+      data.forEach((stockAll, index) => {
         const currentStock = _tagStockList[index];
         const currency = (currentStock && currentStock[2]) || LOCALE.KO;
         const startDateIndex = stockAll.findIndex(
@@ -153,6 +157,7 @@ const Tag = ({ stockList }) => {
     history,
     root.path,
     percentTargetDate,
+    getStockData,
   ]);
 
   const onChartClick = (params) => {

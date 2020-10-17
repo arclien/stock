@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import Routes from 'routers/routes';
+import { StockContext } from 'context/StockContext';
 
 import { Container, StockList, StockItem, StockText } from './Navbar.styles';
 
-const NavBar = ({ stockList }) => {
+const NavBar = () => {
   const { pathname } = useLocation();
   const { stock, tag, root } = Routes;
   const [tagList, setTagList] = useState([]);
+
+  const {
+    state: { stockList },
+  } = useContext(StockContext);
 
   useEffect(() => {
     const tags = new Set([
