@@ -25,7 +25,7 @@ TODAY = datetime.now(timezone('Asia/Seoul')).strftime(DATE_FORMAT)
 # 그 외의 시간에 updated_at을 업데이트 하면, 오후 4시에 장이 마감 후 데이터 받을 수 없는 경우가 생긴다.( updated_at이 TODAY가 아닐 경우에만 stock data fetch 하기 떄문)
 CURRENT_TIME = datetime.now(timezone('Asia/Seoul')).strftime("%H")
 
-CRAWLING_RESULT_MSG = f'{datetime.now()}\n크롤러 결과============================================\n\n\n\n'
+CRAWLING_RESULT_MSG = f'{datetime.now()}\n크롤러 결과============================================\n\n'
 
 # 슬랙 생성
 SLACK_TOKEN =  os.getenv('SLACK_BOT_TOKEN')
@@ -99,7 +99,7 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, start_date):
   ###### END 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
 
 
-def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code):
+def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
   if os.path.exists(raw_csv_file):
     
     # 새로운 종목의 경우 파일 만들고, headaer 생성
@@ -125,7 +125,8 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code):
     df = df[~(df[["Open","High","Low","Close","Volume"]] == 0).any(axis=1)].tail(VOLUME_CALC_LENGTH)
     
     temp_row = ([TODAY, math.ceil(df.describe().loc['mean']['Volume']), math.ceil(df.describe().loc['max']['Volume']), math.ceil(df.describe().loc['min']['Volume'])])
-
+    df_mean_last_three = math.ceil(df.tail(3).describe().loc['mean']['Volume'])
+    
     df_len = len(df)
     # dataframe 정렬 by volume
     df = df.sort_values(['Volume'],ascending=True)
@@ -140,12 +141,22 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code):
       writer = csv.writer(csvfile)
       writer.writerow(temp_row)
 
-    if df_today.iloc[0]['Volume'] > temp_row[2]:
-      return f'>{stock_code} 최대 거래량 갱신 // Volume: {df_today.iloc[0]["Volume"]} // Price: {df_today.iloc[0]["Close"]}\n'
-    else:
-      return ''
-    
 
+    alarm_message = ""
+    # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
+    if not df_today.iloc[0]['Volume'] == 0:
+      if df_mean_last_three > temp_row[1]:
+        alarm_message += f'> 최근 3일 평균 거래량 {df_mean_last_three} > 최근 {VOLUME_CALC_LENGTH}일 평균 거래량 {temp_row[1]}\n'
+      if df_mean_last_three > temp_row[4]:
+        alarm_message += f'> 최근 3일 평균 거래량 {df_mean_last_three} > 최근 {VOLUME_CALC_LENGTH}일 조정 평균 거래량 {temp_row[4]}\n'
+
+    if df_today.iloc[0]['Volume'] > temp_row[2]:
+      alarm_message += f'> 최근 {VOLUME_CALC_LENGTH}일 최대 거래량 갱신\n'
+    
+    if alarm_message:
+      return f'> {stock_name}: {stock_code}\n' + alarm_message + f'> {TODAY} 거래량: {df_today.iloc[0]["Volume"]} / 가격: {df_today.iloc[0]["Close"]}\n\n'
+    else:
+      return alarm_message
 
 
 
@@ -210,7 +221,7 @@ for i, line in enumerate(rdr):
   fetch_and_generate_stock_csv(raw_csv_file, line[0], start_date)
 
   if CURRENT_TIME == AUTO_CRAWLING_TIME:
-    CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, line[0])
+    CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, line[0], line[1])
 
 
 
