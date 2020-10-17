@@ -15,7 +15,7 @@ STOCK_LIST = "stock_list.csv"
 STOCK_LIST_HEADER = ["code","name","nation","user_id","created_at","updated_at","tag_list"]
 START_DATE = "2015-01-02"
 AUTO_CRAWLING_TIME = "16"
-VOLUME_CALC_LENGTH = 30
+VOLUME_CALC_LENGTH = [180,90,60,30]
 DATE_FORMAT = "%Y-%m-%d"
 # stock_list csv를 새롭게 업데이트 하기 위한 list
 new_stock_list = [STOCK_LIST_HEADER]
@@ -104,7 +104,7 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
     
     # 새로운 종목의 경우 파일 만들고, headaer 생성
     if os.path.exists(calc_csv_file) == False:
-      temp_row = ['date','mean','max','min','adjusted_mean']
+      temp_row = ['date','max_180','min_180','mean_180','adjusted_mean_180','max_90','min_90','mean_90','adjusted_mean_90','max_60','min_60','mean_60','adjusted_mean_60','max_30','min_30','mean_30','adjusted_mean_30']
       with open(calc_csv_file, "a") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(temp_row)
@@ -116,25 +116,49 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
       data = list(reader)
       row_count = len(data)
     # 공휴일을 제외하고 VOLUME_CALC_LENGTH일 의 데이터를 가져오기 위해 csv에서 2배수로 데이터를 읽는다.
-    df = pd.read_csv(raw_csv_file, names=["Date","Open","High","Low","Close","Volume","Change"], skiprows = row_count - VOLUME_CALC_LENGTH*2)
+    df = pd.read_csv(raw_csv_file, names=["Date","Open","High","Low","Close","Volume","Change"], skiprows = row_count - VOLUME_CALC_LENGTH[0]*2)
     df_today = df.tail(1)
     # 오늘 날짜를 제외
     df = df[:-1]
     
     # 주식시장이 열리지 않는 날은 값이 0 이므로, 해당 값이 있을 경우 drop 하고, VOLUME_CALC_LENGTH 만큼의 최신 데이터를 가져온다.
-    df = df[~(df[["Open","High","Low","Close","Volume"]] == 0).any(axis=1)].tail(VOLUME_CALC_LENGTH)
+    df = df[~(df[["Open","High","Low","Close","Volume"]] == 0).any(axis=1)]
     
-    temp_row = ([TODAY, math.ceil(df.describe().loc['mean']['Volume']), math.ceil(df.describe().loc['max']['Volume']), math.ceil(df.describe().loc['min']['Volume'])])
+    temp_row = ([TODAY])
+
     df_mean_last_three = math.ceil(df.tail(3).describe().loc['mean']['Volume'])
-    
-    df_len = len(df)
-    # dataframe 정렬 by volume
-    df = df.sort_values(['Volume'],ascending=True)
-    # volume 기준 상/하위 5% row 지움
-    df.drop(df.tail( math.ceil(df_len * 0.05) ).index,  inplace = True)
-    df.drop(df.head( math.ceil(df_len * 0.05) ).index,  inplace = True)
-    # print(df.describe())
-    temp_row.append(math.ceil(df.describe().loc['mean']['Volume']))
+
+    alarm_message = ""
+    for day in VOLUME_CALC_LENGTH:
+      df = df.tail(day)
+      
+      _max = math.ceil(df.describe().loc['max']['Volume'])
+      _mean = math.ceil(df.describe().loc['mean']['Volume'])
+      temp_row.append(_max)
+      temp_row.append(math.ceil(df.describe().loc['min']['Volume']))
+      temp_row.append(_mean)
+      
+      df_len = len(df)
+      # dataframe 정렬 by volume
+      df_sorted = df.sort_values(['Volume'],ascending=True)
+      # volume 기준 상/하위 5% row 지움
+      df_sorted.drop(df_sorted.tail( math.ceil(df_len * 0.05) ).index,  inplace = True)
+      df_sorted.drop(df_sorted.head( math.ceil(df_len * 0.05) ).index,  inplace = True)
+      # adjusted_mean
+      _adjusted_mean = math.ceil(df_sorted.describe().loc['mean']['Volume'])
+      temp_row.append(_adjusted_mean)
+
+      
+      # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
+      if not df_today.iloc[0]['Volume'] == 0:
+        if df_mean_last_three > temp_row[3]:
+          alarm_message += f'> 최근 {day}일 평균 거래량 {_mean} < 최근 3일 평균 거래량 {df_mean_last_three} \n'
+        if df_mean_last_three > temp_row[4]:
+          alarm_message += f'> 최근 {day}일 조정 평균 거래량 {_adjusted_mean} < 최근 3일 평균 거래량 {df_mean_last_three} \n'
+
+      if df_today.iloc[0]['Volume'] > _max:
+        alarm_message += f'> 최근 {day}일 최대 거래량 갱신\n'
+      
 
     # 파일에 데이터 추가
     with open(calc_csv_file, "a") as csvfile:
@@ -142,25 +166,10 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
       writer.writerow(temp_row)
 
 
-    alarm_message = ""
-    # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
-    if not df_today.iloc[0]['Volume'] == 0:
-      if df_mean_last_three > temp_row[1]:
-        alarm_message += f'> 최근 3일 평균 거래량 {df_mean_last_three} > 최근 {VOLUME_CALC_LENGTH}일 평균 거래량 {temp_row[1]}\n'
-      if df_mean_last_three > temp_row[4]:
-        alarm_message += f'> 최근 3일 평균 거래량 {df_mean_last_three} > 최근 {VOLUME_CALC_LENGTH}일 조정 평균 거래량 {temp_row[4]}\n'
-
-    if df_today.iloc[0]['Volume'] > temp_row[2]:
-      alarm_message += f'> 최근 {VOLUME_CALC_LENGTH}일 최대 거래량 갱신\n'
-    
     if alarm_message:
       return f'> {stock_name}: {stock_code}\n' + alarm_message + f'> {TODAY} 거래량: {df_today.iloc[0]["Volume"]} / 가격: {df_today.iloc[0]["Close"]}\n\n'
     else:
       return alarm_message
-
-
-
-
 
   
 
