@@ -98,6 +98,8 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, start_date):
   
   ###### END 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
 
+def get_increase_percent(origin, target):
+  return round(100 - origin/target*100,2)
 
 def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
   if os.path.exists(raw_csv_file):
@@ -151,13 +153,13 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
       
       # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
       if not df_today.iloc[0]['Volume'] == 0:
-        if df_mean_last_three > temp_row[3]:
-          alarm_message += f'> 최근 {day}일 평균 거래량 {_mean} < 최근 3일 평균 거래량 {df_mean_last_three} \n'
-        if df_mean_last_three > temp_row[4]:
-          alarm_message += f'> 최근 {day}일 조정 평균 거래량 {_adjusted_mean} < 최근 3일 평균 거래량 {df_mean_last_three} \n'
+        if df_mean_last_three > _mean:
+          alarm_message += f'> {day}일         평균 거래량 {_mean} < 3일 평균 거래량 {df_mean_last_three} ({get_increase_percent(_mean, df_mean_last_three)}% 증가)\n'
+        if df_mean_last_three > _adjusted_mean:
+          alarm_message += f'> {day}일 조정 평균 거래량 {_adjusted_mean} < 3일 평균 거래량 {df_mean_last_three} ({get_increase_percent(_adjusted_mean, df_mean_last_three)}% 증가)\n'
 
       if df_today.iloc[0]['Volume'] > _max:
-        alarm_message += f'> 최근 {day}일 최대 거래량 갱신\n'
+        alarm_message += f'> {day}일 최대 거래량 갱신\n'
       
 
     # 파일에 데이터 추가
@@ -167,7 +169,8 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
 
 
     if alarm_message:
-      return f'> {stock_name}: {stock_code}\n' + alarm_message + f'> {TODAY} 거래량: {df_today.iloc[0]["Volume"]} / 가격: {df_today.iloc[0]["Close"]}\n\n'
+      link = "https://arclien.github.io/stock/code/" + stock_code
+      return f'> {stock_name}: {stock_code}\n' + alarm_message + f'> `{TODAY} 거래량: {df_today.iloc[0]["Volume"]} / 가격: {df_today.iloc[0]["Close"]}`\n' + f'> {link}\n\n'
     else:
       return alarm_message
 

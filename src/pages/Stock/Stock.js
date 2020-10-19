@@ -42,7 +42,7 @@ const Stock = () => {
   useEffect(() => {
     const getData = async () => {
       const currentStock = stockList.find((el) => el[0] === stockCode);
-      if (!currentStock) history.replace(root.path);
+      if (stockList.length > 0 && !currentStock) history.replace(root.path);
 
       const stockData = { ...chartOption };
       const stockDataPercent = { ...chartOption };
