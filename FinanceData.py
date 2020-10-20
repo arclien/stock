@@ -206,9 +206,15 @@ for i, line in enumerate(rdr):
   # 이전에 추가된 종목은, 처음 추가 될때 created_at을 업데이트 해주며, updated_at + 1에 해당하는 날짜를 받는다
   else:
     if not line[5]:
-      start_date = TODAY
+      if line[2] == 'ko':
+        start_date = TODAY
+      elif line[2] == 'us':
+        start_date = (TODAY - timedelta(days=1)).strftime(DATE_FORMAT)
     else:
-      start_date = (datetime.strptime(line[5], DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
+      if line[2] == 'ko':
+        start_date = (datetime.strptime(line[5], DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
+      elif line[2] == 'us':
+        start_date = datetime.strptime(line[5], DATE_FORMAT)
 
     if CURRENT_TIME == AUTO_CRAWLING_TIME:
       # updated_at을 오늘 날짜로 업데이트
