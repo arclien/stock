@@ -34,6 +34,9 @@ const Stock = () => {
   const [optionPercent, setOptionPercent] = useState({
     ...chartOption,
   });
+  const [optionBasePrice, setOptionBasePrice] = useState({
+    ...chartOption,
+  });
 
   const [startDate, setStartDate] = useState('2020-01-02');
   const [endDate, setEndDate] = useState(getTodayDate());
@@ -46,6 +49,7 @@ const Stock = () => {
 
       const stockData = { ...chartOption };
       const stockDataPercent = { ...chartOption };
+      const stockDataBasePrice = { ...chartOption };
 
       const stockAll = await getStockData(stockCode);
 
@@ -111,6 +115,9 @@ const Stock = () => {
       stockDataPercent.xAxis = {
         ...stockData.xAxis,
       };
+      stockDataBasePrice.xAxis = {
+        ...stockData.xAxis,
+      };
 
       // y축
       stockData.yAxis = {
@@ -123,6 +130,12 @@ const Stock = () => {
       };
       stockDataPercent.yAxis = {
         ...stockDataPercent.yAxis,
+        axisLabel: {
+          formatter: '{value} %',
+        },
+      };
+      stockDataBasePrice.yAxis = {
+        ...stockDataBasePrice.yAxis,
         axisLabel: {
           formatter: '{value} %',
         },
@@ -164,8 +177,23 @@ const Stock = () => {
         },
       ];
 
+      stockDataBasePrice.series = [
+        ...stockDataBasePrice.series,
+        {
+          data: stock.slice(1).map((el) => {
+            if (el[4] !== '0')
+              return getPercent(basePriceValue, parseInt(el[4], 10));
+            return null;
+          }),
+          type: 'line',
+          connectNulls: true,
+          name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
+        },
+      ];
+
       setOption(stockData);
       setOptionPercent(stockDataPercent);
+      setOptionBasePrice(stockDataBasePrice);
       setLoaded(true);
     };
 
@@ -214,6 +242,19 @@ const Stock = () => {
             onEvents={{
               click: onChartClick,
             }}
+            style={{ height: '300px', width: '100%' }}
+          />
+        </>
+      )}
+
+      {isLoaded && (
+        <>
+          {stockList.length > 0 &&
+            stockList.find((el) => el[0] === stockCode)[7]}
+          원 ( 기준원 = 0% ) 대비 상승/하락 률
+          <StockChart
+            stockList={stockList}
+            chartData={optionBasePrice}
             style={{ height: '300px', width: '100%' }}
           />
         </>
