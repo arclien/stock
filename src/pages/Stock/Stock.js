@@ -61,12 +61,21 @@ const Stock = () => {
         stockAll[0],
         ...stockAll.slice(startDateIndex, endDateIndex + 1),
       ];
-      // eslint-disable-next-line no-nested-ternary
-      const targetDateValue = stock.find((el) => el[0] === percentTargetDate)
-        ? parseInt(stock.find((el) => el[0] === percentTargetDate)[4], 10)
-        : stock[1]
-        ? stock[1][4]
-        : null;
+
+      let targetDateValue = null;
+
+      if (stock.find((el) => el[0] === percentTargetDate)) {
+        targetDateValue = parseInt(
+          stock.find((el) => el[0] === percentTargetDate)[4],
+          10
+        );
+        if (targetDateValue === 0) {
+          const _valueDate = stock.find((el) => el[4] !== '0');
+          targetDateValue = _valueDate ? _valueDate[4] : null;
+        }
+      } else if (stock[1]) {
+        targetDateValue = stock[1][4];
+      }
 
       const minValue = parseInt(
         Math.min(
