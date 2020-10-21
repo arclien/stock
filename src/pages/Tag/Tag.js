@@ -64,6 +64,7 @@ const Tag = () => {
     Promise.all(fetchAllData).then((data) => {
       data.forEach((stockAll, index) => {
         const currentStock = _tagStockList[index];
+
         const currency = (currentStock && currentStock[2]) || LOCALE.KO;
         const startDateIndex = stockAll.findIndex(
           (el) => el[0] === dayjs(startDate).format(CalendarFormat)
@@ -79,12 +80,20 @@ const Tag = () => {
           ...stockAll.slice(startDateIndex, endDateIndex + 1),
         ];
 
-        // eslint-disable-next-line no-nested-ternary
-        const targetDateValue = stock.find((el) => el[0] === percentTargetDate)
-          ? parseInt(stock.find((el) => el[0] === percentTargetDate)[4], 10)
-          : stock[1]
-          ? stock[1][4]
-          : null;
+        let targetDateValue = null;
+
+        if (stock.find((el) => el[0] === percentTargetDate)) {
+          targetDateValue = parseInt(
+            stock.find((el) => el[0] === percentTargetDate)[4],
+            10
+          );
+          if (targetDateValue === 0) {
+            const _valueDate = stock.find((el) => el[4] !== '0');
+            targetDateValue = _valueDate ? _valueDate[4] : null;
+          }
+        } else if (stock[1]) {
+          targetDateValue = stock[1][4];
+        }
 
         const ref = currency === LOCALE.US ? stockDataUs : stockData;
 
