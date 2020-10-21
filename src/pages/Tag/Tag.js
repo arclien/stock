@@ -66,9 +66,10 @@ const Tag = () => {
         const currentStock = _tagStockList[index];
 
         const currency = (currentStock && currentStock[2]) || LOCALE.KO;
-        const startDateIndex = stockAll.findIndex(
+        let startDateIndex = stockAll.findIndex(
           (el) => el[0] === dayjs(startDate).format(CalendarFormat)
         );
+        startDateIndex = startDateIndex <= 0 ? 0 : startDateIndex;
 
         let endDateIndex = stockAll.findIndex(
           (el) => el[0] === dayjs(endDate).format(CalendarFormat)
