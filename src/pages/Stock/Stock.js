@@ -34,28 +34,26 @@ const Stock = () => {
   const [optionPercent, setOptionPercent] = useState({
     ...chartOption,
   });
-  const [optionBasePrice, setOptionBasePrice] = useState({
-    ...chartOption,
-  });
 
   const [startDate, setStartDate] = useState('2020-01-02');
   const [endDate, setEndDate] = useState(getTodayDate());
   const [percentTargetDate, setPercentTargetDate] = useState(startDate);
+  const [basePriceValue, setBasePriceValue] = useState(null);
 
   useEffect(() => {
     const getData = async () => {
+      setLoaded(false);
       const currentStock = stockList.find((el) => el[0] === stockCode);
       if (stockList.length > 0 && !currentStock) history.replace(root.path);
 
       const stockData = { ...chartOption };
       const stockDataPercent = { ...chartOption };
-      const stockDataBasePrice = { ...chartOption };
 
       const stockAll = await getStockData(stockCode);
-
-      const startDateIndex = stockAll.findIndex(
+      let startDateIndex = stockAll.findIndex(
         (el) => el[0] === dayjs(startDate).format(CalendarFormat)
       );
+      startDateIndex = startDateIndex <= 0 ? 0 : startDateIndex;
 
       let endDateIndex = stockAll.findIndex(
         (el) => el[0] === dayjs(endDate).format(CalendarFormat)
@@ -65,7 +63,6 @@ const Stock = () => {
         stockAll[0],
         ...stockAll.slice(startDateIndex, endDateIndex + 1),
       ];
-
       let targetDateValue = null;
 
       if (stock.find((el) => el[0] === percentTargetDate)) {
@@ -80,6 +77,13 @@ const Stock = () => {
       } else if (stock[1]) {
         targetDateValue = stock[1][4];
       }
+
+      const _basePriceValue =
+        currentStock &&
+        currentStock.length > 0 &&
+        parseInt(currentStock[7], 10);
+
+      setBasePriceValue(_basePriceValue);
 
       const minValue = parseInt(
         Math.min(
@@ -115,9 +119,6 @@ const Stock = () => {
       stockDataPercent.xAxis = {
         ...stockData.xAxis,
       };
-      stockDataBasePrice.xAxis = {
-        ...stockData.xAxis,
-      };
 
       // y축
       stockData.yAxis = {
@@ -130,12 +131,6 @@ const Stock = () => {
       };
       stockDataPercent.yAxis = {
         ...stockDataPercent.yAxis,
-        axisLabel: {
-          formatter: '{value} %',
-        },
-      };
-      stockDataBasePrice.yAxis = {
-        ...stockDataBasePrice.yAxis,
         axisLabel: {
           formatter: '{value} %',
         },
@@ -160,6 +155,29 @@ const Stock = () => {
           type: 'line',
           connectNulls: true,
           name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
+          lineStyle: {
+            color: '#ff457e',
+          },
+          markLine: {
+            slient: true,
+            symbol: ['none', 'none'],
+            lineStyle: {
+              color: '#f58c23',
+              width: 2,
+              type: 'solid',
+            },
+            data: [
+              {
+                name: 'Base Price',
+                yAxis: basePriceValue || 0,
+                label: {
+                  formatter: '{c}',
+                  position: 'end',
+                  distance: 10,
+                },
+              },
+            ],
+          },
         },
       ];
 
@@ -174,31 +192,34 @@ const Stock = () => {
           type: 'line',
           connectNulls: true,
           name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
+          lineStyle: {
+            color: '#ff457e',
+            width: 3,
+          },
         },
-      ];
-
-      stockDataBasePrice.series = [
-        ...stockDataBasePrice.series,
         {
           data: stock.slice(1).map((el) => {
             if (el[4] !== '0')
-              return getPercent(basePriceValue, parseInt(el[4], 10));
+              return getPercent(_basePriceValue, parseInt(el[4], 10));
             return null;
           }),
           type: 'line',
           connectNulls: true,
           name: `${currentStock ? currentStock[1] : ''}/${stockCode}`,
+          lineStyle: {
+            color: 'rgba(87,159,251,.5)',
+          },
         },
       ];
 
       setOption(stockData);
       setOptionPercent(stockDataPercent);
-      setOptionBasePrice(stockDataBasePrice);
       setLoaded(true);
     };
 
     getData();
   }, [
+    basePriceValue,
     endDate,
     getStockData,
     history,
@@ -236,25 +257,15 @@ const Stock = () => {
         <>
           {percentTargetDate}일( 기준일 = 0% ) 대비 상승/하락 률 ( 그래프 클릭
           날짜 변경 )
+          <br />
+          {basePriceValue && <>기준 가격(0%): {basePriceValue}</>}
+          원 대비 상승/하락 률
           <StockChart
             stockList={stockList}
             chartData={optionPercent}
             onEvents={{
               click: onChartClick,
             }}
-            style={{ height: '300px', width: '100%' }}
-          />
-        </>
-      )}
-
-      {isLoaded && (
-        <>
-          {stockList.length > 0 &&
-            stockList.find((el) => el[0] === stockCode)[7]}
-          원 ( 기준원 = 0% ) 대비 상승/하락 률
-          <StockChart
-            stockList={stockList}
-            chartData={optionBasePrice}
             style={{ height: '300px', width: '100%' }}
           />
         </>
