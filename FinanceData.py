@@ -16,6 +16,7 @@ STOCK_LIST_HEADER = ["code","name","nation","user_id","created_at","updated_at",
 START_DATE = "2015-01-02"
 AUTO_CRAWLING_TIME = "16"
 VOLUME_CALC_LENGTH = [180,90,60,30]
+VOLUME_ALARM_PERCENT_THRESHOLD = 10
 DATE_FORMAT = "%Y-%m-%d"
 # stock_list csv를 새롭게 업데이트 하기 위한 list
 new_stock_list = [STOCK_LIST_HEADER]
@@ -125,6 +126,7 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
     
     # 주식시장이 열리지 않는 날은 값이 0 이므로, 해당 값이 있을 경우 drop 하고, VOLUME_CALC_LENGTH 만큼의 최신 데이터를 가져온다.
     df = df[~(df[["Open","High","Low","Close","Volume"]] == 0).any(axis=1)]
+    df_prev_day = df.tail(1)
     
     temp_row = ([TODAY])
 
@@ -154,9 +156,13 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
       # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
       if not df_today.iloc[0]['Volume'] == 0:
         if df_mean_last_three > _mean:
-          alarm_message += f'> {day}일         평균 거래량 {_mean} < 3일 평균 거래량 {df_mean_last_three} ({get_increase_percent(_mean, df_mean_last_three)}% 증가)\n'
+          increase_percent = get_increase_percent(_mean, df_mean_last_three)
+          if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
+            alarm_message += f'> {day}일         평균 거래량 {_mean} < 3일 평균 거래량 {df_mean_last_three} ({increase_percent}% 증가)\n'
         if df_mean_last_three > _adjusted_mean:
-          alarm_message += f'> {day}일 조정 평균 거래량 {_adjusted_mean} < 3일 평균 거래량 {df_mean_last_three} ({get_increase_percent(_adjusted_mean, df_mean_last_three)}% 증가)\n'
+          increase_percent = get_increase_percent(_adjusted_mean, df_mean_last_three)
+          if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
+            alarm_message += f'> {day}일 조정 평균 거래량 {_adjusted_mean} < 3일 평균 거래량 {df_mean_last_three} ({increase_percent}% 증가)\n'
 
       if df_today.iloc[0]['Volume'] > _max:
         alarm_message += f'> {day}일 최대 거래량 갱신\n'
@@ -170,7 +176,7 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
 
     if alarm_message:
       link = "https://arclien.github.io/stock/code/" + stock_code
-      return f'> {stock_name}: {stock_code}\n' + alarm_message + f'> `{TODAY} 거래량: {df_today.iloc[0]["Volume"]} / 가격: {df_today.iloc[0]["Close"]}`\n' + f'> {link}\n\n'
+      return f'> {stock_name}: {stock_code}\n' + alarm_message + f'> `{TODAY} 거래량: {df_today.iloc[0]["Volume"]} / 가격: {df_today.iloc[0]["Close"]} ({get_increase_percent(df_prev_day.iloc[0]["Close"], df_today.iloc[0]["Close"])}%)`\n' + f'> {link}\n\n'
     else:
       return alarm_message
 
