@@ -12,7 +12,7 @@ const StockProvider = ({ children }) => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await fetchStockListFromCsv();
+      const data = await fetchStockListFromCsv();
       setStockList(data.slice(1).filter((el) => el.length > 1));
       STOCK_DATA_LIST = data
         .slice(1)
@@ -45,7 +45,7 @@ const StockProvider = ({ children }) => {
     ) {
       return STOCK_DATA_LIST[stockCode].data;
     }
-    const { data } = await fetchStockDataFromCsv(stockCode);
+    const data = await fetchStockDataFromCsv(stockCode);
 
     STOCK_DATA_LIST = {
       ...STOCK_DATA_LIST,
@@ -54,7 +54,6 @@ const StockProvider = ({ children }) => {
         data,
       },
     };
-
     return data;
   };
 

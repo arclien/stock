@@ -1,23 +1,27 @@
-import { readString } from 'react-papaparse';
-
 export const fetchStockListFromCsv = async () => {
   const response = await fetch(
     `${window.location.origin}/stock/data/stock_list.csv`
   );
-  const reader = response.body.getReader();
-  const result = await reader.read(); // raw array
-  const decoder = new TextDecoder('utf-8');
-  const csv = decoder.decode(result.value); // the csv text
-  return readString(csv);
+  const returnValue = [];
+  const data = await response.text();
+  const table = data.split(/\n/);
+  table.forEach((row) => {
+    const columns = row.split(',');
+    returnValue.push(columns);
+  });
+  return returnValue;
 };
 
 export const fetchStockDataFromCsv = async (stockNumber) => {
   const response = await fetch(
     `${window.location.origin}/stock/data/${stockNumber}.csv`
   );
-  const reader = response.body.getReader();
-  const result = await reader.read(); // raw array
-  const decoder = new TextDecoder('utf-8');
-  const csv = decoder.decode(result.value); // the csv text
-  return readString(csv);
+  const returnValue = [];
+  const data = await response.text();
+  const table = data.split(/\n/).slice(1);
+  table.forEach((row) => {
+    const columns = row.split(',');
+    returnValue.push(columns);
+  });
+  return returnValue;
 };
