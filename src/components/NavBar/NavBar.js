@@ -20,8 +20,8 @@ const NavBar = () => {
       ...stockList
         .map((el) => el[6].split(','))
         .reduce((acc, cur) => acc.concat(cur), [])
-        .filter((el) => el !== '')
-        .map((el) => el.trim()),
+        .map((el) => el.trim().replace(/"/gi, ''))
+        .filter((el) => el !== ''),
     ]);
     setTagList([...tags]);
   }, [stockList]);

@@ -258,8 +258,9 @@ const Stock = () => {
           {percentTargetDate}일( 기준일 = 0% ) 대비 상승/하락 률 ( 그래프 클릭
           날짜 변경 )
           <br />
-          {basePriceValue && <>기준 가격(0%): {basePriceValue}</>}
-          원 대비 상승/하락 률
+          {basePriceValue > 0 && (
+            <>기준 가격(0%): {basePriceValue} 원 대비 상승/하락 률</>
+          )}
           <StockChart
             stockList={stockList}
             chartData={optionPercent}
