@@ -18,7 +18,7 @@ const NavBar = () => {
   useEffect(() => {
     const tags = new Set([
       ...stockList
-        .map((el) => el[6].split(','))
+        .map((el) => el[6].split('/'))
         .reduce((acc, cur) => acc.concat(cur), [])
         .map((el) => el.trim().replace(/"/gi, ''))
         .filter((el) => el !== ''),
