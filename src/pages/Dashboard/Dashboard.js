@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
-import dayjs from 'dayjs';
 
 import { chartOption } from 'constants/chart';
-import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
 import StockChart from 'components/StockChart/StockChart';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
-import { getCurrency } from 'utils/chart';
+import { getCurrency, getIndexOfDayBetween } from 'utils/chart';
 import { StockContext } from 'context/StockContext';
 
 import { Container } from './Dashboard.styles';
@@ -55,19 +53,13 @@ const Dashboard = () => {
       data.forEach((stockAll, index) => {
         const currentStock = stockList[index];
         const currency = (currentStock && currentStock[2]) || LOCALE.KO;
-        const startDateIndex = stockAll.findIndex(
-          (el) => el[0] === dayjs(startDate).format(CalendarFormat)
+        const { startDateIndex, endDateIndex } = getIndexOfDayBetween(
+          stockAll,
+          startDate,
+          endDate
         );
 
-        let endDateIndex = stockAll.findIndex(
-          (el) => el[0] === dayjs(endDate).format(CalendarFormat)
-        );
-        endDateIndex = endDateIndex <= 0 ? stockAll.length - 1 : endDateIndex;
-
-        const stock = [
-          stockAll[0],
-          ...stockAll.slice(startDateIndex, endDateIndex + 1),
-        ];
+        const stock = stockAll.slice(startDateIndex, endDateIndex + 1);
 
         const priceList = stock
           .slice(1)
@@ -94,7 +86,7 @@ const Dashboard = () => {
 
         ref.xAxis = {
           ...ref.xAxis,
-          data: stock.slice(1).map((el) => el[0]),
+          data: stock.map((el) => el[0]),
         };
 
         ref.yAxis = {
@@ -107,7 +99,7 @@ const Dashboard = () => {
         ref.series = [
           ...ref.series,
           {
-            data: stock.slice(1).map((el) => {
+            data: stock.map((el) => {
               if (el[4] !== '0') {
                 if (currentStock && currentStock[2] === LOCALE.KO) {
                   return parseInt(el[4], 10);
