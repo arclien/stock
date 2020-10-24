@@ -1,16 +1,19 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useRouteMatch } from 'react-router-dom';
 import { useHistory } from 'react-router';
-import dayjs from 'dayjs';
 
 import Routes from 'routers/routes';
 import { chartOption } from 'constants/chart';
-import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
 import StockChart from 'components/StockChart/StockChart';
 import StockCalendar from 'components/StockCalendar/StockCalendar';
 import { getTodayDate } from 'utils/day';
-import { getCurrency, getPercent } from 'utils/chart';
+import {
+  getCurrency,
+  getPercent,
+  getIndexOfDayBetween,
+  getTargetDateValue,
+} from 'utils/chart';
 import { getStockListByTag } from 'utils/tag';
 import { StockContext } from 'context/StockContext';
 
@@ -66,41 +69,22 @@ const Tag = () => {
         const currentStock = _tagStockList[index];
 
         const currency = (currentStock && currentStock[2]) || LOCALE.KO;
-        let startDateIndex = stockAll.findIndex(
-          (el) => el[0] === dayjs(startDate).format(CalendarFormat)
+
+        const { startDateIndex, endDateIndex } = getIndexOfDayBetween(
+          stockAll,
+          startDate,
+          endDate
         );
-        startDateIndex = startDateIndex <= 0 ? 0 : startDateIndex;
 
-        let endDateIndex = stockAll.findIndex(
-          (el) => el[0] === dayjs(endDate).format(CalendarFormat)
-        );
-        endDateIndex = endDateIndex <= 0 ? stockAll.length - 1 : endDateIndex;
+        const stock = stockAll.slice(startDateIndex, endDateIndex + 1);
 
-        const stock = [
-          stockAll[0],
-          ...stockAll.slice(startDateIndex, endDateIndex + 1),
-        ];
-
-        let targetDateValue = null;
-
-        if (stock.find((el) => el[0] === percentTargetDate)) {
-          targetDateValue = parseInt(
-            stock.find((el) => el[0] === percentTargetDate)[4],
-            10
-          );
-          if (targetDateValue === 0) {
-            const _valueDate = stock.find((el) => el[4] !== '0');
-            targetDateValue = _valueDate ? _valueDate[4] : null;
-          }
-        } else if (stock[1]) {
-          targetDateValue = stock[1][4];
-        }
+        const targetDateValue = getTargetDateValue(stock, percentTargetDate);
 
         const ref = currency === LOCALE.US ? stockDataUs : stockData;
 
         ref.xAxis = {
           ...ref.xAxis,
-          data: stock.slice(1).map((el) => el[0]),
+          data: stock.map((el) => el[0]),
         };
         stockDataPercent.xAxis = {
           ...ref.xAxis,
@@ -122,7 +106,7 @@ const Tag = () => {
         ref.series = [
           ...ref.series,
           {
-            data: stock.slice(1).map((el) => {
+            data: stock.map((el) => {
               if (el[4] !== '0') {
                 if (currentStock && currentStock[2] === LOCALE.KO) {
                   return parseInt(el[4], 10);
@@ -143,7 +127,7 @@ const Tag = () => {
         stockDataPercent.series = [
           ...stockDataPercent.series,
           {
-            data: stock.slice(1).map((el) => {
+            data: stock.map((el) => {
               if (el[4] !== '0')
                 return getPercent(targetDateValue, parseInt(el[4], 10));
               return null;

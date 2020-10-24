@@ -35,3 +35,41 @@ export const getCurrency = (stock) => {
   }
   return '';
 };
+
+export const getIndexOfDayBetween = (stock, startDate, endDate) => {
+  let startDateIndex = stock.findIndex(
+    (el) => el[0] === dayjs(startDate).format(CalendarFormat)
+  );
+  startDateIndex = startDateIndex <= 0 ? 0 : startDateIndex;
+
+  let endDateIndex = stock.findIndex(
+    (el) => el[0] === dayjs(endDate).format(CalendarFormat)
+  );
+  endDateIndex = endDateIndex <= 0 ? stock.length - 1 : endDateIndex;
+  return { startDateIndex, endDateIndex };
+};
+
+export const getTargetDateValue = (stock, targetDate) => {
+  let value = null;
+  if (stock.find((el) => el[0] === targetDate)) {
+    value = parseInt(stock.find((el) => el[0] === targetDate)[4], 10);
+  }
+  if (!value || value === 0) {
+    const _valueDate = stock.find((el) => el[4] !== '0');
+    value = _valueDate ? _valueDate[4] : null;
+  }
+  return value;
+};
+
+export const getMinMaxValue = (stock) => {
+  const values = stock
+    .map((el) => {
+      if (el[4] !== '0') return parseInt(el[4], 10);
+      return null;
+    })
+    .filter((el) => el);
+
+  const minValue = parseInt(Math.min(...values), 10);
+  const maxValue = parseInt(Math.max(...values), 10);
+  return { minValue, maxValue };
+};
