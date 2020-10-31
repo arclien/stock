@@ -223,7 +223,7 @@ for i, line in enumerate(rdr):
       if line[2] == 'ko':
         start_date = TODAY
       elif line[2] == 'us':
-        start_date = (TODAY - timedelta(days=1)).strftime(DATE_FORMAT)
+        start_date = (datetime.strptime(TODAY, DATE_FORMAT)  - timedelta(days=1)).strftime(DATE_FORMAT)
     else:
       if line[2] == 'ko':
         start_date = (datetime.strptime(line[5], DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
