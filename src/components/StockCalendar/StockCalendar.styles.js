@@ -9,6 +9,7 @@ import {
   text,
   gray100,
   yellow100,
+  mobileOnly,
 } from 'remember-ui';
 
 export const Container = styled.div`
@@ -16,6 +17,11 @@ export const Container = styled.div`
 
   width:100%;
   justify-content: space-between;
+
+  ${mobileOnly(css`
+    flex-direction: column;
+    justify-content: center;
+  `)}
 `;
 
 export const CalendarContainer = styled.div`
@@ -29,6 +35,10 @@ export const DateInput = styled(MaskingInput)`
 export const OffsetContainer = styled.div`
   ${flexCenter}
   padding:20px;
+
+  ${mobileOnly(css`
+    padding: 20px 0px;
+  `)}
 `;
 
 export const RadioButton = styled(NewBaseButton)`
@@ -42,6 +52,12 @@ export const RadioButton = styled(NewBaseButton)`
 
   border-radius:0px;
   border: 1px solid ${gray100};
+
+  ${mobileOnly(css`
+    display: none;
+    ${font({ size: '12px', color: text })}
+    padding:0px;
+  `)}
 `;
 
 export const OffsetDate = styled(Radio)``;

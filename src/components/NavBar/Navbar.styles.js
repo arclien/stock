@@ -5,6 +5,9 @@ import {
   textExtraLarge,
   gray400,
   BaseInput,
+  font,
+  gold200,
+  mobileOnly,
 } from 'remember-ui';
 import { Link } from 'react-router-dom';
 
@@ -33,6 +36,12 @@ export const StockText = styled(Chip)`
   &:focus {
     font-weight: bold;
   }
+
+  ${mobileOnly(css`
+    ${font({ size: '12px', color: gold200 })}
+    padding: 5px;
+    min-width: 40px;
+  `)}
 `;
 
 export const PageTitle = styled.div`

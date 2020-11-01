@@ -167,7 +167,9 @@ const Tag = () => {
         endDate={endDate}
         setEndDate={setEndDate}
       />
-      {isLoaded && <StockChart stockList={tagStockList} chartData={option} />}
+      {isLoaded && tagStockList.find((el) => el[2] === LOCALE.KO) && (
+        <StockChart stockList={tagStockList} chartData={option} />
+      )}
 
       {isLoaded && tagStockList.find((el) => el[2] === LOCALE.US) && (
         <StockChart stockList={tagStockList} chartData={optionUs} />
