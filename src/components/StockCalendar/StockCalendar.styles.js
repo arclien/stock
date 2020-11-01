@@ -1,10 +1,25 @@
-import styled from 'styled-components';
-import { flexCenterX, Radio, MaskingInput } from 'remember-ui';
+import styled, { css } from 'styled-components';
+import {
+  flexCenter,
+  Radio,
+  MaskingInput,
+  flexCenterY,
+  NewBaseButton,
+  font,
+  text,
+  gray100,
+  yellow100,
+} from 'remember-ui';
 
 export const Container = styled.div`
-  ${flexCenterX}
+  ${flexCenterY}
 
-  align-items: center;
+  width:100%;
+  justify-content: space-between;
+`;
+
+export const CalendarContainer = styled.div`
+  ${flexCenter}
 `;
 
 export const DateInput = styled(MaskingInput)`
@@ -12,8 +27,21 @@ export const DateInput = styled(MaskingInput)`
 `;
 
 export const OffsetContainer = styled.div`
-  ${flexCenterX}
+  ${flexCenter}
   padding:20px;
+`;
+
+export const RadioButton = styled(NewBaseButton)`
+  ${font({ size: '15px', color: text })}
+
+  ${({ isChecked }) =>
+    isChecked &&
+    css`
+      background-color: ${yellow100};
+    `}
+
+  border-radius:0px;
+  border: 1px solid ${gray100};
 `;
 
 export const OffsetDate = styled(Radio)``;

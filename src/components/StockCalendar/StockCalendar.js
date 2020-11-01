@@ -10,11 +10,13 @@ import {
 import { isWeekend, getAdjustDateToWeekDay, getTodayDate } from 'utils/day';
 
 import {
+  CalendarContainer,
   DateInput,
   Container,
   OffsetContainer,
   OffsetDate,
   Cursor,
+  RadioButton,
 } from './StockCalendar.styles';
 
 const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
@@ -77,59 +79,66 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
 
   return (
     <Container>
-      <Cursor onClick={() => handleDateByOffset('prev')}>{'<'}</Cursor>
-      <DateInput
-        mask={[
-          /[0-9]/,
-          /[0-9]/,
-          /[0-9]/,
-          /[0-9]/,
-          '-',
-          /[0-9]/,
-          /[0-9]/,
-          '-',
-          /[0-9]/,
-          /[0-9]/,
-        ]}
-        type="text"
-        name="startDate"
-        value={startDate}
-        required
-        onChange={handleChange}
-        placeholder="8자리 숫자 입력(2015-01-02)"
-      />
-      ~
-      <DateInput
-        mask={[
-          /[0-9]/,
-          /[0-9]/,
-          /[0-9]/,
-          /[0-9]/,
-          '-',
-          /[0-9]/,
-          /[0-9]/,
-          '-',
-          /[0-9]/,
-          /[0-9]/,
-        ]}
-        type="text"
-        name="endDate"
-        value={endDate}
-        required
-        onChange={handleChange}
-        placeholder="8자리 숫자 입력(2015-01-02)"
-      />
-      <Cursor onClick={() => handleDateByOffset('next')}>{'>'}</Cursor>
+      <CalendarContainer>
+        <Cursor onClick={() => handleDateByOffset('prev')}>{'<'}</Cursor>
+        <DateInput
+          mask={[
+            /[0-9]/,
+            /[0-9]/,
+            /[0-9]/,
+            /[0-9]/,
+            '-',
+            /[0-9]/,
+            /[0-9]/,
+            '-',
+            /[0-9]/,
+            /[0-9]/,
+          ]}
+          type="text"
+          name="startDate"
+          value={startDate}
+          required
+          onChange={handleChange}
+          placeholder="8자리 숫자 입력(2015-01-02)"
+        />
+        ~
+        <DateInput
+          mask={[
+            /[0-9]/,
+            /[0-9]/,
+            /[0-9]/,
+            /[0-9]/,
+            '-',
+            /[0-9]/,
+            /[0-9]/,
+            '-',
+            /[0-9]/,
+            /[0-9]/,
+          ]}
+          type="text"
+          name="endDate"
+          value={endDate}
+          required
+          onChange={handleChange}
+          placeholder="8자리 숫자 입력(2015-01-02)"
+        />
+        <Cursor onClick={() => handleDateByOffset('next')}>{'>'}</Cursor>
+      </CalendarContainer>
       <OffsetContainer>
         {OffsetList &&
           OffsetList.map((el) => (
-            <div key={el.value}>
+            <RadioButton
+              isChecked={calendarOffset === el.name}
+              size="medium"
+              outline
+              key={el.value}
+            >
               <OffsetDate
                 isChecked={calendarOffset === el.name}
                 onClick={() => handleCalendarOffset(el.name, el.value)}
               />
               <span>{el.name}</span>
-            </div>
+            </RadioButton>
           ))}
       </OffsetContainer>
     </Container>
