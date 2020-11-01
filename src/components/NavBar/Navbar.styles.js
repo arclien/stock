@@ -1,5 +1,11 @@
 import styled, { css } from 'styled-components';
-import { Chip, flexColumnCenterX, textExtraLarge, gray400 } from 'remember-ui';
+import {
+  Chip,
+  flexColumnCenterX,
+  textExtraLarge,
+  gray400,
+  BaseInput,
+} from 'remember-ui';
 import { Link } from 'react-router-dom';
 
 export const Container = styled.div`
@@ -31,4 +37,8 @@ export const StockText = styled(Chip)`
 
 export const PageTitle = styled.div`
   ${textExtraLarge({ color: gray400 })}
+`;
+
+export const SearchInput = styled(BaseInput)`
+  width: 220px;
 `;
