@@ -7,13 +7,14 @@ import Routes from 'routers/routes';
 import CommonRoute from 'routers/CommonRoute';
 import NavBar from 'components/NavBar/NavBar';
 import Stock from 'pages/Stock/Stock';
+import StockList from 'pages/StockList/StockList';
 import Dashboard from 'pages/Dashboard/Dashboard';
 import Tag from 'pages/Tag/Tag';
 
 import { AppBody } from './App.styles';
 
 function App() {
-  const { root, stock, tag } = Routes;
+  const { root, stock, stockList, tag } = Routes;
 
   return (
     <StockProvider>
@@ -27,6 +28,9 @@ function App() {
             </CommonRoute>
             <CommonRoute path={tag.path}>
               <Tag />
+            </CommonRoute>
+            <CommonRoute path={stockList.path}>
+              <StockList />
             </CommonRoute>
             <CommonRoute path={root.path}>
               <Dashboard />
