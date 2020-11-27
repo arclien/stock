@@ -15,6 +15,7 @@ export const getTrello = (path, callback = onSuccess, params = {}) => {
 };
 
 export const postTrello = (path, callback = onSuccess, params = {}) => {
+  console.log(params);
   Trello.post(path, params, callback, onError);
 };
 
@@ -48,4 +49,14 @@ export const getColletionTrello = (
     default:
       return null;
   }
+};
+
+export const addCardUITrello = (source, name, idList, idBoard) => {
+  Trello.addCard({
+    source,
+    name,
+    idList,
+    idBoard,
+    width: 600,
+  });
 };

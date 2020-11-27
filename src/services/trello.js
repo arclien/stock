@@ -1,4 +1,9 @@
-import { getTrello, getColletionTrello } from 'services/trelloApi';
+import {
+  getTrello,
+  getColletionTrello,
+  addCardUITrello,
+  postTrello,
+} from 'services/trelloApi';
 import { TRELLO_COLLECTION_TYPE } from 'constants/trello';
 
 export const getMe = (callback) => {
@@ -37,4 +42,25 @@ export const getCardById = (callback, cardId) => {
 
 export const getListById = (callback, listId) => {
   getColletionTrello(TRELLO_COLLECTION_TYPE.LISTS, listId, callback);
+};
+
+export const addCardUI = (source, name, idList, idBoard) => {
+  addCardUITrello(source, name, idList, idBoard);
+};
+
+export const createCard = (listId) => {
+  const newCard = {
+    name: 'New Test Card',
+    desc: 'This is the description of our new card.',
+    idList: listId,
+    pos: 'top',
+  };
+
+  postTrello(
+    `cards/?idList=${listId}`,
+    (res) => {
+      console.log(res);
+    },
+    newCard
+  );
 };
