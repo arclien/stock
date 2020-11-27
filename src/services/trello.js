@@ -57,7 +57,7 @@ export const createCard = (listId) => {
   };
 
   postTrello(
-    `cards/?idList=${listId}`,
+    'cards',
     (res) => {
       console.log(res);
     },
