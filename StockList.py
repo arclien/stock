@@ -26,7 +26,7 @@ def req(method, path, query = {}, data={}):
     # print('Headers: %s' % headers)
     # print('QueryString: %s' % query)
 
-    if method == 'GET':
+    if method == 'GET' or  method == 'PUT':
         return requests.request(method, url, headers=HEADERS, params=query)
     else:
         return requests.post(url, headers=HEADERS, data=data)
@@ -91,6 +91,12 @@ def get_card_by_id(cardId):
   PATH = "/1/cards/{}".format(cardId)
   resp = req('GET', PATH)
   return resp.text
+
+def put_card_by_id(cardId, cardData):
+  PATH = "/1/cards/{}".format(cardId)
+  resp = req('PUT', PATH, cardData)
+  return resp.text
+
 
 
 
