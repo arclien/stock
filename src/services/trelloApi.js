@@ -1,62 +1,49 @@
-import { Trello } from 'react-trello-client';
+import { TRELLO_API_KEY } from 'constants/trello';
 
-import { TRELLO_COLLECTION_TYPE } from 'constants/trello';
+const TrelloWeb = require('trello-web');
 
-const onSuccess = (res) => {
-  return res;
-};
+const Trello = new TrelloWeb(TRELLO_API_KEY);
 
-const onError = (res) => {
-  console.error(res);
-};
-
-export const getTrello = (path, callback = onSuccess, params = {}) => {
-  Trello.get(path, params, callback, onError);
-};
-
-export const postTrello = (path, callback = onSuccess, params = {}) => {
-  console.log(params);
-  Trello.post(path, params, callback, onError);
-};
-
-export const putTrello = (path, callback = onSuccess, params = {}) => {
-  Trello.put(path, params, callback, onError);
-};
-
-export const deleteTrello = (path, callback = onSuccess, params = {}) => {
-  Trello.delete(path, params, callback, onError);
-};
-
-export const getColletionTrello = (
-  type,
-  id,
-  callback = onSuccess,
-  params = {}
-) => {
-  switch (type) {
-    case TRELLO_COLLECTION_TYPE.ACTIONS:
-      return Trello.actions.get(id, params, callback, onError);
-    case TRELLO_COLLECTION_TYPE.CARDS:
-      return Trello.cards.get(id, params, callback, onError);
-    case TRELLO_COLLECTION_TYPE.CHECKLISTS:
-      return Trello.checklists.get(id, params, callback, onError);
-    case TRELLO_COLLECTION_TYPE.BOARDS:
-      return Trello.boards.get(id, params, callback, onError);
-    case TRELLO_COLLECTION_TYPE.LISTS:
-      return Trello.lists.get(id, params, callback, onError);
-    case TRELLO_COLLECTION_TYPE.ORGANIZATIONS:
-      return Trello.organizations.get(id, params, callback, onError);
-    default:
-      return null;
-  }
-};
-
-export const addCardUITrello = (source, name, idList, idBoard) => {
-  Trello.addCard({
-    source,
-    name,
-    idList,
-    idBoard,
-    width: 600,
+Promise.resolve()
+  .then(() => localStorage.getItem('trello_token'))
+  .then((existingToken) => {
+    if (existingToken) {
+      Trello.token = existingToken;
+    } else {
+      return Trello.auth({
+        name: 'Stock App',
+        scope: {
+          read: true,
+          write: true,
+          account: true,
+        },
+        expiration: 'never',
+      });
+    }
+  })
+  .catch((e) => {
+    console.log(
+      'something bad happened, or the user took too long to authorize.',
+      e
+    );
   });
+
+export const getTrello = (path, params = {}) => {
+  return Trello.get(`/1/${path}`, params);
+};
+
+export const postTrello = (path, params = {}) => {
+  return Trello.post(`/1/${path}`, params);
+};
+
+export const putTrello = (path, params = {}) => {
+  return Trello.put(`/1/${path}`, params);
+};
+
+export const deleteTrello = (path, params = {}) => {
+  return Trello.delete(`/1/${path}`, params);
+};
+
+export const getColletionTrello = (type, id, params = {}) => {
+  return Trello.get(`/1/${type}/${id}`, params);
 };

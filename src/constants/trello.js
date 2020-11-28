@@ -14,3 +14,16 @@ export const TRELLO_COLLECTION_TYPE = {
   ORGANIZATIONS: 'organizations',
   ACTIONS: 'actions',
 };
+
+export const TRELLO_LABEL_COLOR = [
+  'yellow',
+  'purple',
+  'blue',
+  'red',
+  'green',
+  'orange',
+  'black',
+  'sky',
+  'pink',
+  'lime',
+];

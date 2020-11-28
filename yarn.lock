@@ -9130,7 +9130,7 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.5.7, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -9492,13 +9492,6 @@ react-transition-group@^4:
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
-
-react-trello-client@^1.1.6:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/react-trello-client/-/react-trello-client-1.1.6.tgz#45f2e859736e23542455fea62a6b6e9f98e97153"
-  integrity sha512-QPQ5oKwxuHCp1i6cCl/tUPaqOJWzStRV9yRTTeQ6bovwwgQrtIw3CoRjgqazSSoZLvGnM+6buiRmo3ArnFN9HA==
-  dependencies:
-    prop-types "^15.5.7"
 
 react-xml-parser@^1.1.6:
   version "1.1.6"
@@ -11102,6 +11095,11 @@ tr46@^1.0.1:
   integrity sha1-qLE/1r/SSJUZZ0zN5VujaTtwbQk=
   dependencies:
     punycode "^2.1.0"
+
+trello-web@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/trello-web/-/trello-web-1.0.3.tgz#3ed4d802d239ed3dfc8d8c352f50a6e844791959"
+  integrity sha512-ZBSk0coy2tkt1pCLbLQhV9k3NoN18Q2T+PRGj0fQVqBTp+REms1/uDoGmyRuciO8ixpJQflnknHcHE1pc+4soQ==
 
 trim-newlines@^1.0.0:
   version "1.0.0"
