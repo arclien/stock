@@ -1,11 +1,8 @@
 import os
 import csv
-import time
-from datetime import timedelta, datetime, date
-from pytz import timezone
+from datetime import timedelta
 
-DATE_FORMAT = "%Y-%m-%d"
-TODAY = datetime.now(timezone('Asia/Seoul')).strftime(DATE_FORMAT)
+from Constants import *
 
 # populate all date between two dates
 def daterange(start_date, end_date):

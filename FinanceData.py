@@ -12,8 +12,8 @@ from slacker import Slacker
 from StockList import *
 from Utils import *
 
-__DIR__ = "./public/data/"
-__CALC_DIR__ = "./public/data/calculate/"
+DIR = "./public/data/"
+CALC_DIR = "./public/data/calculate/"
 STOCK_LIST = "stock_list.csv"
 STOCK_LIST_HEADER = ["code","name","nation","user_id","created_at","updated_at","tag_list"]
 START_DATE = "2015-01-02"
@@ -172,12 +172,12 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
   
 
 # 폴더가 없으면 만든다
-if os.path.exists(__DIR__) == False:
-  os.mkdir(__DIR__)
-if os.path.exists(__CALC_DIR__) == False:
-  os.mkdir(__CALC_DIR__)
+if os.path.exists(DIR) == False:
+  os.mkdir(DIR)
+if os.path.exists(CALC_DIR) == False:
+  os.mkdir(CALC_DIR)
 
-f = open(__DIR__ + STOCK_LIST, "r", encoding="utf-8", newline="")
+f = open(DIR + STOCK_LIST, "r", encoding="utf-8", newline="")
 rdr = csv.reader(f)
 
 # stock_list(종목 리스트 및 해당 종목 페치 정보, 태그 정보).csv
@@ -224,8 +224,8 @@ for i, line in enumerate(rdr):
 
 
   ###### START 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
-  raw_csv_file = "{}/{}.csv".format(__DIR__, line[0])
-  calc_csv_file = "{}/{}.csv".format(__CALC_DIR__, line[0])
+  raw_csv_file = "{}/{}.csv".format(DIR, line[0])
+  calc_csv_file = "{}/{}.csv".format(CALC_DIR, line[0])
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다 
   if has_already_appended_today(raw_csv_file) == True:
     continue
@@ -241,7 +241,7 @@ for i, line in enumerate(rdr):
 f.close()
 
 # stock_list csv를 새롭게 업데이트
-with open(__DIR__ + STOCK_LIST, "w", encoding="utf-8", newline="") as file_write: 
+with open(DIR + STOCK_LIST, "w", encoding="utf-8", newline="") as file_write: 
   for item in new_stock_list:
     writer = csv.writer(file_write)
     writer.writerow(item)

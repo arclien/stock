@@ -1,14 +1,13 @@
-from datetime import timedelta, datetime, date
-from pytz import timezone
 import requests
 import json
 
-DATE_FORMAT = "%Y-%m-%d"
-
-TODAY = datetime.now(timezone('Asia/Seoul')).strftime(DATE_FORMAT)
+from Constants import *
 
 # TRELLO
-
+TRELLO_KEY =  os.getenv('REACT_APP_TRELLO_API_KEY') 
+TRELLO_TOKEN =  os.getenv('REACT_APP_TRELLO_TOKEN')
+TRELLO_API_END =  'https://api.trello.com'
+TRELLO_BOARD_STUDY_ID =  os.getenv('REACT_APP_TRELLO_BOARD_STUDY_ID')
 
 AUTH_QUERY = {
    'key': TRELLO_KEY,
@@ -113,5 +112,3 @@ def get_card_ids():
 
 #   if card_json['desc'] != '':
 #     print(json.loads(card_json["desc"]))
-
-# print(json.dumps(json.loads(get_card_by_id("5f926d587501427b0145742c")), sort_keys=True, indent=4, separators=(",", ": ")))
