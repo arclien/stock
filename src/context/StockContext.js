@@ -1,6 +1,8 @@
 import React, { useState, createContext, useEffect } from 'react';
 
-import { fetchStockListFromCsv, fetchStockDataFromCsv } from 'services/stock';
+import { fetchStockDataFromCsv } from 'services/stock';
+import { TRELLO_BOARD_STUDY_ID } from 'constants/trello';
+import { getLabelsOnBoard, getCardsOnBoard } from 'services/trello';
 
 const Context = createContext();
 
@@ -13,37 +15,47 @@ const StockProvider = ({ children }) => {
 
   useEffect(() => {
     (async () => {
-      const data = await fetchStockListFromCsv();
-      setStockList(data.slice(1).filter((el) => el.length > 1));
-      STOCK_DATA_LIST = data
-        .slice(1)
-        .filter((el) => el.length > 1)
-        .reduce(
-          (acc, cur) => ({
-            ...acc,
-            [cur[0]]: {
-              code: cur[0],
-              name: cur[1],
-              nation: cur[2],
-              user_id: cur[3],
-              created_at: cur[4],
-              updated_at: cur[5],
-              tag_list: cur[6],
-              data: [],
-            },
-          }),
-          {}
-        );
-      const tags = new Set([
-        ...data
-          .slice(1)
-          .filter((el) => el.length > 1)
-          .map((el) => el[6] && el[6].split('/'))
-          .reduce((acc, cur) => acc.concat(cur), [])
-          .map((el) => el.trim().replace(/"/gi, ''))
-          .filter((el) => el !== ''),
-      ]);
+      const _labels = await getLabelsOnBoard(TRELLO_BOARD_STUDY_ID);
+      const tags = _labels.reduce((acc, cur) => {
+        return [...acc, cur.name];
+      }, []);
       setTagList([...tags]);
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const _cards = await getCardsOnBoard(TRELLO_BOARD_STUDY_ID);
+      const _stockList = _cards.map((card) => {
+        const desc = JSON.parse(card.desc);
+        const array = [
+          desc.code,
+          card.name,
+          desc.nation,
+          '1',
+          desc.created_at,
+          card.due ? card.due.split('T')[0] : '',
+          card.labels.map((label) => label.name).join('/'),
+        ];
+        return array;
+      });
+      setStockList(_stockList);
+      STOCK_DATA_LIST = _stockList.reduce(
+        (acc, cur) => ({
+          ...acc,
+          [cur[0]]: {
+            code: cur[0],
+            name: cur[1],
+            nation: cur[2],
+            user_id: cur[3],
+            created_at: cur[4],
+            updated_at: cur[5],
+            tag_list: cur[6],
+            data: [],
+          },
+        }),
+        {}
+      );
     })();
   }, []);
 
