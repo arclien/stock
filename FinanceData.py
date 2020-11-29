@@ -28,7 +28,7 @@ for cardId in my_card_list:
   created_at = ""
   nation = ""
   last_fetched_date = ""
-  if 'desc' in json.loads(card_json):
+  if 'desc' in card_json:
     if card_json['desc'] != '':
       if 'code' in json.loads(card_json["desc"]):
         stock_code = json.loads(card_json["desc"])['code']
