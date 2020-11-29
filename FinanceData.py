@@ -28,18 +28,18 @@ for cardId in my_card_list:
   created_at = ""
   nation = ""
   last_fetched_date = ""
-  
-  if not card_json or card_json['desc'] != '':
-    if 'code' in json.loads(card_json["desc"]):
-      stock_code = json.loads(card_json["desc"])['code']
-    if 'name' in json.loads(card_json["desc"]):
-      stock_name = json.loads(card_json["desc"])['name']
-    if 'created_at' in json.loads(card_json["desc"]):
-      created_at = json.loads(card_json["desc"])['created_at']
-    if 'nation' in json.loads(card_json["desc"]):
-      nation = json.loads(card_json["desc"])['nation']
-  else:
-    continue
+  if 'desc' in json.loads(card_json):
+    if card_json['desc'] != '':
+      if 'code' in json.loads(card_json["desc"]):
+        stock_code = json.loads(card_json["desc"])['code']
+      if 'name' in json.loads(card_json["desc"]):
+        stock_name = json.loads(card_json["desc"])['name']
+      if 'created_at' in json.loads(card_json["desc"]):
+        created_at = json.loads(card_json["desc"])['created_at']
+      if 'nation' in json.loads(card_json["desc"]):
+        nation = json.loads(card_json["desc"])['nation']
+    else:
+      continue
   
   if card_json['due']:
     last_fetched_date = card_json['due'].split("T")[0]
