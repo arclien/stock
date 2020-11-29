@@ -15,7 +15,7 @@ import { AppBody } from './App.styles';
 
 function App() {
   const { root, stock, stockListPage, tag } = Routes;
-
+  console.log(process.env);
   return (
     <StockProvider>
       <BrowserRouter>
