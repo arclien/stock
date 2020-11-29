@@ -54,7 +54,7 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
       _endDate = _endDate.add(offsetValue, 'month');
       _startDate = _startDate.add(offsetValue, 'month');
       if (dayjs(_endDate).isAfter(getTodayDate())) {
-        alert('오늘 이후의 날짜는 선택할 수 없습니다.');
+        // alert('오늘 이후의 날짜는 선택할 수 없습니다.');
         return;
       }
     } else if (dir === 'prev') {
@@ -62,7 +62,7 @@ const StockCalendar = ({ startDate, setStartDate, endDate, setEndDate }) => {
       _startDate = _startDate.subtract(offsetValue, 'month');
 
       if (dayjs(_startDate).isBefore(chartStartDate)) {
-        alert(`${chartStartDate} 이전의 날짜는 선택할 수 없습니다.`);
+        // alert(`${chartStartDate} 이전의 날짜는 선택할 수 없습니다.`);
         return;
       }
     }

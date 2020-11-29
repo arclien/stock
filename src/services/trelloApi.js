@@ -26,11 +26,11 @@ const reqTrello = (callback) => {
     .then(() => {
       return callback();
     })
-    .catch((e) => {
-      console.log(
-        'something bad happened, or the user took too long to authorize.',
-        e
-      );
+    .catch(() => {
+      // console.log(
+      //   'something bad happened, or the user took too long to authorize.',
+      //   e
+      // );
     });
 };
 
