@@ -13,6 +13,7 @@ if (!NODE_ENV) {
   );
 }
 
+// eslint-disable-next-line no-console
 // https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
 const dotenvFiles = [
   `${paths.dotenv}.${NODE_ENV}.local`,
@@ -64,6 +65,8 @@ function getClientEnvironment(publicUrl) {
     .filter((key) => REACT_APP.test(key))
     .reduce(
       (env, key) => {
+        // eslint-disable-next-line no-console
+        console.log(env, key);
         env[key] = process.env[key];
         return env;
       },
@@ -88,6 +91,7 @@ function getClientEnvironment(publicUrl) {
         REACT_APP_TRELLO_TOKEN: process.env.REACT_APP_TRELLO_TOKEN,
         REACT_APP_TRELLO_BOARD_STUDY_ID:
           process.env.REACT_APP_TRELLO_BOARD_STUDY_ID,
+        REACT_APP_TRELLO_CARD_ID: process.env.REACT_APP_TRELLO_CARD_ID,
       }
     );
   // Stringify all values so we can feed into webpack DefinePlugin
