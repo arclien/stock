@@ -14,7 +14,7 @@ import Tag from 'pages/Tag/Tag';
 import { AppBody } from './App.styles';
 
 function App() {
-  const { root, stock, stockList, tag } = Routes;
+  const { root, stock, stockListPage, tag } = Routes;
 
   return (
     <StockProvider>
@@ -29,13 +29,13 @@ function App() {
             <CommonRoute path={tag.path}>
               <Tag />
             </CommonRoute>
-            <CommonRoute path={stockList.path}>
+            <CommonRoute path={stockListPage.path}>
               <StockList />
             </CommonRoute>
             <CommonRoute path={root.path}>
               <Dashboard />
             </CommonRoute>
-            <Redirect to={root.path} />
+            <Redirect to={stockListPage.path} />
           </Switch>
         </AppBody>
       </BrowserRouter>

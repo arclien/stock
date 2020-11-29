@@ -3,7 +3,7 @@ import { getTrello, getColletionTrello, postTrello } from 'services/trelloApi';
 import {
   TRELLO_COLLECTION_TYPE,
   TRELLO_LABEL_COLOR,
-  TRELLO_BOARD_STUDY_ID,
+  // TRELLO_BOARD_STUDY_ID,
 } from 'constants/trello';
 
 export const getMe = () => {
@@ -61,10 +61,10 @@ export const createCard = async (stock, idList, labels) => {
   const code = stock[0];
   const name = stock[1];
   const nation = stock[2];
-  const created_at = stock[4];
-  const updated_at = stock[5];
+  const createdAt = stock[4];
+  const updatedAt = stock[5];
   const tags = stock[6].split('/');
-  const base_price = stock.length === 8 ? stock[7] : '';
+  const basePrice = stock.length === 8 ? stock[7] : '';
 
   const idLabels = [];
   await tags.forEach(async (tag) => {
@@ -78,8 +78,8 @@ export const createCard = async (stock, idList, labels) => {
     code,
     name,
     nation,
-    created_at,
-    base_price,
+    created_at: createdAt,
+    base_price: basePrice,
   };
 
   const newCard = {
@@ -87,7 +87,7 @@ export const createCard = async (stock, idList, labels) => {
     name,
     desc: JSON.stringify(desc),
     pos: 'top',
-    due: updated_at ? new Date(updated_at).toISOString() : '',
+    due: updatedAt ? new Date(updatedAt).toISOString() : '',
     idLabels: idLabels.toString(),
   };
   await postTrello('cards', newCard);

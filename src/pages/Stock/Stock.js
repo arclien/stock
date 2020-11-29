@@ -29,7 +29,7 @@ const Stock = () => {
   } = useContext(StockContext);
 
   const history = useHistory();
-  const { root } = Routes;
+  const { stockListPage } = Routes;
 
   const [isLoaded, setLoaded] = useState(false);
   const [option, setOption] = useState({
@@ -48,7 +48,8 @@ const Stock = () => {
     const getData = async () => {
       setLoaded(false);
       const currentStock = stockList.find((el) => el[0] === stockCode);
-      if (stockList.length > 0 && !currentStock) history.replace(root.path);
+      if (stockList.length > 0 && !currentStock)
+        history.replace(stockListPage.path);
 
       const stockData = { ...chartOption };
       const stockDataPercent = { ...chartOption };
@@ -186,10 +187,10 @@ const Stock = () => {
     getStockData,
     history,
     percentTargetDate,
-    root.path,
     startDate,
     stockCode,
     stockList,
+    stockListPage.path,
   ]);
 
   const onChartClick = (params) => {

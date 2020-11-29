@@ -16,27 +16,15 @@ import {
 
 const NavBar = () => {
   const { pathname } = useLocation();
-  const { stock, tag, root } = Routes;
-  const [tagList, setTagList] = useState([]);
+  const { stock, tag, root, stockListPage } = Routes;
   const [currentStock, setCurrentStock] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const debounceSearchKeyword = useDebounce(searchKeyword, 500);
 
   const {
-    state: { stockList },
+    state: { stockList, tagList },
   } = useContext(StockContext);
-
-  useEffect(() => {
-    const tags = new Set([
-      ...stockList
-        .map((el) => el[6].split('/'))
-        .reduce((acc, cur) => acc.concat(cur), [])
-        .map((el) => el.trim().replace(/"/gi, ''))
-        .filter((el) => el !== ''),
-    ]);
-    setTagList([...tags]);
-  }, [stockList]);
 
   useEffect(() => {
     const stockCode = pathname.replace(stock.url, '');
@@ -80,6 +68,11 @@ const NavBar = () => {
         <StockItem to={`${root.path}`}>
           <StockText active={pathname === `${root.path}`}>
             {`${root.description}`}
+          </StockText>
+        </StockItem>
+        <StockItem to={`${stockListPage.path}`}>
+          <StockText active={pathname === `${stockListPage.path}`}>
+            {`${stockListPage.description}`}
           </StockText>
         </StockItem>
         {tagList &&
