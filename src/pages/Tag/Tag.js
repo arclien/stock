@@ -29,7 +29,7 @@ const Tag = () => {
   } = useContext(StockContext);
 
   const history = useHistory();
-  const { root } = Routes;
+  const { stockListPage } = Routes;
 
   const [tagStockList, setTagStockList] = useState([]);
   const [isLoaded, setLoaded] = useState(false);
@@ -50,7 +50,7 @@ const Tag = () => {
   useEffect(() => {
     const _tagStockList = getStockListByTag(stockList, tagName);
     if (stockList.length > 0 && _tagStockList.length === 0)
-      history.replace(root.path);
+      history.replace(stockListPage.path);
 
     setTagStockList(_tagStockList);
     const stockData = { ...chartOption };
@@ -149,7 +149,7 @@ const Tag = () => {
     stockList,
     tagName,
     history,
-    root.path,
+    stockListPage.path,
     percentTargetDate,
     getStockData,
   ]);

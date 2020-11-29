@@ -9,6 +9,7 @@ let STOCK_DATA_LIST = {};
 
 const StockProvider = ({ children }) => {
   const [stockList, setStockList] = useState([]);
+  const [tagList, setTagList] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -33,6 +34,16 @@ const StockProvider = ({ children }) => {
           }),
           {}
         );
+      const tags = new Set([
+        ...data
+          .slice(1)
+          .filter((el) => el.length > 1)
+          .map((el) => el[6] && el[6].split('/'))
+          .reduce((acc, cur) => acc.concat(cur), [])
+          .map((el) => el.trim().replace(/"/gi, ''))
+          .filter((el) => el !== ''),
+      ]);
+      setTagList([...tags]);
     })();
   }, []);
 
@@ -62,6 +73,7 @@ const StockProvider = ({ children }) => {
       value={{
         state: {
           stockList,
+          tagList,
           STOCK_DATA_LIST,
         },
         actions: { getStockData },

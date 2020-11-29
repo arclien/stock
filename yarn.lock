@@ -4135,7 +4135,7 @@ echarts-for-react@^2.0.16:
     fast-deep-equal "^2.0.1"
     size-sensor "^1.0.0"
 
-echarts@4.9.0:
+echarts@^4.9.0:
   version "4.9.0"
   resolved "https://registry.yarnpkg.com/echarts/-/echarts-4.9.0.tgz#a9b9baa03f03a2a731e6340c55befb57a9e1347d"
   integrity sha512-+ugizgtJ+KmsJyyDPxaw2Br5FqzuBnyOWwcxPKO6y0gc5caYcfnEUIlNStx02necw8jmKmTafmpHhGo4XDtEIA==
@@ -11095,6 +11095,11 @@ tr46@^1.0.1:
   integrity sha1-qLE/1r/SSJUZZ0zN5VujaTtwbQk=
   dependencies:
     punycode "^2.1.0"
+
+trello-web@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/trello-web/-/trello-web-1.0.3.tgz#3ed4d802d239ed3dfc8d8c352f50a6e844791959"
+  integrity sha512-ZBSk0coy2tkt1pCLbLQhV9k3NoN18Q2T+PRGj0fQVqBTp+REms1/uDoGmyRuciO8ixpJQflnknHcHE1pc+4soQ==
 
 trim-newlines@^1.0.0:
   version "1.0.0"

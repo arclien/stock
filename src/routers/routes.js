@@ -1,13 +1,19 @@
 const root = {
   path: '/stock',
   url: '/stock',
-  description: 'Main Page',
+  description: 'Dashboard Page',
 };
 
 const stock = {
   path: '/stock/code/:code',
   url: '/stock/code/',
   description: 'Stock Page',
+};
+
+const stockListPage = {
+  path: '/stock/list',
+  url: '/stock/list/',
+  description: 'Stock List Page',
 };
 
 const tag = {
@@ -19,5 +25,6 @@ const tag = {
 export default {
   root,
   stock,
+  stockListPage,
   tag,
 };
