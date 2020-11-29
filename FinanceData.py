@@ -40,9 +40,10 @@ for cardId in my_card_list:
         nation = json.loads(card_json["desc"])['nation']
     else:
       continue
-  
-  if card_json['due']:
-    last_fetched_date = card_json['due'].split("T")[0]
+ 
+  if 'due' in card_json:
+    if card_json['due']:
+      last_fetched_date = card_json['due'].split("T")[0]
   
 
   if not last_fetched_date:
