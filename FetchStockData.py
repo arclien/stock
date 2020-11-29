@@ -40,7 +40,7 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date):
         # 기존 csv 파일에 append 하기
         # 공휴일 등으로 주식시장 데이터가 없을 경우, 해당 날짜에 대한 row를 강제로 csv에 추가
         if len(df_list) == 0:
-          writer.writerow([TODAY, 0,0,0,0,0,0])
+          writer.writerow([fetch_start_date, 0,0,0,0,0,0])
         # fetch 된 데이터가 있으면 해당 내용 append
         else:
           for item in df_list.reset_index().values.tolist():
