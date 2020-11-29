@@ -1,6 +1,6 @@
 const root = {
-  path: '/stock',
-  url: '/stock',
+  path: '/stock/dashboard',
+  url: '/stock/dashboard',
   description: 'Dashboard Page',
 };
 

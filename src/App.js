@@ -16,8 +16,6 @@ import { AppBody } from './App.styles';
 function App() {
   const { root, stock, stockListPage, tag } = Routes;
 
-  // eslint-disable-next-line no-console
-  console.log(process.env);
   return (
     <StockProvider>
       <BrowserRouter>
