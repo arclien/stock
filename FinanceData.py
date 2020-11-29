@@ -45,33 +45,16 @@ for cardId in my_card_list:
     last_fetched_date = card_json['due'].split("T")[0]
   
 
-  # 처음 추가된 종목은 due date(last_fetched_date) 정보가 없다.
-  if not created_at:
+  if not last_fetched_date:
     fetch_start_date = START_DATE
-    if CURRENT_TIME == AUTO_CRAWLING_TIME:
-      # created_at, updated_at을 오늘 날짜로 업데이트
-      created_at = last_fetched_date = TODAY
-    else:
-      created_at = TODAY
-   
-
-  # 이전에 추가된 종목은, 처음 추가 될때 created_at을 업데이트 해주며, updated_at + 1에 해당하는 날짜를 받는다
+    last_fetched_date = TODAY
   else:
-    if not last_fetched_date:
-      if nation == 'ko':
-        fetch_start_date = TODAY
-      elif nation == 'us':
-        fetch_start_date = (datetime.strptime(TODAY, DATE_FORMAT)  - timedelta(days=1)).strftime(DATE_FORMAT)
-    else:
-      if nation == 'ko':
-        fetch_start_date = (datetime.strptime(last_fetched_date, DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
-      elif nation == 'us':
-        fetch_start_date = datetime.strptime(last_fetched_date, DATE_FORMAT)
-
-    if CURRENT_TIME == AUTO_CRAWLING_TIME:
-      # updated_at을 오늘 날짜로 업데이트
-      last_fetched_date = TODAY
-    
+    if nation == 'ko':
+      fetch_start_date = (datetime.strptime(last_fetched_date, DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
+      last_fetched_date = fetch_start_date
+    elif nation == 'us':
+      fetch_start_date = datetime.strptime(last_fetched_date, DATE_FORMAT)
+      last_fetched_date = fetch_start_date
   ###### END 각 종목에 대해 데이터 가져올 날짜 정의
 
  
@@ -86,7 +69,7 @@ for cardId in my_card_list:
   fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date)
 
   # trello due date 업데이트
-  card_json['due'] = fetch_start_date
+  card_json['due'] = last_fetched_date
   put_card_by_id(cardId, {'due': card_json['due']})
   # trello due date 업데이트
 
