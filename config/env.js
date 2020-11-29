@@ -84,15 +84,10 @@ function getClientEnvironment(publicUrl) {
         WDS_SOCKET_HOST: process.env.WDS_SOCKET_HOST,
         WDS_SOCKET_PATH: process.env.WDS_SOCKET_PATH,
         WDS_SOCKET_PORT: process.env.WDS_SOCKET_PORT,
-        REACT_APP_TRELLO_API_KEY: JSON.stringify(
-          process.env.REACT_APP_TRELLO_API_KEY
-        ),
-        REACT_APP_TRELLO_TOKEN: JSON.stringify(
-          process.env.REACT_APP_TRELLO_TOKEN
-        ),
-        REACT_APP_TRELLO_BOARD_STUDY_ID: JSON.stringify(
-          process.env.REACT_APP_TRELLO_BOARD_STUDY_ID
-        ),
+        REACT_APP_TRELLO_API_KEY: process.env.REACT_APP_TRELLO_API_KEY,
+        REACT_APP_TRELLO_TOKEN: process.env.REACT_APP_TRELLO_TOKEN,
+        REACT_APP_TRELLO_BOARD_STUDY_ID:
+          process.env.REACT_APP_TRELLO_BOARD_STUDY_ID,
       }
     );
   // Stringify all values so we can feed into webpack DefinePlugin

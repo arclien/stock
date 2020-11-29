@@ -43,14 +43,14 @@ jobs:
         run: |
           yarn install
           yarn build
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          REACT_APP_TRELLO_API_KEY: ${{ secrets.REACT_APP_TRELLO_API_KEY }}
+          REACT_APP_TRELLO_TOKEN: ${{ secrets.REACT_APP_TRELLO_TOKEN }}
+          REACT_APP_TRELLO_BOARD_STUDY_ID: ${{ secrets.REACT_APP_TRELLO_BOARD_STUDY_ID }}
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          REACT_APP_TRELLO_API_KEY: ${{ secrets.REACT_APP_TRELLO_API_KEY }}
-          REACT_APP_TRELLO_TOKEN: ${{ secrets.REACT_APP_TRELLO_TOKEN }}
-          REACT_APP_TRELLO_BOARD_STUDY_ID: ${{ secrets.REACT_APP_TRELLO_BOARD_STUDY_ID }}
