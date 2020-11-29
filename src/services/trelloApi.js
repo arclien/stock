@@ -10,6 +10,7 @@ const reqTrello = (callback) => {
     .then((existingToken) => {
       if (existingToken) {
         Trello.token = existingToken;
+        Trello.key = TRELLO_API_KEY;
       } else {
         return Trello.auth({
           name: 'Stock App',
