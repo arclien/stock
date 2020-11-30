@@ -64,10 +64,11 @@ for cardId in my_card_list:
 
   fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nation)
 
-  # trello due date 업데이트
-  card_json['due'] = due_date
-  put_card_by_id(cardId, {'due': card_json['due']})
-  # trello due date 업데이트
+  if CURRENT_TIME == AUTO_CRAWLING_TIME:
+    # trello due date 업데이트
+    card_json['due'] = due_date
+    put_card_by_id(cardId, {'due': card_json['due']})
+    # trello due date 업데이트
 
   if CURRENT_TIME == AUTO_CRAWLING_TIME:
     CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name)
