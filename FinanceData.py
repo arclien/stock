@@ -74,7 +74,6 @@ for cardId in my_card_list:
     CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name)
 
 
-
 slack = Slacker(token=SLACK_TOKEN)
 
 CRAWLING_RESULT_MSG += '====================================================='
