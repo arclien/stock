@@ -95,4 +95,4 @@ class Trello {
   }
 }
 
-module.exports = Trello;
+export default Trello;
