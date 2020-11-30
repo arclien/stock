@@ -47,7 +47,7 @@ const stockDefaultValue = {
 
 const StockList = () => {
   const {
-    state: { tagList },
+    state: { tagList, hasTrelloToken },
   } = useContext(StockContext);
 
   const [cards, setCards] = useState([]);
@@ -55,13 +55,15 @@ const StockList = () => {
   const [stock, setStock] = useState({ ...stockDefaultValue });
 
   useEffect(() => {
-    (async function searchStockList() {
-      const _cards = await getCardsOnBoard(TRELLO_BOARD_STUDY_ID);
-      setCards(_cards);
-      const _labels = await getLabelsOnBoard(TRELLO_BOARD_STUDY_ID);
-      setLabels(_labels);
+    (async () => {
+      if (hasTrelloToken) {
+        const _cards = await getCardsOnBoard(TRELLO_BOARD_STUDY_ID);
+        setCards(_cards);
+        const _labels = await getLabelsOnBoard(TRELLO_BOARD_STUDY_ID);
+        setLabels(_labels);
+      }
     })();
-  }, []);
+  }, [hasTrelloToken]);
 
   const addCardToTrello = () => {
     const { code, name, nation, userId, createdAt, tags, basePrice } = stock;

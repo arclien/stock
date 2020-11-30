@@ -1,18 +1,17 @@
 import { TRELLO_API_KEY } from 'constants/trello';
+import Trello from 'Trello';
 
-const TrelloWeb = require('trello-web');
+const MyTrello = new Trello(TRELLO_API_KEY);
 
-const Trello = new TrelloWeb(TRELLO_API_KEY);
-
-const reqTrello = (callback) => {
+export const authTrello = (callback) => {
   return Promise.resolve()
     .then(() => localStorage.getItem('trello_token'))
     .then((existingToken) => {
       if (existingToken) {
-        Trello.token = existingToken;
-        Trello.key = TRELLO_API_KEY;
+        MyTrello.token = existingToken;
+        MyTrello.key = TRELLO_API_KEY;
       } else {
-        return Trello.auth({
+        return MyTrello.auth({
           name: 'Stock App',
           scope: {
             read: true,
@@ -35,31 +34,21 @@ const reqTrello = (callback) => {
 };
 
 export const getTrello = (path, params = {}) => {
-  return reqTrello(() => {
-    return Trello.get(`/1/${path}`, params);
-  });
+  return MyTrello.get(`/1/${path}`, params);
 };
 
 export const postTrello = (path, params = {}) => {
-  return reqTrello(() => {
-    return Trello.post(`/1/${path}`, params);
-  });
+  return MyTrello.post(`/1/${path}`, params);
 };
 
 export const putTrello = (path, params = {}) => {
-  return reqTrello(() => {
-    return Trello.put(`/1/${path}`, params);
-  });
+  return MyTrello.put(`/1/${path}`, params);
 };
 
 export const deleteTrello = (path, params = {}) => {
-  return reqTrello(() => {
-    return Trello.delete(`/1/${path}`, params);
-  });
+  return MyTrello.delete(`/1/${path}`, params);
 };
 
 export const getColletionTrello = (type, id, params = {}) => {
-  return reqTrello(() => {
-    return Trello.get(`/1/${type}/${id}`, params);
-  });
+  return MyTrello.get(`/1/${type}/${id}`, params);
 };
