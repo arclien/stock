@@ -5,9 +5,12 @@ from Constants import *
 from Utils import *
 
 # 종목코드 & fetch_start_date 를 바탕으로 stock 정보 fetch 후  raw_csv_file에 append
-def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date):
+def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nation):
   # fetch_start_date 기준으로 stock_code(종목코드)에 대한 데이터를 불러옴
-  df_list = fdr.DataReader(stock_code, fetch_start_date)
+  if nation == 'ko':
+    df_list = fdr.DataReader(stock_code, fetch_start_date)
+  elif nation == 'us':
+    df_list = fdr.DataReader(stock_code, fetch_start_date, (datetime.strptime(TODAY, DATE_FORMAT) - timedelta(days=1)).strftime(DATE_FORMAT))
 
   if not CURRENT_TIME == AUTO_CRAWLING_TIME:
     df_list = df_list[:-1]

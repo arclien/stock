@@ -27,7 +27,7 @@ for cardId in my_card_list:
   stock_code = ""
   created_at = ""
   nation = ""
-  last_fetched_date = ""
+  due_date = ""
   if 'desc' in card_json:
     if card_json['desc'] != '':
       if 'code' in json.loads(card_json["desc"]):
@@ -43,19 +43,14 @@ for cardId in my_card_list:
  
   if 'due' in card_json:
     if card_json['due']:
-      last_fetched_date = card_json['due'].split("T")[0]
+      due_date = card_json['due'].split("T")[0]
   
 
-  if not last_fetched_date:
+  if not due_date:
     fetch_start_date = START_DATE
-    last_fetched_date = TODAY
+    due_date = TODAY
   else:
-    if nation == 'ko':
-      fetch_start_date = (datetime.strptime(last_fetched_date, DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
-      last_fetched_date = fetch_start_date
-    elif nation == 'us':
-      fetch_start_date = datetime.strptime(last_fetched_date, DATE_FORMAT)
-      last_fetched_date = fetch_start_date
+    due_date = fetch_start_date = (datetime.strptime(due_date, DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
   ###### END 각 종목에 대해 데이터 가져올 날짜 정의
 
  
@@ -67,10 +62,10 @@ for cardId in my_card_list:
     continue
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다   
 
-  fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date)
+  fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nation)
 
   # trello due date 업데이트
-  card_json['due'] = last_fetched_date
+  card_json['due'] = due_date
   put_card_by_id(cardId, {'due': card_json['due']})
   # trello due date 업데이트
 
