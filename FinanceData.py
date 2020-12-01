@@ -49,6 +49,8 @@ for cardId in my_card_list:
   if not due_date:
     fetch_start_date = START_DATE
     due_date = TODAY
+    # 첫 크롤링은 무조건 데이터를 fetch하기 때문에 due date를 업데이트
+    put_card_by_id(cardId, {'due': (datetime.strptime(due_date, DATE_FORMAT) - timedelta(days=1)).strftime(DATE_FORMAT)})
   else:
     due_date = fetch_start_date = (datetime.strptime(due_date, DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
   ###### END 각 종목에 대해 데이터 가져올 날짜 정의
@@ -66,8 +68,7 @@ for cardId in my_card_list:
 
   if CURRENT_TIME == AUTO_CRAWLING_TIME:
     # trello due date 업데이트
-    card_json['due'] = due_date
-    put_card_by_id(cardId, {'due': card_json['due']})
+    put_card_by_id(cardId, {'due': due_date})
     # trello due date 업데이트
 
   if CURRENT_TIME == AUTO_CRAWLING_TIME:

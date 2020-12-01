@@ -12,6 +12,7 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nat
   elif nation == 'us':
     df_list = fdr.DataReader(stock_code, fetch_start_date, (datetime.strptime(TODAY, DATE_FORMAT) - timedelta(days=1)).strftime(DATE_FORMAT))
 
+  # 가장 마지막 데이터를 지우는 로직
   if not CURRENT_TIME == AUTO_CRAWLING_TIME:
     df_list = df_list[:-1]
     

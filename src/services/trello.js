@@ -90,5 +90,5 @@ export const createCard = async (stock, idList, labels) => {
     due: updatedAt ? new Date(updatedAt).toISOString() : '',
     idLabels: idLabels.toString(),
   };
-  await postTrello('cards', newCard);
+  return postTrello('cards', newCard);
 };
