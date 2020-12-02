@@ -52,7 +52,8 @@ for cardId in my_card_list:
     # 첫 크롤링은 무조건 데이터를 fetch하기 때문에 due date를 업데이트
     put_card_by_id(cardId, {'due': (datetime.strptime(due_date, DATE_FORMAT) - timedelta(days=1)).strftime(DATE_FORMAT)})
   else:
-    due_date = fetch_start_date = (datetime.strptime(due_date, DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
+    # 미국 주식은 항상 하루 늦게 가져오기 때문에, fetch_start_date = (미국장은 오늘 기준(12월2일)으로 due_date(어제날짜))(12월1일)
+    due_date = fetch_start_date = datetime.strptime(due_date, DATE_FORMAT)
   ###### END 각 종목에 대해 데이터 가져올 날짜 정의
 
  

@@ -8,9 +8,9 @@ from Utils import *
 def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nation):
   # fetch_start_date 기준으로 stock_code(종목코드)에 대한 데이터를 불러옴
   if nation == 'ko':
-    df_list = fdr.DataReader(stock_code, fetch_start_date)
+    df_list = fdr.DataReader(stock_code, fetch_start_date) # 시작일 부터 오늘 날짜까지 모두 fetch함.
   elif nation == 'us':
-    df_list = fdr.DataReader(stock_code, fetch_start_date, (datetime.strptime(TODAY, DATE_FORMAT) - timedelta(days=1)).strftime(DATE_FORMAT))
+    df_list = fdr.DataReader(stock_code, fetch_start_date, datetime.strptime(TODAY, DATE_FORMAT)) # 시작일(미국장은 오늘 기준으로 due_date(어제날짜)) ~ 오늘날짜( 오늘날짜는 fetch 안함 )
 
   # 가장 마지막 데이터를 지우는 로직
   if not CURRENT_TIME == AUTO_CRAWLING_TIME:
@@ -28,7 +28,14 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nat
         if not CURRENT_TIME == AUTO_CRAWLING_TIME:
           if _today == TODAY:
             continue
-       
+        
+        # 미국 주식의 경우, 어제까지의 데이터만 가져오도록 한다.
+        # 4시 크롤링 타임 기준으로 어제의 데이터까지만 주식 장이 열려있기에
+        if CURRENT_TIME == AUTO_CRAWLING_TIME:
+          if nation == 'us':
+            if _today == TODAY:
+              continue
+        
         has_data = False
         for item in df_list.reset_index().values.tolist():
           item[0] = item[0].strftime(DATE_FORMAT)
