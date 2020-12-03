@@ -52,8 +52,13 @@ for cardId in my_card_list:
     # 첫 크롤링은 무조건 데이터를 fetch하기 때문에 due date를 업데이트
     put_card_by_id(cardId, {'due': (datetime.strptime(due_date, DATE_FORMAT) - timedelta(days=1)).strftime(DATE_FORMAT)})
   else:
-    # 미국 주식은 항상 하루 늦게 가져오기 때문에, fetch_start_date = (미국장은 오늘 기준(12월2일)으로 due_date(어제날짜))(12월1일)
-    due_date = fetch_start_date = datetime.strptime(due_date, DATE_FORMAT)
+    fetch_start_date = datetime.strptime(due_date, DATE_FORMAT)
+    due_date = (datetime.strptime(due_date, DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
+    if nation == 'ko':
+      fetch_start_date = due_date
+    elif nation == 'us':
+      fetch_start_date = fetch_start_date
+      # 미국 주식은 항상 하루 늦게 가져오기 때문에, fetch_start_date = (미국장은 오늘 기준(12월2일)으로 due_date(어제날짜))(12월1일)
   ###### END 각 종목에 대해 데이터 가져올 날짜 정의
 
  
@@ -61,7 +66,7 @@ for cardId in my_card_list:
   raw_csv_file = "{}/{}.csv".format(DIR, stock_code)
   calc_csv_file = "{}/{}.csv".format(CALC_DIR, stock_code)
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다 
-  if has_already_appended_today(raw_csv_file) == True:
+  if has_already_appended_today(raw_csv_file, nation) == True:
     continue
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다   
 

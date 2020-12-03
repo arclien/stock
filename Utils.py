@@ -10,15 +10,20 @@ def daterange(start_date, end_date):
       yield start_date + timedelta(n)
 
 # check today data has been appended
-def has_already_appended_today(raw_csv_file):
+def has_already_appended_today(raw_csv_file, nation):
   has_today_appended = False
   if os.path.exists(raw_csv_file):
     with open(raw_csv_file, "r") as f:
       reader = csv.reader(f)
       for content in enumerate(reader):
-        if content[1][0] == TODAY:
-          has_today_appended = True
-          break
+        if nation == 'ko':
+          if content[1][0] == TODAY:
+            has_today_appended = True
+            break
+        elif nation == 'us':
+          if content[1][0] == (datetime.strptime(TODAY, DATE_FORMAT) - timedelta(days=1)).strftime(DATE_FORMAT):
+            has_today_appended = True
+            break
   
   return has_today_appended
 
