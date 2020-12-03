@@ -10,7 +10,8 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nat
   if nation == 'ko':
     df_list = fdr.DataReader(stock_code, fetch_start_date) # 시작일 부터 오늘 날짜까지 모두 fetch함.
   elif nation == 'us':
-    df_list = fdr.DataReader(stock_code, fetch_start_date, datetime.strptime(TODAY, DATE_FORMAT)) # 시작일(미국장은 오늘 기준으로 due_date(어제날짜)) ~ 오늘날짜( 오늘날짜는 fetch 안함 )
+    # 시작일(미국장은 오늘 기준으로 due_date(어제날짜)) ~ 오늘날짜( 오늘날짜는 fetch 안함 )
+    df_list = fdr.DataReader(stock_code, fetch_start_date, datetime.strptime(TODAY, DATE_FORMAT))
 
   # 가장 마지막 데이터를 지우는 로직
   if not CURRENT_TIME == AUTO_CRAWLING_TIME:

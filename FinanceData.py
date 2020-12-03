@@ -71,6 +71,7 @@ for cardId in my_card_list:
   # 이미 한번 오늘 날짜에 해당하는 데이터를 추가했으면(crawled) 해당 csv 파일은 업데이트 하지 않는다   
 
   fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nation)
+  
 
   if CURRENT_TIME == AUTO_CRAWLING_TIME:
     # trello due date 업데이트
