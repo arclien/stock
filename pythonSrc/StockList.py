@@ -1,7 +1,8 @@
 import requests
 import json
+import os
 
-from Constants import *
+from pythonSrc.Constants import *
 
 # TRELLO
 TRELLO_KEY =  os.getenv('REACT_APP_TRELLO_API_KEY') 
