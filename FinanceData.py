@@ -68,17 +68,10 @@ for cardId in my_card_list:
 slack = Slacker(token=SLACK_TOKEN)
 
 CRAWLING_RESULT_MSG += '====================================================='
-if nation == 'ko':
-  if CURRENT_TIME == AUTO_CRAWLING_TIME:
-    slack.chat.post_message(
-            channel=SLACK_CHANNEL, 
-            username=SLACK_SENDER_NAME,
-            text=CRAWLING_RESULT_MSG
-          )
-elif nation == 'us':
-  if CURRENT_TIME == US_CRAWLING_TIME:
-    slack.chat.post_message(
-            channel=SLACK_CHANNEL, 
-            username=SLACK_SENDER_NAME,
-            text=CRAWLING_RESULT_MSG
-          )
+if CURRENT_TIME == AUTO_CRAWLING_TIME or CURRENT_TIME == US_CRAWLING_TIME:
+  slack.chat.post_message(
+    channel=SLACK_CHANNEL, 
+    username=SLACK_SENDER_NAME,
+    text=CRAWLING_RESULT_MSG
+  )
+  
