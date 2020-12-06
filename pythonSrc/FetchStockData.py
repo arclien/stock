@@ -5,58 +5,24 @@ from pythonSrc.Constants import *
 from pythonSrc.Utils import *
 
 # 종목코드 & fetch_start_date 를 바탕으로 stock 정보 fetch 후  raw_csv_file에 append
-def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, nation):
+def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, fetch_end_date):
+  print(stock_code, fetch_start_date, fetch_end_date)
   # fetch_start_date 기준으로 stock_code(종목코드)에 대한 데이터를 불러옴
-  if nation == 'ko':
-    df_list = fdr.DataReader(stock_code, fetch_start_date) # 시작일 부터 오늘 날짜까지 모두 fetch함.
-  elif nation == 'us':
-    # 시작일(미국장은 오늘 기준으로 due_date(어제날짜)) ~ 오늘날짜( 오늘날짜는 fetch 안함 )
-    df_list = fdr.DataReader(stock_code, fetch_start_date, datetime.strptime(TODAY, DATE_FORMAT))
-
-  # 가장 마지막 데이터를 지우는 로직
-  if not CURRENT_TIME == AUTO_CRAWLING_TIME:
-    df_list = df_list[:-1]
-    
+  df_list = fdr.DataReader(stock_code, fetch_start_date, fetch_end_date)
+  
   with open(raw_csv_file, "a") as csvfile:
     writer = csv.writer(csvfile)
     # csv 파일 저장 로직
-    if fetch_start_date == START_DATE:
-      # 종목 코드에 해당하는 csv 파일 생성
 
-      # TODO n^2 퍼포먼스. 개선하기
-      for single_date in daterange(datetime.strptime(START_DATE, DATE_FORMAT), datetime.strptime(TODAY, DATE_FORMAT)):
-        _today = single_date.strftime(DATE_FORMAT)
-        if not CURRENT_TIME == AUTO_CRAWLING_TIME:
-          if _today == TODAY:
-            continue
-        
-        # 미국 주식의 경우, 어제까지의 데이터만 가져오도록 한다.
-        # 4시 크롤링 타임 기준으로 어제의 데이터까지만 주식 장이 열려있기에
-        if CURRENT_TIME == AUTO_CRAWLING_TIME:
-          if nation == 'us':
-            if _today == TODAY:
-              continue
-        
-        has_data = False
-        for item in df_list.reset_index().values.tolist():
-          item[0] = item[0].strftime(DATE_FORMAT)
-          if item[0] == _today:
-            writer.writerow(item)
-            has_data = True
-            break
-        if has_data == False:
-          writer.writerow([_today, 0,0,0,0,0,0])
+    for single_date in daterange(datetime.strptime(fetch_start_date, DATE_FORMAT), datetime.strptime(fetch_end_date, DATE_FORMAT)):
+      _today = single_date.strftime(DATE_FORMAT)
       
-    else:
-      if CURRENT_TIME == AUTO_CRAWLING_TIME:
-        # 기존 csv 파일에 append 하기
-        # 공휴일 등으로 주식시장 데이터가 없을 경우, 해당 날짜에 대한 row를 강제로 csv에 추가
-        if len(df_list) == 0:
-          writer.writerow([fetch_start_date, 0,0,0,0,0,0])
-        # fetch 된 데이터가 있으면 해당 내용 append
-        else:
-          for item in df_list.reset_index().values.tolist():
-            item[0] = item[0].strftime(DATE_FORMAT)
-            writer.writerow(item)
-  
-  ###### END 시작 날짜를 바탕으로 각 종목을 fetch 및 각 종목 csv 파일에 데이터 업데이트
+      has_data = False
+      for item in df_list.reset_index().values.tolist():
+        item[0] = item[0].strftime(DATE_FORMAT)
+        if item[0] == _today:
+          writer.writerow(item)
+          has_data = True
+          break
+      if has_data == False:
+        writer.writerow([_today, 0,0,0,0,0,0])
