@@ -5,8 +5,7 @@ from pythonSrc.Constants import *
 from pythonSrc.Utils import *
 
 # 종목코드 & fetch_start_date 를 바탕으로 stock 정보 fetch 후  raw_csv_file에 append
-def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, fetch_end_date):
-  print(stock_code, fetch_start_date, fetch_end_date)
+def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, fetch_end_date, nation):
   # fetch_start_date 기준으로 stock_code(종목코드)에 대한 데이터를 불러옴
   df_list = fdr.DataReader(stock_code, fetch_start_date, fetch_end_date)
   
@@ -21,7 +20,10 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, fet
       for item in df_list.reset_index().values.tolist():
         item[0] = item[0].strftime(DATE_FORMAT)
         if item[0] == _today:
-          writer.writerow(item)
+          if nation == 'ko':
+            writer.writerow(item)
+          elif nation == 'us':
+            writer.writerow([item[0], item[2], item[3], item[4], item[1], item[5], item[6]])
           has_data = True
           break
       if has_data == False:

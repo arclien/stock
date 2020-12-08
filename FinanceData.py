@@ -55,7 +55,7 @@ for cardId in my_card_list:
 
   # 이미 fetching을 했으면 fetch_start_date가 False 이다.
   if not fetch_start_date == False:
-    fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, fetch_end_date)
+    fetch_and_generate_stock_csv(raw_csv_file, stock_code, fetch_start_date, fetch_end_date, nation)
   
   if nation == 'ko':
     if CURRENT_TIME == AUTO_CRAWLING_TIME:
