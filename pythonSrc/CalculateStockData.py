@@ -38,6 +38,7 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
   
     alarm_message = ""
     for day in VOLUME_CALC_LENGTH:
+      inner_alarm_message = ""
       df = df.tail(day)
       
       _max_price = math.ceil(df.describe().loc['max']['Close'])
@@ -62,21 +63,30 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
       if not df_today_volume == 0:
         increase_percent = get_increase_percent(_mean_volume, df_today_volume)
         if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
-          alarm_message += f'> {day}일 평균 대비 {increase_percent}% 증가 / '
+          inner_alarm_message += f'> {day}일 평균 대비 {increase_percent}% 증가 / '
         
         increase_percent = get_increase_percent(_adjusted_mean, df_today_volume)
         if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
-          alarm_message += f'조정 평균 대비 {increase_percent}% 증가 / '
-
+          if inner_alarm_message != "":
+            inner_alarm_message += f'조정 평균 대비 {increase_percent}% 증가 / '
+          else:
+            inner_alarm_message += f'> {day}일 조정 평균 대비 {increase_percent}% 증가 / '
+          
         if df_today_volume > _max_volume:
-          alarm_message += f'최대 거래량 갱신 {df_today_volume}'
+          if inner_alarm_message != "":
+            inner_alarm_message += f'최대 거래량 갱신 {df_today_volume}'
+          else:
+            inner_alarm_message += f'> {day}일 최대 거래량 갱신 {df_today_volume}'
+
+        if inner_alarm_message:
+          inner_alarm_message += '\n'
         
-        alarm_message += '\n'
 
       if df_today_price > _max_price:
         increase_percent = get_increase_percent(_max_price, df_today_price)
-        alarm_message += f'> {day}일 최대 가격 {increase_percent}% 갱신 {_max_price} => {df_today_price} \n'
+        inner_alarm_message += f'> {day}일 최대 가격 {increase_percent}% 갱신 {_max_price} => {df_today_price} \n'
       
+      alarm_message += inner_alarm_message
 
     # 파일에 데이터 추가
     with open(calc_csv_file, "a") as csvfile:
