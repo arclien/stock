@@ -65,4 +65,7 @@ def get_fetch_end_date(nation):
 
 
 def get_increase_percent(origin, target):
-  return round(100 - origin/target*100,2)
+  if target > origin:
+    return round(100 - origin / target * 100, 2)
+  else:
+    return 0

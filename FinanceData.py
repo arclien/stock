@@ -59,10 +59,10 @@ for cardId in my_card_list:
   
   if nation == 'ko':
     if CURRENT_TIME == AUTO_CRAWLING_TIME:
-      CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name)
+      CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation)
   elif nation == 'us':
     if CURRENT_TIME == US_CRAWLING_TIME:
-      CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name)
+      CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation)
 
 
 slack = Slacker(token=SLACK_TOKEN)

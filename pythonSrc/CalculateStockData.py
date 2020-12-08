@@ -6,7 +6,7 @@ import csv
 from pythonSrc.Constants import *
 from pythonSrc.Utils import *
 
-def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
+def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation):
   if os.path.exists(raw_csv_file):
     
     # 새로운 종목의 경우 파일 만들고, headaer 생성
@@ -60,20 +60,22 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
       
       # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
       if not df_today_volume == 0:
-        if df_today_volume > _mean_volume:
-          increase_percent = get_increase_percent(_mean_volume, df_today_volume)
-          if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
-            alarm_message += f'> {day}일         평균 거래량 {_mean_volume} < 오늘 거래량 {df_today_volume} ({increase_percent}% 증가)\n'
-        if df_today_volume > _adjusted_mean:
-          increase_percent = get_increase_percent(_adjusted_mean, df_today_volume)
-          if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
-            alarm_message += f'> {day}일 조정 평균 거래량 {_adjusted_mean} < 오늘 거래량 {df_today_volume} ({increase_percent}% 증가)\n'
+        increase_percent = get_increase_percent(_mean_volume, df_today_volume)
+        if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
+          alarm_message += f'> {day}일 평균 대비 {increase_percent}% 증가 / '
+        
+        increase_percent = get_increase_percent(_adjusted_mean, df_today_volume)
+        if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
+          alarm_message += f'조정 평균 대비 {increase_percent}% 증가 / '
 
-      if df_today_volume > _max_volume:
-        alarm_message += f'> {day}일 최대 거래량 갱신 {_max_volume} ===> {df_today_volume} \n'
+        if df_today_volume > _max_volume:
+          alarm_message += f'최대 거래량 갱신 {df_today_volume}'
+        
+        alarm_message += '\n'
 
       if df_today_price > _max_price:
-        alarm_message += f'> {day}일 최대 가격 갱신 {_max_price} ===> {df_today_price} \n'
+        increase_percent = get_increase_percent(_max_price, df_today_price)
+        alarm_message += f'> {day}일 최대 가격 {increase_percent}% 갱신 {_max_price} => {df_today_price} \n'
       
 
     # 파일에 데이터 추가
@@ -84,11 +86,16 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name):
 
     if alarm_message:
       main_link = f'> ' + '<{}|{}>'.format(f'https://arclien.github.io/stock/code/{stock_code}',f'{stock_name}:{stock_code}') + f'\n'
-      additional_link = '<{}|{}>'.format(f'https://finance.naver.com/item/main.nhn?code={stock_code}','네이버') + f'\n'
-      additional_link += f'> ' +'<{}|{}>'.format(f'http://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?pGB=1&cID=&MenuYn=Y&ReportGB=&NewMenuID=11&stkGb=701&gicode=A{stock_code}','에프엔가이드') + f'\n'
-      additional_link += f'> ' +'<{}|{}>'.format(f'https://m.comp.wisereport.co.kr:44302/CompanyInfo/Summary/{stock_code}','와이즈에프엔') + f'\n'
 
-      return f'{main_link}' + alarm_message + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({get_increase_percent(df_prev_day.iloc[0]["Close"], df_today_price)}%)`\n' + f'> {additional_link}\n\n'
+      if nation == 'ko':
+        additional_link = '<{}|{}>'.format(f'https://finance.naver.com/item/main.nhn?code={stock_code}','네이버') + f'\n'
+        additional_link += f'> ' +'<{}|{}>'.format(f'http://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?pGB=1&cID=&MenuYn=Y&ReportGB=&NewMenuID=11&stkGb=701&gicode=A{stock_code}','에프엔가이드') + f'\n'
+        additional_link += f'> ' +'<{}|{}>'.format(f'https://m.comp.wisereport.co.kr:44302/CompanyInfo/Summary/{stock_code}','와이즈에프엔') + f'\n'
+      elif nation == 'us':
+        additional_link = '<{}|{}>'.format(f'https://finance.yahoo.com/quote/{stock_code}','야후') + f'\n'
+        additional_link += f'> ' +'<{}|{}>'.format(f'https://finviz.com/quote.ashx?t={stock_code}','finviz') + f'\n'
+
+      return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({get_increase_percent(df_prev_day.iloc[0]["Close"], df_today_price)}%)`\n' + alarm_message +  f'> {additional_link}\n\n'
     else:
       return alarm_message
 
