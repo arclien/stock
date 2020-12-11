@@ -93,6 +93,10 @@ class Trello {
   put(path, data) {
     return this.req('PUT', path, data);
   }
+
+  delete(path, data) {
+    return this.req('DELETE', path, data);
+  }
 }
 
 export default Trello;

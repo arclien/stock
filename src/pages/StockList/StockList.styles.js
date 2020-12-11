@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import {
   font,
   gray100,
+  white,
   text,
   Chip,
   BaseInput,
@@ -17,15 +18,6 @@ export const Container = styled.div`
   padding: 20px;
 `;
 
-export const List = styled.div`
-  width: 100%;
-`;
-
-export const StockItem = styled.div`
-  ${flexContainer('flex-start', 'center', 'row')};
-  margin: 5px;
-`;
-
 export const StockText = styled(Chip)``;
 
 export const Input = styled.div`
@@ -36,6 +28,10 @@ export const Input = styled.div`
 
 export const StockInput = styled(BaseInput)`
   width: 120px;
+
+  > input {
+    cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  }
 `;
 
 export const Dropdown = styled(BasePopover)`
@@ -60,7 +56,12 @@ export const DropdownText = styled.div`
 `;
 
 export const AddButton = styled(NewBaseButton)`
-  ${font({ size: '15px', color: text })};
+  ${font({ size: '15px', color: white })};
 
   width: 200px;
+  margin: 10px 10px 10px 0px;
+`;
+
+export const Buttons = styled.div`
+  ${flexContainer('flex-start', 'center', 'row')};
 `;

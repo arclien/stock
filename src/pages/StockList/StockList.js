@@ -21,12 +21,12 @@ import {
   // createLabel,
   createCard,
 } from 'services/trello';
+import List from './List/List';
 
 import {
+  Buttons,
   AddButton,
   Container,
-  List,
-  StockItem,
   StockText,
   Input,
   StockInput,
@@ -50,6 +50,7 @@ const StockList = () => {
     state: { tagList, hasTrelloToken },
   } = useContext(StockContext);
 
+  const [isModificationMode, setModificationMode] = useState(false);
   const [cards, setCards] = useState([]);
   const [labels, setLabels] = useState([]);
   const [stock, setStock] = useState({ ...stockDefaultValue });
@@ -69,7 +70,10 @@ const StockList = () => {
     const { code, name, nation, userId, createdAt, tags, basePrice } = stock;
     const _stock = [code, name, nation, userId, createdAt, '', tags, basePrice];
     createCard(_stock, TRELLO_LIST_ID, labels).then((res) => {
-      if (res) setStock({ ...stockDefaultValue });
+      if (res) {
+        setStock({ ...stockDefaultValue });
+        setCards([res, ...cards]);
+      }
     });
   };
 
@@ -85,9 +89,23 @@ const StockList = () => {
 
   return (
     <Container>
-      <AddButton onClick={addCardToTrello} disabled={!name || !code}>
-        AddCARD
-      </AddButton>
+      <Buttons>
+        <AddButton
+          theme="blue"
+          onClick={addCardToTrello}
+          disabled={!name || !code || isModificationMode}
+        >
+          신규 종목 추가
+        </AddButton>
+        <AddButton
+          theme="red"
+          onClick={() => {
+            setModificationMode(!isModificationMode);
+          }}
+        >
+          {isModificationMode ? '종목 수정 모드' : '종목 읽기 모드'}
+        </AddButton>
+      </Buttons>
       <Input>
         <StockInput
           type="text"
@@ -96,6 +114,7 @@ const StockList = () => {
           maxLength={20}
           value={code}
           onChange={handleChange}
+          disabled={isModificationMode}
         />
         <StockInput
           type="text"
@@ -104,8 +123,10 @@ const StockList = () => {
           maxLength={20}
           value={name}
           onChange={handleChange}
+          disabled={isModificationMode}
         />
         <Dropdown
+          disabled={isModificationMode}
           size="medium"
           placement="bottom-start"
           content={
@@ -137,6 +158,7 @@ const StockList = () => {
           value={createdAt}
           onChange={handleChange}
           readOnly
+          disabled={isModificationMode}
         />
         <StockInput
           type="text"
@@ -145,8 +167,10 @@ const StockList = () => {
           maxLength={20}
           value={basePrice}
           onChange={handleChange}
+          disabled={isModificationMode}
         />
         <Dropdown
+          disabled={isModificationMode}
           size="medium"
           placement="bottom-start"
           content={
@@ -176,29 +200,11 @@ const StockList = () => {
             .split('/')
             .map((tag) => <StockText key={tag}>{tag}</StockText>)}
       </Input>
-      <List>
-        {cards?.map((card) => (
-          <StockItem key={card.id}>
-            {Object.keys(JSON.parse(card.desc)).map((key) => {
-              return (
-                <StockInput
-                  key={key}
-                  type="text"
-                  name={key}
-                  placeholder={key}
-                  maxLength={20}
-                  value={JSON.parse(card.desc)[key]}
-                  onChange={handleChange}
-                  disabled
-                />
-              );
-            })}
-            {card.labels.map((label) => (
-              <StockText key={label.id}>{label.name}</StockText>
-            ))}
-          </StockItem>
-        ))}
-      </List>
+      <List
+        cards={cards}
+        isModificationMode={isModificationMode}
+        setCards={setCards}
+      />
     </Container>
   );
 };

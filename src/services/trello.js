@@ -1,5 +1,10 @@
 import { getRandomInt } from 'utils/utils';
-import { getTrello, getColletionTrello, postTrello } from 'services/trelloApi';
+import {
+  getTrello,
+  getColletionTrello,
+  deleteTrello,
+  postTrello,
+} from 'services/trelloApi';
 import {
   TRELLO_COLLECTION_TYPE,
   TRELLO_LABEL_COLOR,
@@ -62,7 +67,6 @@ export const createCard = async (stock, idList, labels) => {
   const name = stock[1];
   const nation = stock[2];
   const createdAt = stock[4];
-  const updatedAt = stock[5];
   const tags = stock[6].split('/');
   const basePrice = stock.length === 8 ? stock[7] : '';
 
@@ -87,8 +91,14 @@ export const createCard = async (stock, idList, labels) => {
     name,
     desc: JSON.stringify(desc),
     pos: 'top',
-    due: updatedAt ? new Date(updatedAt).toISOString() : '',
     idLabels: idLabels.toString(),
   };
   return postTrello('cards', newCard);
+};
+
+/** 
+################ delete collections by id
+* */
+export const deleteCardById = (cardId) => {
+  return deleteTrello(`${TRELLO_COLLECTION_TYPE.CARDS}/${cardId}`);
 };
