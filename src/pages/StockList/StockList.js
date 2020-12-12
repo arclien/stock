@@ -204,6 +204,7 @@ const StockList = () => {
         cards={cards}
         isModificationMode={isModificationMode}
         setCards={setCards}
+        labels={labels}
       />
     </Container>
   );

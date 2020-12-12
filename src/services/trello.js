@@ -4,6 +4,7 @@ import {
   getColletionTrello,
   deleteTrello,
   postTrello,
+  putTrello,
 } from 'services/trelloApi';
 import {
   TRELLO_COLLECTION_TYPE,
@@ -94,6 +95,17 @@ export const createCard = async (stock, idList, labels) => {
     idLabels: idLabels.toString(),
   };
   return postTrello('cards', newCard);
+};
+
+export const updateCard = async (stock, labels) => {
+  if (!stock) return;
+
+  const { id, desc, idLabels } = stock;
+  const card = {
+    desc,
+    idLabels,
+  };
+  return putTrello(`${TRELLO_COLLECTION_TYPE.CARDS}/${id}`, card);
 };
 
 /** 
