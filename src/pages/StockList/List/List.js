@@ -33,21 +33,24 @@ const renderItem = (
 ) => (
   <StockItem key={card.id}>
     {Object.keys(JSON.parse(card.desc)).map((key) => {
-      if (key === 'created_at') return;
       return (
-        <StockInput
-          width={getWidth(key)}
-          key={key}
-          type={key === 'base_price' ? 'number' : 'text'}
-          name={key}
-          placeholder={key}
-          maxLength={20}
-          value={JSON.parse(card.desc)[key]}
-          onChange={(e) => {
-            handleChange(e, card);
-          }}
-          disabled={key !== 'base_price' || !isModificationMode}
-        />
+        <>
+          {key !== 'created_at' && (
+            <StockInput
+              width={getWidth(key)}
+              key={key}
+              type={key === 'base_price' ? 'number' : 'text'}
+              name={key}
+              placeholder={key}
+              maxLength={20}
+              value={JSON.parse(card.desc)[key]}
+              onChange={(e) => {
+                handleChange(e, card);
+              }}
+              disabled={key !== 'base_price' || !isModificationMode}
+            />
+          )}
+        </>
       );
     })}
     {card.labels.map((label) => (
