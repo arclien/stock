@@ -23,20 +23,23 @@ export const getMyBoards = () => {
 /** 
 ################ Get from board
 * */
-export const getListsOnBoard = (listId, field = 'all') => {
-  return getTrello(`boards/${listId}/lists/${field}`);
+export const getListsOnBoard = (boardId, field = 'all') => {
+  return getTrello(`boards/${boardId}/lists/${field}`);
 };
 
-export const getLabelsOnBoard = (listId) => {
-  return getTrello(`boards/${listId}/labels`);
+export const getLabelsOnBoard = (boardId) => {
+  const params = {
+    limit: 100,
+  };
+  return getTrello(`boards/${boardId}/labels`, params);
 };
 
-export const getCardsOnBoard = (listId, field = 'all') => {
-  return getTrello(`boards/${listId}/cards/${field}`);
+export const getCardsOnBoard = (boardId, field = 'all') => {
+  return getTrello(`boards/${boardId}/cards/${field}`);
 };
 
-export const getCardOnBoardById = (listId, cardId) => {
-  return getTrello(`boards/${listId}/cards/${cardId}`);
+export const getCardOnBoardById = (boardId, cardId) => {
+  return getTrello(`boards/${boardId}/cards/${cardId}`);
 };
 
 /** 
@@ -97,7 +100,7 @@ export const createCard = async (stock, idList, labels) => {
   return postTrello('cards', newCard);
 };
 
-export const updateCard = async (stock, labels) => {
+export const updateCard = async (stock) => {
   if (!stock) return;
 
   const { id, desc, idLabels } = stock;

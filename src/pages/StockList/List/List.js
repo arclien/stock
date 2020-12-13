@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ConfirmModal } from 'remember-ui';
 
 import { deleteCardById, updateCard } from 'services/trello';
+import { LOCALE } from 'constants/locale';
 
 import {
   Container,
@@ -118,11 +119,11 @@ const List = ({ cards, isModificationMode, setCards, labels }) => {
 
   useEffect(() => {
     const _koCards = cards.filter(
-      (card) => JSON.parse(card.desc).nation === 'ko'
+      (card) => JSON.parse(card.desc).nation === LOCALE.KO
     );
     setKoCards(_koCards);
     const _usCards = cards.filter(
-      (card) => JSON.parse(card.desc).nation === 'us'
+      (card) => JSON.parse(card.desc).nation === LOCALE.US
     );
     setUsCards(_usCards);
   }, [cards]);
@@ -137,7 +138,7 @@ const List = ({ cards, isModificationMode, setCards, labels }) => {
     if (name === 'base_price') {
       const _card = { ...JSON.parse(card.desc), base_price: value };
       card.desc = JSON.stringify(_card);
-      if (_card.nation === 'ko') {
+      if (_card.nation === LOCALE.KO) {
         setKoCards([...koCards]);
       } else {
         setUsCards([...usCards]);
@@ -150,7 +151,7 @@ const List = ({ cards, isModificationMode, setCards, labels }) => {
     card.idLabels = [...card.idLabels, label.id];
     card.labels = [...card.labels, label];
 
-    if (card.nation === 'ko') {
+    if (card.nation === LOCALE.KO) {
       setKoCards([...koCards]);
     } else {
       setUsCards([...usCards]);
@@ -161,7 +162,7 @@ const List = ({ cards, isModificationMode, setCards, labels }) => {
     card.idLabels = [...card.idLabels.filter((el) => el !== label.id)];
     card.labels = [...card.labels.filter((el) => el.id !== label.id)];
 
-    if (card.nation === 'ko') {
+    if (card.nation === LOCALE.KO) {
       setKoCards([...koCards]);
     } else {
       setUsCards([...usCards]);

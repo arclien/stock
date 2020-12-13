@@ -97,7 +97,7 @@ const StockProvider = ({ children }) => {
           hasTrelloToken,
           STOCK_DATA_LIST,
         },
-        actions: { getStockData },
+        actions: { getStockData, setTagList },
       }}
     >
       {children}

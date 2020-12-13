@@ -1,26 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import dayjs from 'dayjs';
 
+import NewLabelModal from './NewLabelModal/NewLabelModal';
 import { StockContext } from 'context/StockContext';
-import {
-  // TRELLO_CARD_ID,
-  TRELLO_LIST_ID,
-  TRELLO_BOARD_STUDY_ID,
-} from 'constants/trello';
+import { TRELLO_LIST_ID, TRELLO_BOARD_STUDY_ID } from 'constants/trello';
 import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
-import {
-  // getMe,
-  // getMyBoards,
-  // getListsOnBoard,
-  getLabelsOnBoard,
-  getCardsOnBoard,
-  // getCardOnBoardById,
-  // getCardById,
-  // getListById,
-  // createLabel,
-  createCard,
-} from 'services/trello';
+import { getLabelsOnBoard, getCardsOnBoard, createCard } from 'services/trello';
 import List from './List/List';
 
 import {
@@ -50,6 +36,7 @@ const StockList = () => {
     state: { tagList, hasTrelloToken },
   } = useContext(StockContext);
 
+  const [isOpenNewLabelModal, setOpenNewLabelModal] = useState(false);
   const [isModificationMode, setModificationMode] = useState(false);
   const [cards, setCards] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -88,125 +75,143 @@ const StockList = () => {
   const { name, code, nation, createdAt, basePrice } = stock;
 
   return (
-    <Container>
-      <Buttons>
-        <AddButton
-          theme="blue"
-          onClick={addCardToTrello}
-          disabled={!name || !code || isModificationMode}
-        >
-          신규 종목 추가
-        </AddButton>
-        <AddButton
-          theme="red"
-          onClick={() => {
-            setModificationMode(!isModificationMode);
-          }}
-        >
-          {isModificationMode ? '종목 수정 모드' : '종목 읽기 모드'}
-        </AddButton>
-      </Buttons>
-      <Input>
-        <StockInput
-          type="text"
-          name="code"
-          placeholder="종목코드"
-          maxLength={20}
-          value={code}
-          onChange={handleChange}
-          disabled={isModificationMode}
-        />
-        <StockInput
-          type="text"
-          name="name"
-          placeholder="종목이름"
-          maxLength={20}
-          value={name}
-          onChange={handleChange}
-          disabled={isModificationMode}
-        />
-        <Dropdown
-          disabled={isModificationMode}
-          size="medium"
-          placement="bottom-start"
-          content={
-            <div>
-              {Object.keys(LOCALE).map((_nation) => (
-                <DropdownList
-                  key={_nation}
-                  onClick={() => {
-                    setStock((prevState) => ({
-                      ...prevState,
-                      nation: LOCALE[_nation],
-                    }));
-                  }}
-                >
-                  {LOCALE[_nation]}
-                </DropdownList>
-              ))}
-            </div>
-          }
-        >
-          <DropdownText> {nation || LOCALE.KO}</DropdownText>
-        </Dropdown>
+    <>
+      <Container>
+        <Buttons>
+          <AddButton
+            theme="blue"
+            onClick={addCardToTrello}
+            disabled={!name || !code || isModificationMode}
+          >
+            신규 종목 추가
+          </AddButton>
+          <AddButton
+            theme="blue"
+            onClick={() => {
+              setOpenNewLabelModal(true);
+            }}
+            disabled={isModificationMode}
+          >
+            신규 태그 추가
+          </AddButton>
 
-        <StockInput
-          type="text"
-          name="createdAt"
-          placeholder="추가날짜"
-          maxLength={20}
-          value={createdAt}
-          onChange={handleChange}
-          readOnly
-          disabled={isModificationMode}
+          <AddButton
+            theme="red"
+            onClick={() => {
+              setModificationMode(!isModificationMode);
+            }}
+          >
+            {isModificationMode ? '종목 수정 모드' : '종목 읽기 모드'}
+          </AddButton>
+        </Buttons>
+        <Input>
+          <StockInput
+            type="text"
+            name="code"
+            placeholder="종목코드"
+            maxLength={20}
+            value={code}
+            onChange={handleChange}
+            disabled={isModificationMode}
+          />
+          <StockInput
+            type="text"
+            name="name"
+            placeholder="종목이름"
+            maxLength={20}
+            value={name}
+            onChange={handleChange}
+            disabled={isModificationMode}
+          />
+          <Dropdown
+            disabled={isModificationMode}
+            size="medium"
+            placement="bottom-start"
+            content={
+              <div>
+                {Object.keys(LOCALE).map((_nation) => (
+                  <DropdownList
+                    key={_nation}
+                    onClick={() => {
+                      setStock((prevState) => ({
+                        ...prevState,
+                        nation: LOCALE[_nation],
+                      }));
+                    }}
+                  >
+                    {LOCALE[_nation]}
+                  </DropdownList>
+                ))}
+              </div>
+            }
+          >
+            <DropdownText> {nation || LOCALE.KO}</DropdownText>
+          </Dropdown>
+
+          <StockInput
+            type="text"
+            name="createdAt"
+            placeholder="추가날짜"
+            maxLength={20}
+            value={createdAt}
+            onChange={handleChange}
+            readOnly
+            disabled={isModificationMode}
+          />
+          <StockInput
+            type="text"
+            name="basePrice"
+            placeholder="basePrice"
+            maxLength={20}
+            value={basePrice}
+            onChange={handleChange}
+            disabled={isModificationMode}
+          />
+          <Dropdown
+            disabled={isModificationMode}
+            size="medium"
+            placement="bottom-start"
+            content={
+              <div>
+                {tagList.map((tag) => (
+                  <DropdownList
+                    key={tag}
+                    onClick={() => {
+                      setStock((prevState) => ({
+                        ...prevState,
+                        tags: prevState.tags
+                          ? `${prevState.tags}/${tag}`
+                          : `${tag}`,
+                      }));
+                    }}
+                  >
+                    {tag}
+                  </DropdownList>
+                ))}
+              </div>
+            }
+          >
+            <DropdownText>태그 추가</DropdownText>
+          </Dropdown>
+          {stock.tags &&
+            stock.tags
+              .split('/')
+              .map((tag) => <StockText key={tag}>{tag}</StockText>)}
+        </Input>
+        <List
+          cards={cards}
+          isModificationMode={isModificationMode}
+          setCards={setCards}
+          labels={labels}
         />
-        <StockInput
-          type="text"
-          name="basePrice"
-          placeholder="basePrice"
-          maxLength={20}
-          value={basePrice}
-          onChange={handleChange}
-          disabled={isModificationMode}
+      </Container>
+      {isOpenNewLabelModal && (
+        <NewLabelModal
+          isOpenNewLabelModal={isOpenNewLabelModal}
+          setOpenNewLabelModal={setOpenNewLabelModal}
         />
-        <Dropdown
-          disabled={isModificationMode}
-          size="medium"
-          placement="bottom-start"
-          content={
-            <div>
-              {tagList.map((tag) => (
-                <DropdownList
-                  key={tag}
-                  onClick={() => {
-                    setStock((prevState) => ({
-                      ...prevState,
-                      tags: prevState.tags
-                        ? `${prevState.tags}/${tag}`
-                        : `${tag}`,
-                    }));
-                  }}
-                >
-                  {tag}
-                </DropdownList>
-              ))}
-            </div>
-          }
-        >
-          <DropdownText>태그 추가</DropdownText>
-        </Dropdown>
-        {stock.tags &&
-          stock.tags
-            .split('/')
-            .map((tag) => <StockText key={tag}>{tag}</StockText>)}
-      </Input>
-      <List
-        cards={cards}
-        isModificationMode={isModificationMode}
-        setCards={setCards}
-        labels={labels}
-      />
-    </Container>
+      )}
+    </>
   );
 };
 
