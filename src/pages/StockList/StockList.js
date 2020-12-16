@@ -29,6 +29,8 @@ const stockDefaultValue = {
   createdAt: dayjs(new Date()).format(CalendarFormat),
   tags: '',
   basePrice: '',
+  alertPrice: '',
+  alertPercent: '20',
 };
 
 const StockList = () => {
@@ -54,8 +56,29 @@ const StockList = () => {
   }, [hasTrelloToken]);
 
   const addCardToTrello = () => {
-    const { code, name, nation, userId, createdAt, tags, basePrice } = stock;
-    const _stock = [code, name, nation, userId, createdAt, '', tags, basePrice];
+    const {
+      code,
+      name,
+      nation,
+      userId,
+      createdAt,
+      tags,
+      basePrice,
+      alertPrice,
+      alertPercent,
+    } = stock;
+    const _stock = [
+      code,
+      name,
+      nation,
+      userId,
+      createdAt,
+      '',
+      tags,
+      basePrice,
+      alertPrice,
+      alertPercent,
+    ];
     createCard(_stock, TRELLO_LIST_ID, labels).then((res) => {
       if (res) {
         setStock({ ...stockDefaultValue });
@@ -72,7 +95,15 @@ const StockList = () => {
     }));
   };
 
-  const { name, code, nation, createdAt, basePrice } = stock;
+  const {
+    name,
+    code,
+    nation,
+    createdAt,
+    basePrice,
+    alertPrice,
+    alertPercent,
+  } = stock;
 
   return (
     <>
@@ -159,11 +190,29 @@ const StockList = () => {
             disabled={isModificationMode}
           />
           <StockInput
-            type="text"
+            type="number"
             name="basePrice"
             placeholder="basePrice"
             maxLength={20}
             value={basePrice}
+            onChange={handleChange}
+            disabled={isModificationMode}
+          />
+          <StockInput
+            type="number"
+            name="alertPrice"
+            placeholder="alertPrice"
+            maxLength={20}
+            value={alertPrice}
+            onChange={handleChange}
+            disabled={isModificationMode}
+          />
+          <StockInput
+            type="number"
+            name="alertPercent"
+            placeholder="alertPercent"
+            maxLength={3}
+            value={alertPercent}
             onChange={handleChange}
             disabled={isModificationMode}
           />

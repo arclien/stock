@@ -72,7 +72,9 @@ export const createCard = async (stock, idList, labels) => {
   const nation = stock[2];
   const createdAt = stock[4];
   const tags = stock[6].split('/');
-  const basePrice = stock.length === 8 ? stock[7] : '';
+  const basePrice = stock[7];
+  const alertPrice = stock[8];
+  const alertPercent = stock[9];
 
   const idLabels = [];
   await tags.forEach(async (tag) => {
@@ -88,6 +90,8 @@ export const createCard = async (stock, idList, labels) => {
     nation,
     created_at: createdAt,
     base_price: basePrice,
+    alert_price: alertPrice,
+    alert_percent: alertPercent,
   };
 
   const newCard = {
