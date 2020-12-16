@@ -29,6 +29,7 @@ for cardId in my_card_list:
   stock_code = ""
   created_at = ""
   nation = ""
+  alert_percent = ""
   if 'desc' in card_json:
     if card_json['desc'] != '':
       if 'code' in json.loads(card_json["desc"]):
@@ -39,6 +40,8 @@ for cardId in my_card_list:
         created_at = json.loads(card_json["desc"])['created_at']
       if 'nation' in json.loads(card_json["desc"]):
         nation = json.loads(card_json["desc"])['nation']
+      if 'alert_percent' in json.loads(card_json["desc"]):
+        alert_percent = int(json.loads(card_json["desc"])['alert_percent'])
     else:
       continue
 
@@ -59,10 +62,10 @@ for cardId in my_card_list:
   
   if nation == 'ko':
     if CURRENT_TIME == AUTO_CRAWLING_TIME:
-      CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation)
+      CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent)
   elif nation == 'us':
     if CURRENT_TIME == US_CRAWLING_TIME:
-      CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation)
+      CRAWLING_RESULT_MSG += calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent)
 
 
 slack = Slacker(token=SLACK_TOKEN)

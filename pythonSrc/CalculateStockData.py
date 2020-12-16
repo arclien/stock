@@ -6,7 +6,7 @@ import csv
 from pythonSrc.Constants import *
 from pythonSrc.Utils import *
 
-def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation):
+def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent):
   if os.path.exists(raw_csv_file):
     
     # 새로운 종목의 경우 파일 만들고, headaer 생성
@@ -62,11 +62,11 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
       # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
       if not df_today_volume == 0:
         increase_percent = get_increase_percent(_mean_volume, df_today_volume)
-        if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
+        if increase_percent >= alert_percent:
           inner_alarm_message += f'> {day}일 평균 대비 {increase_percent}% 증가 / '
         
         increase_percent = get_increase_percent(_adjusted_mean, df_today_volume)
-        if increase_percent >= VOLUME_ALARM_PERCENT_THRESHOLD:
+        if increase_percent >= alert_percent:
           if inner_alarm_message != "":
             inner_alarm_message += f'조정 평균 대비 {increase_percent}% 증가 / '
           else:
