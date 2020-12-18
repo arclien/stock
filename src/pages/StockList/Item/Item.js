@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 
 import { updateCard } from 'services/trello';
 import { LOCALE } from 'constants/locale';
+import TagDropdown from '../components/TagDropdown/TagDropdown';
 
 import {
   StockItem,
@@ -9,9 +10,6 @@ import {
   StockInput,
   DeleteButton,
   ModifyButton,
-  Dropdown,
-  DropdownList,
-  DropdownText,
 } from './Item.styles';
 
 const EditableKey = ['base_price', 'alert_price', 'alert_percent'];
@@ -32,22 +30,28 @@ const Item = ({
   setUsCards,
   koCards = [],
   usCards = [],
-  labels,
 }) => {
   const handleChange = useCallback(
-    (e, card) => {
+    (e, id, desc) => {
       const { name, value } = e.target;
       if (EditableKey.includes(name)) {
-        const _card = { ...JSON.parse(card.desc), [`${name}`]: value };
-        card.desc = JSON.stringify(_card);
-        if (_card.nation === LOCALE.KO) {
-          setKoCards([...koCards]);
+        const _desc = { ...JSON.parse(desc), [`${name}`]: value };
+        if (_desc.nation === LOCALE.KO) {
+          setKoCards((cards) =>
+            cards.map((el) =>
+              el.id === id ? { ...el, desc: JSON.stringify(_desc) } : el
+            )
+          );
         } else {
-          setUsCards([...usCards]);
+          setUsCards((cards) =>
+            cards.map((el) =>
+              el.id === id ? { ...el, desc: JSON.stringify(_desc) } : el
+            )
+          );
         }
       }
     },
-    [koCards, setKoCards, setUsCards, usCards]
+    [setKoCards, setUsCards]
   );
 
   const addTags = useCallback(
@@ -94,7 +98,7 @@ const Item = ({
                 maxLength={20}
                 value={JSON.parse(card.desc)[key]}
                 onChange={(e) => {
-                  handleChange(e, card);
+                  handleChange(e, card.id, card.desc);
                 }}
                 disabled={!EditableKey.includes(key) || !isModificationMode}
               />
@@ -115,28 +119,7 @@ const Item = ({
         </Tag>
       ))}
 
-      {isModificationMode && (
-        <Dropdown
-          size="medium"
-          placement="bottom-start"
-          content={
-            <div>
-              {labels.map((label) => (
-                <DropdownList
-                  key={label.id}
-                  onClick={() => {
-                    addTags(label, card);
-                  }}
-                >
-                  {label.name}
-                </DropdownList>
-              ))}
-            </div>
-          }
-        >
-          <DropdownText>태그</DropdownText>
-        </Dropdown>
-      )}
+      {isModificationMode && <TagDropdown card={card} addTags={addTags} />}
 
       {isModificationMode && (
         <>

@@ -8,8 +8,6 @@ import {
   gray100,
   white,
   NewBaseButton,
-  BasePopover,
-  PopoverItem,
 } from 'remember-ui';
 
 export const StockItem = styled.div`
@@ -65,27 +63,4 @@ export const ModifyButton = styled(NewBaseButton)`
   position: absolute;
   right: -170px;
   height: 100%;
-`;
-
-export const Dropdown = styled(BasePopover)`
-  height: 300px;
-  max-height: 300px;
-  overflow-y: scroll;
-`;
-
-export const DropdownList = styled(PopoverItem)``;
-
-export const DropdownText = styled.div`
-  ${font({ size: '11px', color: text })};
-
-  width: 35px;
-  border-radius: 4px;
-  border: 1px solid ${gray100};
-  padding: 12px 6px;
-  box-sizing: border-box;
-  outline: none;
-  cursor: pointer;
-  position: absolute;
-  right: 0;
-  top: 0px;
 `;

@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import dayjs from 'dayjs';
 
 import NewLabelModal from './NewLabelModal/NewLabelModal';
 import { StockContext } from 'context/StockContext';
-import { TRELLO_LIST_ID, TRELLO_BOARD_STUDY_ID } from 'constants/trello';
+import { TRELLO_LIST_ID } from 'constants/trello';
 import { CalendarFormat } from 'constants/calendar';
 import { LOCALE } from 'constants/locale';
-import { getLabelsOnBoard, getCardsOnBoard, createCard } from 'services/trello';
+import { createCard } from 'services/trello';
 import List from './List/List';
 
 import {
@@ -35,25 +35,13 @@ const stockDefaultValue = {
 
 const StockList = () => {
   const {
-    state: { tagList, hasTrelloToken },
+    state: { cardObjectList: cards, labelObjectList: labels, tagList },
+    actions: { setCardObjectList },
   } = useContext(StockContext);
 
   const [isOpenNewLabelModal, setOpenNewLabelModal] = useState(false);
   const [isModificationMode, setModificationMode] = useState(false);
-  const [cards, setCards] = useState([]);
-  const [labels, setLabels] = useState([]);
   const [stock, setStock] = useState({ ...stockDefaultValue });
-
-  useEffect(() => {
-    (async () => {
-      if (hasTrelloToken) {
-        const _cards = await getCardsOnBoard(TRELLO_BOARD_STUDY_ID);
-        setCards(_cards);
-        const _labels = await getLabelsOnBoard(TRELLO_BOARD_STUDY_ID);
-        setLabels(_labels);
-      }
-    })();
-  }, [hasTrelloToken]);
 
   const addCardToTrello = () => {
     const {
@@ -82,18 +70,18 @@ const StockList = () => {
     createCard(_stock, TRELLO_LIST_ID, labels).then((res) => {
       if (res) {
         setStock({ ...stockDefaultValue });
-        setCards([res, ...cards]);
+        setCardObjectList([res, ...cards]);
       }
     });
   };
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setStock((prevState) => ({
       ...prevState,
       [name]: value,
     }));
-  };
+  }, []);
 
   const {
     name,
@@ -250,8 +238,7 @@ const StockList = () => {
         <List
           cards={cards}
           isModificationMode={isModificationMode}
-          setCards={setCards}
-          labels={labels}
+          setCards={setCardObjectList}
         />
       </Container>
       {isOpenNewLabelModal && (

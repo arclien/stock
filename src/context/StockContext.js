@@ -13,26 +13,21 @@ let STOCK_DATA_LIST = {};
 const StockProvider = ({ children }) => {
   const [stockList, setStockList] = useState([]);
   const [tagList, setTagList] = useState([]);
-  const [hasTrelloToken, setTrelloToken] = useState(false);
+  const [cardObjectList, setCardObjectList] = useState([]);
+  const [labelObjectList, setLabelObjectList] = useState([]);
 
   useEffect(() => {
     (async () => {
-      await authTrello().then(() => {
-        setTrelloToken(true);
-      });
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      if (hasTrelloToken) {
+      await authTrello().then(async () => {
         const _labels = await getLabelsOnBoard(TRELLO_BOARD_STUDY_ID);
+        setLabelObjectList(_labels);
         const tags = _labels.reduce((acc, cur) => {
           return [...acc, cur.name];
         }, []);
         setTagList([...tags]);
 
         const _cards = await getCardsOnBoard(TRELLO_BOARD_STUDY_ID);
+        setCardObjectList(_cards);
         const _stockList = _cards.map((card) => {
           const desc = JSON.parse(card.desc);
           const array = [
@@ -63,9 +58,9 @@ const StockProvider = ({ children }) => {
           }),
           {}
         );
-      }
+      });
     })();
-  }, [hasTrelloToken]);
+  }, []);
 
   const getStockData = async (stockCode) => {
     if (!stockCode) return [];
@@ -94,10 +89,11 @@ const StockProvider = ({ children }) => {
         state: {
           stockList,
           tagList,
-          hasTrelloToken,
+          labelObjectList,
+          cardObjectList,
           STOCK_DATA_LIST,
         },
-        actions: { getStockData, setTagList },
+        actions: { getStockData, setTagList, setCardObjectList },
       }}
     >
       {children}

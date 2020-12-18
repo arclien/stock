@@ -7,7 +7,7 @@ import Item from '../Item/Item';
 
 import { Container, StockList } from './List.styles';
 
-const List = ({ cards, isModificationMode, setCards, labels }) => {
+const List = ({ cards, isModificationMode, setCards }) => {
   const [isOpenDeleteModal, setOpenDeleteModal] = useState(false);
   const [currentCard, setCurrentCard] = useState({});
   const [koCards, setKoCards] = useState([]);
@@ -32,11 +32,11 @@ const List = ({ cards, isModificationMode, setCards, labels }) => {
             key={card.id}
             card={card}
             isModificationMode={isModificationMode}
+            currentCard={currentCard}
             setCurrentCard={setCurrentCard}
             setOpenDeleteModal={setOpenDeleteModal}
             setKoCards={setKoCards}
             koCards={koCards}
-            labels={labels}
           />
         ))}
       </StockList>
@@ -46,11 +46,11 @@ const List = ({ cards, isModificationMode, setCards, labels }) => {
             key={card.id}
             card={card}
             isModificationMode={isModificationMode}
+            currentCard={currentCard}
             setCurrentCard={setCurrentCard}
             setOpenDeleteModal={setOpenDeleteModal}
             setUsCards={setUsCards}
             usCards={usCards}
-            labels={labels}
           />
         ))}
       </StockList>

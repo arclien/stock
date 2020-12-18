@@ -9,7 +9,6 @@ export default function useDebounce(value, delay) {
     }, delay);
 
     return () => {
-      // value 값이 바뀌면 이전 setTimeout을 clear 해줌
       clearTimeout(handler);
     };
   }, [value, delay]);
