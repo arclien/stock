@@ -6,6 +6,7 @@ DIR = "./public/data/"
 CALC_DIR = "./public/data/calculate/"
 STOCK_LIST = "stock_list.csv"
 STOCK_LIST_HEADER = ["code","name","nation","user_id","created_at","updated_at","tag_list"]
+STOCK_CALC_LIST_HEADER = ['date','max_180','min_180','mean_180','adjusted_mean_180','max_90','min_90','mean_90','adjusted_mean_90','max_60','min_60','mean_60','adjusted_mean_60','max_30','min_30','mean_30','adjusted_mean_30']
 START_DATE = "2015-01-02"
 AUTO_CRAWLING_TIME = "16"
 US_CRAWLING_TIME = "07"
