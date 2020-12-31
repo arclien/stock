@@ -64,8 +64,8 @@ def get_fetch_end_date(nation):
       return prev_date
 
 
-def get_increase_percent(origin, target):
+def get_diff_percent(origin, target):
   if target > origin:
     return round(100 - origin / target * 100, 2)
   else:
-    return 0
+    return round(100 - target / origin * 100, 2)

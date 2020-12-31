@@ -53,8 +53,8 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
     if alarm_message:
       main_link = f'> ' + '<{}|{}>'.format(f'https://arclien.github.io/stock/code/{stock_code}',f'{stock_name}:{stock_code}') + f'\n'
       additional_link = get_link_by_nation(nation, stock_code)
-
-      return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({get_increase_percent(df_prev_day.iloc[0]["Close"], df_today_price)}%)`\n' + alarm_message +  f'> {additional_link}\n\n'
+      diff_symbol = "+" if df_today_price > df_prev_day.iloc[0]["Close"] else "-"
+      return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{get_diff_percent(df_prev_day.iloc[0]["Close"], df_today_price)}%)`\n' + alarm_message +  f'> {additional_link}\n\n'
     else:
       return alarm_message
 
@@ -92,16 +92,18 @@ def calculate(day, df, calculated_row, df_today_volume, df_today_price, alert_pe
   
   # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
   if not df_today_volume == 0:
-    increase_percent = get_increase_percent(_mean_volume, df_today_volume)
-    if increase_percent >= alert_percent:
-      inner_alarm_message += f'> {day}일 평균 대비 {increase_percent}% 증가 / '
+    diff_percent = get_diff_percent(_mean_volume, df_today_volume)
+    diff_text = "가" if df_today_volume > _mean_volume else "감소"
+    if diff_percent >= alert_percent:
+      inner_alarm_message += f'> {day}일 평균 대비 {diff_percent}% {diff_text} / '
     
-    increase_percent = get_increase_percent(_adjusted_mean, df_today_volume)
-    if increase_percent >= alert_percent:
+    diff_percent = get_diff_percent(_adjusted_mean, df_today_volume)
+    diff_text = "증가" if df_today_volume > _adjusted_mean else "감소"
+    if diff_percent >= alert_percent:
       if inner_alarm_message != "":
-        inner_alarm_message += f'조정 평균 대비 {increase_percent}% 증가 / '
+        inner_alarm_message += f'조정 평균 대비 {diff_percent}% {diff_text} / '
       else:
-        inner_alarm_message += f'> {day}일 조정 평균 대비 {increase_percent}% 증가 / '
+        inner_alarm_message += f'> {day}일 조정 평균 대비 {diff_percent}% {diff_text} / '
       
     if df_today_volume > _max_volume:
       if inner_alarm_message != "":
@@ -114,8 +116,8 @@ def calculate(day, df, calculated_row, df_today_volume, df_today_price, alert_pe
 
 
   if df_today_price > _max_price:
-    increase_percent = get_increase_percent(_max_price, df_today_price)
-    inner_alarm_message += f'> {day}일 최대 가격 {increase_percent}% 갱신 {_max_price} => {df_today_price} \n'
+    diff_percent = get_diff_percent(_max_price, df_today_price)
+    inner_alarm_message += f'> {day}일 최대 가격 {diff_percent}% 갱신 {_max_price} => {df_today_price} \n'
   
   return inner_alarm_message
 
