@@ -93,17 +93,15 @@ def calculate(day, df, calculated_row, df_today_volume, df_today_price, alert_pe
   # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
   if not df_today_volume == 0:
     diff_percent = get_diff_percent(_mean_volume, df_today_volume)
-    diff_text = "가" if df_today_volume > _mean_volume else "감소"
-    if diff_percent >= alert_percent:
-      inner_alarm_message += f'> {day}일 평균 대비 {diff_percent}% {diff_text} / '
+    if diff_percent >= alert_percent and df_today_volume > _mean_volume:
+      inner_alarm_message += f'> {day}일 평균 대비 {diff_percent}% 증가 / '
     
     diff_percent = get_diff_percent(_adjusted_mean, df_today_volume)
-    diff_text = "증가" if df_today_volume > _adjusted_mean else "감소"
-    if diff_percent >= alert_percent:
+    if diff_percent >= alert_percent and df_today_volume > _adjusted_mean:
       if inner_alarm_message != "":
-        inner_alarm_message += f'조정 평균 대비 {diff_percent}% {diff_text} / '
+        inner_alarm_message += f'조정 평균 대비 {diff_percent}% 증가 / '
       else:
-        inner_alarm_message += f'> {day}일 조정 평균 대비 {diff_percent}% {diff_text} / '
+        inner_alarm_message += f'> {day}일 조정 평균 대비 {diff_percent}% 증가 / '
       
     if df_today_volume > _max_volume:
       if inner_alarm_message != "":
