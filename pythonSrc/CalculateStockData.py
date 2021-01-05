@@ -143,13 +143,13 @@ def check_alert_price(df_yesterday, df_today, alert_price):
     # 3. 전날/오늘 종가가 다 35000 초과인데, 장중 최저가가 35000이하면 35000 (지지)
     # 4. 전날/오늘 종가가 다 35000 미만인데, 장중 최고가가 35000이상이면 35000 (저항)
     if yesterday_price < alert_price and today_price >= alert_price:
-        inner_alarm_message += f' {alert_price} 돌파 \n'
+        inner_alarm_message += f'> {alert_price} 돌파 \n'
     elif yesterday_price > alert_price and today_price <= alert_price:
-        inner_alarm_message += f' {alert_price} 하향돌파 \n'
+        inner_alarm_message += f'> {alert_price} 하향돌파 \n'
     elif yesterday_price > alert_price and today_price > alert_price and today_low <= alert_price:
-        inner_alarm_message += f' {alert_price} 지지 \n'
+        inner_alarm_message += f'> {alert_price} 지지 \n'
     elif yesterday_price < alert_price and today_price < alert_price and today_high >= alert_price:
-        inner_alarm_message += f' {alert_price} 저항 \n'
+        inner_alarm_message += f'> {alert_price} 저항 \n'
 
     return inner_alarm_message
 
