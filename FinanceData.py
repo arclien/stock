@@ -29,8 +29,8 @@ for cardId in my_card_list:
     stock_code = ""
     created_at = ""
     nation = ""
-    alert_percent = ""
-    alert_price = ""
+    alert_percent = "50"
+    alert_price = "0"
     if 'desc' in card_json:
         if card_json['desc'] != '':
             if 'code' in json.loads(card_json["desc"]):
@@ -42,10 +42,13 @@ for cardId in my_card_list:
             if 'nation' in json.loads(card_json["desc"]):
                 nation = json.loads(card_json["desc"])['nation']
             if 'alert_percent' in json.loads(card_json["desc"]):
-                alert_percent = int(json.loads(
-                    card_json["desc"])['alert_percent'])
+                alert_percent = int(json.loads(card_json["desc"])['alert_percent'])
             if 'alert_price' in json.loads(card_json["desc"]):
-                alert_price = int(json.loads(card_json["desc"])['alert_price'])
+                alert_price = json.loads(card_json["desc"])['alert_price']
+                if alert_price == "":
+                    alert_price = 0
+                else
+                    alert_price = float(alert_price)
         else:
             continue
 

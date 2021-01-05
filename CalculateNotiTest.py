@@ -4,7 +4,7 @@ from pythonSrc.CalculateStockData import calc_stock_volume
 
 STOCK_CODE = '005930'
 ALERT_PERCENT = 30
-ALERT_PRICE = 80000
+ALERT_PRICE = 80000.0
 
 CRAWLING_RESULT_MSG += calc_stock_volume(
     "{}{}.csv".format(DIR, STOCK_CODE),
