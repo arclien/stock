@@ -47,7 +47,7 @@ for cardId in my_card_list:
                 alert_price = json.loads(card_json["desc"])['alert_price']
                 if alert_price == "":
                     alert_price = 0
-                else
+                else:
                     alert_price = float(alert_price)
         else:
             continue
