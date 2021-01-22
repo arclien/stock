@@ -125,10 +125,10 @@ def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_perce
                 round(df_today_volume - _max_volume))
 
     if df_today_price > _max_price:
-        alert_result["max_volume_over_alert"]["days"].append(day)
-        alert_result["max_volume_over_alert"]["%"].append(
+        alert_result["max_price_over_alert"]["days"].append(day)
+        alert_result["max_price_over_alert"]["%"].append(
             get_diff_percent(_max_price, df_today_price))
-        alert_result["max_volume_over_alert"]["over"].append(
+        alert_result["max_price_over_alert"]["over"].append(
             round(df_today_price - _max_price, 2))
 
 
@@ -167,22 +167,22 @@ def format_alert_message(alert_result):
 
     # 가격, 최대 거래량, 평균 거래량 순으로 출력
     if len(alert_result["max_price_over_alert"]["days"]) > 0:
+        alert_message += "> "
         alert_message += "/".join(
             map(str, alert_result["max_price_over_alert"]["days"]))
         alert_message += f'일 최대가격갱신 (+{alert_result["max_price_over_alert"]["%"][0]}%, +{alert_result["max_price_over_alert"]["over"][0]}) \n'
 
     if len(alert_result["max_volume_over_alert"]["days"]) > 0:
+        alert_message += "> "
         alert_message += "/".join(
             map(str, alert_result["max_volume_over_alert"]["days"]))
         alert_message += f'일 최대거래량갱신 (+{alert_result["max_volume_over_alert"]["%"][0]}%, +{alert_result["max_volume_over_alert"]["over"][0]}) \n'
 
     if len(alert_result["mean_volume_over_alert"]["days"]) > 0:
+        alert_message += "> "
         alert_message += "/".join(
             map(str, alert_result["mean_volume_over_alert"]["days"]))
         alert_message += f'일 평균거래량갱신 (+{alert_result["mean_volume_over_alert"]["%"][0]}%, +{alert_result["mean_volume_over_alert"]["over"][0]}) \n'
-
-    if alert_message:
-        alert_message = "> " + alert_message
 
     return alert_message
 
