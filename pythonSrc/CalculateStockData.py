@@ -58,7 +58,8 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
         for alert_price in alert_price_list:
             alert_message += check_alert_price(nation,
                                             df_prev_day, df_today, alert_price)
-            alert_message += format_alert_message(alert_result)
+        
+        alert_message += format_alert_message(alert_result)
 
         if alert_message:
             main_link = f'> ' + '<{}|{}>'.format(
