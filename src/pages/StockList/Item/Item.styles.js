@@ -10,6 +10,8 @@ import {
   NewBaseButton,
 } from 'remember-ui';
 
+import closeIcon from 'assets/images/ico-close.png';
+
 export const StockItem = styled.div`
   ${flexContainer('flex-start', 'center', 'row')};
   margin: 5px;
@@ -52,15 +54,21 @@ export const StockInput = styled(BaseInput)`
   }
 `;
 
-export const DeleteButton = styled(NewBaseButton)`
-  position: absolute;
-  right: -100px;
-  height: 100%;
-  padding: 0px;
-`;
-
 export const ModifyButton = styled(NewBaseButton)`
   position: absolute;
-  right: -170px;
+  right: -115px;
   height: 100%;
+`;
+
+export const DeleteButton = styled.img.attrs({
+  width: 20,
+  height: 20,
+  alt: 'close',
+  src: closeIcon,
+})`
+  cursor: pointer;
+
+  position: absolute;
+  right: -25px;
+  padding: 0px;
 `;
