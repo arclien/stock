@@ -30,7 +30,7 @@ for cardId in my_card_list:
     created_at = ""
     nation = ""
     alert_percent = "50"
-    alert_price = "0"
+    alert_price_list = ""
     if 'desc' in card_json:
         if card_json['desc'] != '':
             if 'code' in json.loads(card_json["desc"]):
@@ -44,14 +44,12 @@ for cardId in my_card_list:
             if 'alert_percent' in json.loads(card_json["desc"]):
                 alert_percent = int(json.loads(card_json["desc"])['alert_percent'])
             if 'alert_price' in json.loads(card_json["desc"]):
-                alert_price = json.loads(card_json["desc"])['alert_price']
-                if alert_price == "":
-                    alert_price = 0
-                else:
-                    alert_price = float(alert_price)
+                alert_price_list = json.loads(card_json["desc"])['alert_price']
+                alert_price_list = [float(e) if e.strip().isdigit() else 0 for e in alert_price_list.split(',')]
         else:
             continue
 
+    
     # csv 파일 매핑
     raw_csv_file = "{}{}.csv".format(DIR, stock_code)
     calc_csv_file = "{}{}.csv".format(CALC_DIR, stock_code)
@@ -70,11 +68,11 @@ for cardId in my_card_list:
     if nation == 'ko':
         if CURRENT_TIME == AUTO_CRAWLING_TIME:
             CRAWLING_RESULT_MSG += calc_stock_volume(
-                raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price)
+                raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price_list)
     elif nation == 'us':
         if CURRENT_TIME == US_CRAWLING_TIME:
             CRAWLING_RESULT_MSG += calc_stock_volume(
-                raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price)
+                raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price_list)
 
 
 slack = Slacker(token=SLACK_TOKEN)

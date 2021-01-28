@@ -17,6 +17,7 @@ const EditableKey = ['base_price', 'alert_price', 'alert_percent'];
 const getWidth = (key) => {
   if (key === 'code') return '65px';
   if (key === 'nation') return '40px';
+  if (key === 'alert_price') return '140px';
   if (key === 'alert_percent') return '50px';
   return '90px';
 };
@@ -92,7 +93,11 @@ const Item = ({
               <StockInput
                 width={getWidth(key)}
                 key={key}
-                type={EditableKey.includes(key) ? 'number' : 'text'}
+                type={
+                  EditableKey.includes(key) && key !== 'alert_price'
+                    ? 'number'
+                    : 'text'
+                }
                 name={key}
                 placeholder={key}
                 maxLength={20}
@@ -124,15 +129,12 @@ const Item = ({
       {isModificationMode && (
         <>
           <DeleteButton
-            theme="red"
-            size="small"
             onClick={() => {
               setCurrentCard(card);
               setOpenDeleteModal(true);
             }}
-          >
-            삭제
-          </DeleteButton>
+          />
+
           <ModifyButton
             theme="blue"
             size="small"

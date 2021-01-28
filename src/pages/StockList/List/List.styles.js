@@ -7,7 +7,7 @@ export const Container = styled.div`
 `;
 
 export const StockList = styled.div`
-  margin-right: 200px;
+  margin-right: 100px;
   &:last-child {
     margin-left: 100px;
     margin-right: 0px;

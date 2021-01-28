@@ -7,7 +7,7 @@ from pythonSrc.Constants import *
 from pythonSrc.Utils import *
 
 
-def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price):
+def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price_list):
     if os.path.exists(raw_csv_file):
 
         # 새로운 종목의 경우 파일 만들고, headaer 생성
@@ -55,10 +55,10 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
 
         alert_message = ""
 
-        # 차후 alert_price가 여러개가 되도록 수정하자.
-        # for alert_price in alert_prices:
-        alert_message += check_alert_price(nation,
-                                           df_prev_day, df_today, alert_price)
+        for alert_price in alert_price_list:
+            alert_message += check_alert_price(nation,
+                                            df_prev_day, df_today, alert_price)
+        
         alert_message += format_alert_message(alert_result)
 
         if alert_message:
