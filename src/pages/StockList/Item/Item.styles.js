@@ -7,16 +7,17 @@ import {
   text,
   gray100,
   white,
-  NewBaseButton,
 } from 'remember-ui';
 
 import closeIcon from 'assets/images/ico-close.png';
+import checkIcon from 'assets/images/ico-check.png';
 
 export const StockItem = styled.div`
   ${flexContainer('flex-start', 'center', 'row')};
   margin: 5px;
   border: 1px solid ${gray100};
   position: relative;
+  min-width: 880px;
 `;
 
 export const Tag = styled(Chip)`
@@ -54,10 +55,17 @@ export const StockInput = styled(BaseInput)`
   }
 `;
 
-export const ModifyButton = styled(NewBaseButton)`
+export const ModifyButton = styled.img.attrs({
+  width: 25,
+  height: 25,
+  alt: 'confirm',
+  src: checkIcon,
+})`
+  cursor: pointer;
+
   position: absolute;
-  right: -115px;
-  height: 100%;
+  right: -50px;
+  padding: 0px;
 `;
 
 export const DeleteButton = styled.img.attrs({

@@ -12,14 +12,19 @@ import {
   ModifyButton,
 } from './Item.styles';
 
+const VisibleKey = [
+  'name',
+  'base_price',
+  'alert_price',
+  'alert_percent',
+  'tag',
+];
 const EditableKey = ['base_price', 'alert_price', 'alert_percent'];
 
 const getWidth = (key) => {
-  if (key === 'code') return '65px';
-  if (key === 'nation') return '40px';
-  if (key === 'alert_price') return '140px';
-  if (key === 'alert_percent') return '50px';
-  return '90px';
+  if (key === 'alert_price') return '150px';
+  if (key === 'alert_percent') return '60px';
+  return '100px';
 };
 
 const Item = ({
@@ -89,7 +94,7 @@ const Item = ({
       {Object.keys(JSON.parse(card.desc)).map((key) => {
         return (
           <>
-            {key !== 'created_at' && (
+            {VisibleKey.includes(key) && (
               <StockInput
                 width={getWidth(key)}
                 key={key}
@@ -135,13 +140,7 @@ const Item = ({
             }}
           />
 
-          <ModifyButton
-            theme="blue"
-            size="small"
-            onClick={() => updateCard(card)}
-          >
-            수정
-          </ModifyButton>
+          <ModifyButton onClick={() => updateCard(card)} />
         </>
       )}
     </StockItem>

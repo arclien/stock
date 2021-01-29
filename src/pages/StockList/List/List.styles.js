@@ -7,9 +7,9 @@ export const Container = styled.div`
 `;
 
 export const StockList = styled.div`
-  margin-right: 100px;
+  margin-right: 50px;
   &:last-child {
-    margin-left: 100px;
+    margin-left: 50px;
     margin-right: 0px;
   }
 `;

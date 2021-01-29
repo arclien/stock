@@ -187,7 +187,7 @@ const StockList = () => {
             disabled={isModificationMode}
           />
           <StockInput
-            type="number"
+            type="text"
             name="alertPrice"
             placeholder="alertPrice"
             maxLength={20}
