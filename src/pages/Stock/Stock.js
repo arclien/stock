@@ -234,6 +234,15 @@ const Stock = () => {
           />
         </>
       )}
+
+      <iframe
+        id="alphaSquare"
+        title="AlphaSquare Frame"
+        width="85%"
+        height="610"
+        allowFullScreen
+        src={`https://www.alphasquare.co.kr/home/market/market-summary?code=${stockCode}`}
+      />
     </Container>
   );
 };
