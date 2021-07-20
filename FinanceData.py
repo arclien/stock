@@ -1,12 +1,12 @@
 import os
 from datetime import timedelta, datetime
-from slacker import Slacker
 
 from pythonSrc.Constants import *
 from pythonSrc.StockList import *
 from pythonSrc.Utils import *
 from pythonSrc.FetchStockData import fetch_and_generate_stock_csv
 from pythonSrc.CalculateStockData import calc_stock_volume
+from pythonSrc.SlackUtils import *
 
 # 폴더가 없으면 만든다
 if os.path.exists(DIR) == False:
@@ -73,14 +73,6 @@ for cardId in my_card_list:
         if CURRENT_TIME == US_CRAWLING_TIME:
             CRAWLING_RESULT_MSG += calc_stock_volume(
                 raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price_list)
-
-
-slack = Slacker(token=SLACK_TOKEN)
-
-CRAWLING_RESULT_MSG += '====================================================='
-if CURRENT_TIME == AUTO_CRAWLING_TIME or CURRENT_TIME == US_CRAWLING_TIME:
-    slack.chat.post_message(
-        channel=SLACK_CHANNEL,
-        username=SLACK_SENDER_NAME,
-        text=CRAWLING_RESULT_MSG
-    )
+    
+    CRAWLING_RESULT_MSG += '====================================================='
+    push_to_slack(CRAWLING_RESULT_MSG)
