@@ -49,9 +49,11 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
                 df, day, df_today_volume, df_today_price, alert_percent, calculated_row, alert_result)
 
         # 파일에 데이터 추가
-        with open(calc_csv_file, "a") as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(calculated_row)
+        write_calc_data = get_fetch_start_date(calc_csv_file)
+        if write_calc_data:
+            with open(calc_csv_file, "a") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(calculated_row)
 
         alert_message = ""
 
