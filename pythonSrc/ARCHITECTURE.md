@@ -3,7 +3,7 @@
 - 각 종목에 대한 정보를 업데이트하고, 필요한 정보들을 계산하여 다른 Dictionary에 업데이트 한다.
 - 2개의 Dictionary를 바탕으로 alert_message를 작성한다.
 
-
+- 종목이라는 dataclass를 선언해서 써 볼 예정.
 
 
 
