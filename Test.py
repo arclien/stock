@@ -34,19 +34,19 @@ def test_stock_report():
 
     stock1 = Stock(name="삼성전자", ticker="005930",
                 created_at="2020-11-20", nation="ko",
-                alert_percent=50, alert_price_list="78000,80000,85000")
+                alert_percent=50, alert_prices="78000,80000,85000")
 
     stock2 = Stock(name="케이엠더블유", ticker="032500",
                 created_at="2020-10-12", nation="ko",
-                alert_percent=50, alert_price_list="49000,50000,55000,60000")
+                alert_percent=50, alert_prices="49000,50000,55000,60000")
 
     stock3 = Stock(name="텔라닥", ticker="TDOC",
                 created_at="2019-05-06", nation="us",
-                alert_percent=50, alert_price_list="90, 100, 110, 120")
+                alert_percent=50, alert_prices="90, 100, 110, 120")
 
     stock4 = Stock(name="모더나", ticker="MRNA",
                 created_at="2020-01-12", nation="us",
-                alert_percent=50, alert_price_list="10,20,30,40,50,60,70")
+                alert_percent=50, alert_prices="10,20,30,40,50,60,70")
 
     stock_dic['삼성전자'] = stock1
     stock_dic['케이엠더블유'] = stock2
@@ -54,12 +54,8 @@ def test_stock_report():
     stock_dic['모더나'] = stock4
 
     old_report = ""
-    for stock in stock_dic.values():
-        raw_csv_file = "{}{}.csv".format(DIR, stock.ticker)
-        calc_csv_file = "{}{}.csv".format(CALC_DIR, stock.ticker)
-        old_report += calc_stock_volume(raw_csv_file, calc_csv_file,
-                                        stock.ticker, stock.name, stock.nation,
-                                        stock.alert_percent, stock.alert_price_list.split(','))
+    for stock in stock_dic.values():        
+        old_report += calc_stock_volume(stock)
 
     report = generate_stock_report(stock_dic, "ko")
 

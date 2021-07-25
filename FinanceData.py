@@ -28,7 +28,7 @@ def update_all_stock_data():
         created_at = ""
         nation = ""
         alert_percent = "50"
-        alert_price_list = ""
+        alert_prices = ""
         if 'desc' in card_json:
             if card_json['desc'] != '':
                 if 'code' in json.loads(card_json["desc"]):
@@ -42,37 +42,37 @@ def update_all_stock_data():
                 if 'alert_percent' in json.loads(card_json["desc"]):
                     alert_percent = int(json.loads(card_json["desc"])['alert_percent'])
                 if 'alert_price' in json.loads(card_json["desc"]):
-                    alert_price_list = json.loads(card_json["desc"])['alert_price']
-                    alert_price_list = [float(e) if e.strip().isdigit() else 0 for e in alert_price_list.split(',')]
+                    alert_prices = json.loads(card_json["desc"])['alert_price']
+                    alert_prices = [float(e) if e.strip().isdigit() else 0 for e in alert_price_list.split(',')]
             else:
                 continue
 
             stock = Stock(name=stock_name, ticker=stock_code,
                         created_at=created_at, nation=nation,
-                        alert_percent=alert_percent, alert_price_list=alert_price_list)
+                        alert_percent=alert_percent, alert_prices=alert_prices)
 
             stock_dic[stock_name] = stock
 
         
         # csv 파일 매핑
-        raw_csv_file = "{}{}.csv".format(DIR, stock_code)
-        calc_csv_file = "{}{}.csv".format(CALC_DIR, stock_code)
+        #raw_csv_file = "{}{}.csv".format(DIR, stock_code)
+        #calc_csv_file = "{}{}.csv".format(CALC_DIR, stock_code)
 
         # csv 파일의 마지막 날짜로부터 다음 fetch start date를 가져옴
         # csv 파일이 없으면 START_DATE
         # csv 파일에 마지막 날짜가 TODAY이면 FALSE를 보내게 했음
-        fetch_start_date = get_fetch_start_date(raw_csv_file)
-        fetch_end_date = get_fetch_end_date(nation)
+        fetch_start_date = get_fetch_start_date(stock.raw_csv_file)
+        fetch_end_date = get_fetch_end_date(stock.nation)
 
         # 이미 fetching을 했으면 fetch_start_date가 False 이다.
         if not fetch_start_date == False:
             fetch_and_generate_stock_csv(
-                raw_csv_file, stock_code, fetch_start_date, fetch_end_date, nation)
+                stock, fetch_start_date, fetch_end_date)
 
-        if nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
-            calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price_list)
+        if stock.nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
+            calc_stock_volume(stock)
         elif nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
-            calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price_list)
+            calc_stock_volume(stock)
     
 # 폴더가 없으면 만든다
 if os.path.exists(DIR) == False:

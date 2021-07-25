@@ -3,21 +3,21 @@ import math
 import os
 import csv
 
-from pythonSrc.Constants import *
-from pythonSrc.Utils import *
+from pythonSrc import Constants
+from pythonSrc import Utils
 
 
-def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price_list):
-    if os.path.exists(raw_csv_file):
+def calc_stock_volume(stock):
+    if os.path.exists(stock.raw_csv_file):
 
         # 새로운 종목의 경우 파일 만들고, headaer 생성
-        if os.path.exists(calc_csv_file) == False:
-            set_csv_header(calc_csv_file)
+        if os.path.exists(stock.calc_csv_file) == False:
+            set_csv_header(stock.calc_csv_file)
 
-        row_count = get_csv_row_count(raw_csv_file)
+        row_count = get_csv_row_count(stock.raw_csv_file)
         # 공휴일을 제외하고 VOLUME_CALC_LENGTH일 의 데이터를 가져오기 위해 csv에서 2배수로 데이터를 읽는다.
         df = pd.read_csv(
-            raw_csv_file,
+            stock.raw_csv_file,
             names=["Date", "Open", "High", "Low", "Close", "Volume", "Change"],
             skiprows=row_count - VOLUME_CALC_LENGTH[0]*2
         )
@@ -46,27 +46,27 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
         for day in VOLUME_CALC_LENGTH:
             df = df.tail(day)
             calculate_daily_values(
-                df, day, df_today_volume, df_today_price, alert_percent, calculated_row, alert_result)
+                df, day, df_today_volume, df_today_price, stock.alert_percent, calculated_row, alert_result)
 
         # 파일에 데이터 추가
-        write_calc_data = get_fetch_start_date(calc_csv_file)
+        write_calc_data = get_fetch_start_date(stock.calc_csv_file)
         if write_calc_data:
-            with open(calc_csv_file, "a") as csvfile:
+            with open(stock.calc_csv_file, "a") as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow(calculated_row)
 
         alert_message = ""
 
-        for alert_price in alert_price_list:
-            alert_message += check_alert_price(nation,
+        for alert_price in stock.alert_price_list.split(','):
+            alert_message += check_alert_price(stock.nation,
                                             df_prev_day, df_today, alert_price)
         
         alert_message += format_alert_message(alert_result)
 
         if alert_message:
             main_link = f'> ' + '<{}|{}>'.format(
-                f'https://arclien.github.io/stock/code/{stock_code}', f'{stock_name}:{stock_code}') + f'\n'
-            additional_link = get_link_by_nation(nation, stock_code)
+                f'https://arclien.github.io/stock/code/{stock.stock_code}', f'{stock.stock_name}:{stock.stock_code}') + f'\n'
+            additional_link = get_link_by_nation(stock.nation, stock.stock_code)
             diff_symbol = "+" if df_today_price > df_prev_price else "-"
             return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{get_diff_percent(df_prev_price, df_today_price)}%)`\n' + alert_message + f'> {additional_link}\n\n'
         else:
