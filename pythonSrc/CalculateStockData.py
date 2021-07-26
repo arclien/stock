@@ -27,6 +27,8 @@ def calc_stock_volume(stock):
         df_today_volume = df_today.iloc[0]['Volume']
         df_today_price = df_today.iloc[0]['Close']
 
+        stock.today_data = StockData(today_close=df_today_price, today_volume=df_today_volume)
+
         # 오늘 날짜를 제외( 평균에서 오늘 값을 제외하기 위해서 )
         df = df[:-1]
 
