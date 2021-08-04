@@ -32,19 +32,19 @@ def test_push_to_slack():
 def test_stock_report():
     stock_dic = {}
 
-    stock1 = Stock(name="삼성전자", ticker="005930",
+    stock1 = StockInfo(name="삼성전자", ticker="005930",
                 created_at="2020-11-20", nation="ko",
                 alert_percent=50, alert_prices="78000,80000,85000")
 
-    stock2 = Stock(name="케이엠더블유", ticker="032500",
+    stock2 = StockInfo(name="케이엠더블유", ticker="032500",
                 created_at="2020-10-12", nation="ko",
                 alert_percent=50, alert_prices="49000,50000,55000,60000")
 
-    stock3 = Stock(name="텔라닥", ticker="TDOC",
+    stock3 = StockInfo(name="텔라닥", ticker="TDOC",
                 created_at="2019-05-06", nation="us",
                 alert_percent=50, alert_prices="90, 100, 110, 120")
 
-    stock4 = Stock(name="모더나", ticker="MRNA",
+    stock4 = StockInfo(name="모더나", ticker="MRNA",
                 created_at="2020-01-12", nation="us",
                 alert_percent=50, alert_prices="10,20,30,40,50,60,70")
 

@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
-from Constants import *
+
+from pythonSrc.Constants import *
+#from Constants import *
 
 @dataclass
 class StockStatistics:
@@ -23,7 +25,7 @@ class StockData:
         self.today_price_percent = 0 if self.today_open <= 0 else (self.today_close - self.today_open) / self.today_open
 
 @dataclass
-class Stock:
+class StockInfo:
     ticker: str
     name: str
     created_at: str
@@ -38,6 +40,12 @@ class Stock:
 
     def __post_init__(self):
         self.alert_price_list = self.alert_prices.split(',')
-        self.raw_csv_file = "{}{}.csv".format(DIR, self.ticker),
+        self.raw_csv_file = "{}{}.csv".format(DIR, self.ticker)
         self.calc_csv_file = "{}{}.csv".format(CALC_DIR, self.ticker)
         self.time_series = []
+
+
+if __name__ == "__main__":
+    stock1 = StockInfo(name="삼성전자", ticker="005930",
+                created_at="2020-11-20", nation="ko",
+                alert_percent=50, alert_prices="78000,80000,85000")

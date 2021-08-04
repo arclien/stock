@@ -3,8 +3,9 @@ import math
 import os
 import csv
 
-from pythonSrc import Constants
-from pythonSrc import Utils
+from pythonSrc.Constants import *
+from pythonSrc.Utils import *
+from pythonSrc.Stock import *
 
 
 def calc_stock_volume(stock):
@@ -27,7 +28,8 @@ def calc_stock_volume(stock):
         df_today_volume = df_today.iloc[0]['Volume']
         df_today_price = df_today.iloc[0]['Close']
 
-        stock.today_data = StockData(today_close=df_today_price, today_volume=df_today_volume)
+        stock.today_data = StockData(today_open=df_today.iloc[0]['Open'],
+            today_close=df_today_price, today_volume=df_today_volume)
 
         # 오늘 날짜를 제외( 평균에서 오늘 값을 제외하기 위해서 )
         df = df[:-1]
@@ -59,7 +61,7 @@ def calc_stock_volume(stock):
 
         alert_message = ""
 
-        for alert_price in stock.alert_price_list.split(','):
+        for alert_price in stock.alert_price_list:
             alert_message += check_alert_price(stock.nation,
                                             df_prev_day, df_today, alert_price)
         
@@ -67,8 +69,8 @@ def calc_stock_volume(stock):
 
         if alert_message:
             main_link = f'> ' + '<{}|{}>'.format(
-                f'https://arclien.github.io/stock/code/{stock.stock_code}', f'{stock.stock_name}:{stock.stock_code}') + f'\n'
-            additional_link = get_link_by_nation(stock.nation, stock.stock_code)
+                f'https://arclien.github.io/stock/code/{stock.ticker}', f'{stock.name}:{stock.ticker}') + f'\n'
+            additional_link = get_link_by_nation(stock.nation, stock.ticker)
             diff_symbol = "+" if df_today_price > df_prev_price else "-"
             return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{get_diff_percent(df_prev_price, df_today_price)}%)`\n' + alert_message + f'> {additional_link}\n\n'
         else:
