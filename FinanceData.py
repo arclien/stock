@@ -68,7 +68,7 @@ def update_all_stock_data():
         if not fetch_start_date == False:
             fetch_and_generate_stock_csv(
                 stock, fetch_start_date, fetch_end_date)
-
+        global old_report
         if stock.nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
             old_report += calc_stock_volume(stock)
         elif nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
