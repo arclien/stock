@@ -62,7 +62,7 @@ def update_all_stock_data():
         # csv 파일이 없으면 START_DATE
         # csv 파일에 마지막 날짜가 TODAY이면 FALSE를 보내게 했음
         fetch_start_date = get_fetch_start_date(stock.raw_csv_file)
-        fetch_end_date = get_fetch_end_date(stock.nation)
+        fetch_end_date = get_fetch_end_date(stock)
 
         # 이미 fetching을 했으면 fetch_start_date가 False 이다.
         if not fetch_start_date == False:
