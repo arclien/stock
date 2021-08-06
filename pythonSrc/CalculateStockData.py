@@ -5,19 +5,20 @@ import csv
 
 from pythonSrc.Constants import *
 from pythonSrc.Utils import *
+from pythonSrc.Stock import *
 
 
-def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, nation, alert_percent, alert_price_list):
-    if os.path.exists(raw_csv_file):
+def calc_stock_volume(stock):
+    if os.path.exists(stock.raw_csv_file):
 
         # 새로운 종목의 경우 파일 만들고, headaer 생성
-        if os.path.exists(calc_csv_file) == False:
-            set_csv_header(calc_csv_file)
+        if os.path.exists(stock.calc_csv_file) == False:
+            set_csv_header(stock.calc_csv_file)
 
-        row_count = get_csv_row_count(raw_csv_file)
+        row_count = get_csv_row_count(stock.raw_csv_file)
         # 공휴일을 제외하고 VOLUME_CALC_LENGTH일 의 데이터를 가져오기 위해 csv에서 2배수로 데이터를 읽는다.
         df = pd.read_csv(
-            raw_csv_file,
+            stock.raw_csv_file,
             names=["Date", "Open", "High", "Low", "Close", "Volume", "Change"],
             skiprows=row_count - VOLUME_CALC_LENGTH[0]*2
         )
@@ -26,6 +27,9 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
         df_today = df.tail(1)
         df_today_volume = df_today.iloc[0]['Volume']
         df_today_price = df_today.iloc[0]['Close']
+
+        stock.today_data = StockData(today_open=df_today.iloc[0]['Open'],
+            today_close=df_today_price, today_volume=df_today_volume)
 
         # 오늘 날짜를 제외( 평균에서 오늘 값을 제외하기 위해서 )
         df = df[:-1]
@@ -46,25 +50,28 @@ def calc_stock_volume(raw_csv_file, calc_csv_file, stock_code, stock_name, natio
         for day in VOLUME_CALC_LENGTH:
             df = df.tail(day)
             calculate_daily_values(
-                df, day, df_today_volume, df_today_price, alert_percent, calculated_row, alert_result)
+                df, day, df_today_volume, df_today_price, stock.alert_percent,
+                calculated_row, alert_result, stock)
 
         # 파일에 데이터 추가
-        with open(calc_csv_file, "a") as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(calculated_row)
+        write_calc_data = get_fetch_start_date(stock.calc_csv_file)
+        if write_calc_data:
+            with open(stock.calc_csv_file, "a") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(calculated_row)
 
         alert_message = ""
 
-        for alert_price in alert_price_list:
-            alert_message += check_alert_price(nation,
+        for alert_price in stock.alert_price_list:
+            alert_message += check_alert_price(stock.nation,
                                             df_prev_day, df_today, alert_price)
         
         alert_message += format_alert_message(alert_result)
 
         if alert_message:
             main_link = f'> ' + '<{}|{}>'.format(
-                f'https://arclien.github.io/stock/code/{stock_code}', f'{stock_name}:{stock_code}') + f'\n'
-            additional_link = get_link_by_nation(nation, stock_code)
+                f'https://arclien.github.io/stock/code/{stock.ticker}', f'{stock.name}:{stock.ticker}') + f'\n'
+            additional_link = get_link_by_nation(stock.nation, stock.ticker)
             diff_symbol = "+" if df_today_price > df_prev_price else "-"
             return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{get_diff_percent(df_prev_price, df_today_price)}%)`\n' + alert_message + f'> {additional_link}\n\n'
         else:
@@ -86,11 +93,13 @@ def get_csv_row_count(csv_file):
         return len(list(reader))
 
 
-def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_percent, calculated_row, alert_result):
+def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_percent, calculated_row, alert_result, stock):
     _max_price = math.ceil(df.describe().loc['max']['Close'])
+    _average_price = math.ceil(df.describe().loc['mean']['Close'])
+    _min_price = math.ceil(df.describe().loc['min']['Close'])
     _max_volume = math.ceil(df.describe().loc['max']['Volume'])
-    _min_volume = math.ceil(df.describe().loc['min']['Volume'])
-    _mean_volume = math.ceil(df.describe().loc['mean']['Volume'])
+    _average_volume = math.ceil(df.describe().loc['mean']['Volume'])
+    _min_volume = math.ceil(df.describe().loc['min']['Volume'])    
 
     # dataframe 정렬 by volume
     df_sorted = df.sort_values(['Volume'], ascending=True)
@@ -104,8 +113,13 @@ def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_perce
 
     calculated_row.append(_max_volume)
     calculated_row.append(_min_volume)
-    calculated_row.append(_mean_volume)
+    calculated_row.append(_average_volume)
     calculated_row.append(_adjusted_mean)
+
+    stock_stat = StockStatistics(day, _max_price, _average_price, _min_price,
+                            _max_volume, _average_volume, _min_volume, _adjusted_mean)
+
+    stock.time_series.append(stock_stat)
 
     # alert_result 계산
     # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
@@ -144,6 +158,8 @@ def check_alert_price(nation, df_yesterday, df_today, alert_price):
 
     if nation == 'ko':
         alert_price = int(alert_price)
+    else:
+        alert_price = float(alert_price)
 
     # https://trello.com/c/Dx9Q0IOy
     # 1. 전날 종가가 35000미만이고 오늘 종가가 35000이상이면, 35000 (돌파) (혹은 위쪽 화살표)
@@ -205,56 +221,3 @@ def get_link_by_nation(nation, stock_code):
                 f'https://finviz.com/quote.ashx?t={stock_code}', 'finviz') + f'\n'
 
     return additional_link
-
-# deprecated
-
-
-def calculate(day, df, calculated_row, df_today_volume, df_today_price, alert_percent):
-    inner_alarm_message = ""
-    _max_price = math.ceil(df.describe().loc['max']['Close'])
-    _max_volume = math.ceil(df.describe().loc['max']['Volume'])
-    _min_volume = math.ceil(df.describe().loc['min']['Volume'])
-    _mean_volume = math.ceil(df.describe().loc['mean']['Volume'])
-
-    # dataframe 정렬 by volume
-    df_sorted = df.sort_values(['Volume'], ascending=True)
-    # volume 기준 상/하위 5% row 지움
-    df_sorted.drop(df_sorted.tail(
-        math.ceil(len(df) * 0.05)).index,  inplace=True)
-    df_sorted.drop(df_sorted.head(
-        math.ceil(len(df) * 0.05)).index,  inplace=True)
-    # adjusted_mean
-    _adjusted_mean = math.ceil(df_sorted.describe().loc['mean']['Volume'])
-
-    calculated_row.append(_max_volume)
-    calculated_row.append(_min_volume)
-    calculated_row.append(_mean_volume)
-    calculated_row.append(_adjusted_mean)
-
-    # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크
-    if not df_today_volume == 0:
-        diff_percent = get_diff_percent(_mean_volume, df_today_volume)
-        if diff_percent >= alert_percent and df_today_volume > _mean_volume:
-            inner_alarm_message += f'> {day}일 평균 대비 {diff_percent}% 증가 / '
-
-        diff_percent = get_diff_percent(_adjusted_mean, df_today_volume)
-        if diff_percent >= alert_percent and df_today_volume > _adjusted_mean:
-            if inner_alarm_message != "":
-                inner_alarm_message += f'조정 평균 대비 {diff_percent}% 증가 / '
-            else:
-                inner_alarm_message += f'> {day}일 조정 평균 대비 {diff_percent}% 증가 / '
-
-        if df_today_volume > _max_volume:
-            if inner_alarm_message != "":
-                inner_alarm_message += f'최대 거래량 갱신 {df_today_volume}'
-            else:
-                inner_alarm_message += f'> {day}일 최대 거래량 갱신 {df_today_volume}'
-
-        if inner_alarm_message:
-            inner_alarm_message += '\n'
-
-    if df_today_price > _max_price:
-        diff_percent = get_diff_percent(_max_price, df_today_price)
-        inner_alarm_message += f'> {day}일 최대 가격 {diff_percent}% 갱신 {_max_price} => {df_today_price} \n'
-
-    return inner_alarm_message
