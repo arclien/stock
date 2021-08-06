@@ -48,12 +48,11 @@ def update_all_stock_data():
             else:
                 continue
 
-            stock = StockInfo(name=stock_name, ticker=stock_code,
-                        created_at=created_at, nation=nation,
-                        alert_percent=alert_percent, alert_prices=alert_prices)
+        stock = StockInfo(name=stock_name, ticker=stock_code,
+                    created_at=created_at, nation=nation,
+                    alert_percent=alert_percent, alert_prices=alert_prices)
 
-            stock_dic[stock_name] = stock
-
+        stock_dic[stock_name] = stock
         
         # csv 파일 매핑
         #raw_csv_file = "{}{}.csv".format(DIR, stock_code)
