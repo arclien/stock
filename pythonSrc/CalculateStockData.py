@@ -50,7 +50,8 @@ def calc_stock_volume(stock):
         for day in VOLUME_CALC_LENGTH:
             df = df.tail(day)
             calculate_daily_values(
-                df, day, df_today_volume, df_today_price, stock.alert_percent, calculated_row, alert_result)
+                df, day, df_today_volume, df_today_price, stock.alert_percent,
+                calculated_row, alert_result, stock)
 
         # 파일에 데이터 추가
         write_calc_data = get_fetch_start_date(stock.calc_csv_file)
@@ -92,11 +93,13 @@ def get_csv_row_count(csv_file):
         return len(list(reader))
 
 
-def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_percent, calculated_row, alert_result):
+def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_percent, calculated_row, alert_result, stock):
     _max_price = math.ceil(df.describe().loc['max']['Close'])
+    _average_price = math.ceil(df.describe().loc['mean']['Close'])
+    _min_price = math.ceil(df.describe().loc['min']['Close'])
     _max_volume = math.ceil(df.describe().loc['max']['Volume'])
-    _min_volume = math.ceil(df.describe().loc['min']['Volume'])
-    _mean_volume = math.ceil(df.describe().loc['mean']['Volume'])
+    _average_volume = math.ceil(df.describe().loc['mean']['Volume'])
+    _min_volume = math.ceil(df.describe().loc['min']['Volume'])    
 
     # dataframe 정렬 by volume
     df_sorted = df.sort_values(['Volume'], ascending=True)
@@ -110,8 +113,13 @@ def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_perce
 
     calculated_row.append(_max_volume)
     calculated_row.append(_min_volume)
-    calculated_row.append(_mean_volume)
+    calculated_row.append(_average_volume)
     calculated_row.append(_adjusted_mean)
+
+    stock_stat = StockStatistics(day, _max_price, _average_price, _min_price,
+                            _max_volume, _average_volume, _min_volume, _adjusted_mean)
+
+    stock.time_series.append(stock_stat)
 
     # alert_result 계산
     # 최근 3일 평균을 구해야 하는데, volume이 있는 날( 주식시장 개장일 )만 평균 3일 체크

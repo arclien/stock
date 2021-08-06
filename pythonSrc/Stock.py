@@ -6,12 +6,13 @@ from pythonSrc.Constants import *
 @dataclass
 class StockStatistics:
     day_range: int
-    average_price: float = field(init=False)
-    max_price: float = field(init=False)
-    min_price: float = field(init=False)
-    average_volume: float = field(init=False)
-    max_volume:int = field(init=False)
-    min_price:int = field(init=False)
+    max_price: float #= field(init=False)
+    average_price: float #= field(init=False)    
+    min_price: float #= field(init=False)
+    max_volume: int #= field(init=False)    
+    average_volume: float #= field(init=False)    
+    min_volume: int #= field(init=False)
+    adjust_average_volume: float #= field(init=False)
 @dataclass
 class StockData:
     today_open: float
@@ -39,7 +40,8 @@ class StockInfo:
     time_series: list = field(init=False)
 
     def __post_init__(self):
-        self.alert_price_list = self.alert_prices.split(',')
+        #self.alert_price_list = self.alert_prices.split(',')
+        self.alert_price_list = [float(e) if e.strip().isdigit() else 0 for e in self.alert_prices.split(',')]
         self.raw_csv_file = "{}{}.csv".format(DIR, self.ticker)
         self.calc_csv_file = "{}{}.csv".format(CALC_DIR, self.ticker)
         self.time_series = []
