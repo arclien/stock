@@ -67,7 +67,7 @@ def update_all_stock_data():
         # 이미 fetching을 했으면 fetch_start_date가 False 이다.
         if not fetch_start_date == False:
             fetch_and_generate_stock_csv(
-                stock.raw_csv_file, stock.ticker, fetch_start_date, fetch_end_date)
+                stock.raw_csv_file, stock.ticker, fetch_start_date, fetch_end_date, stock.nation)
         global old_report
         if stock.nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
             old_report += calc_stock_volume(stock)
