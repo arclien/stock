@@ -12,6 +12,7 @@ from pythonSrc.SlackUtils import *
 from pythonSrc.TrelloUtils import *
 
 stock_dic = {}
+old_report = CRAWLING_RESULT_MSG
 
 def update_all_stock_data():
     my_card_list = get_card_ids()
@@ -43,11 +44,11 @@ def update_all_stock_data():
                     alert_percent = int(json.loads(card_json["desc"])['alert_percent'])
                 if 'alert_price' in json.loads(card_json["desc"]):
                     alert_prices = json.loads(card_json["desc"])['alert_price']
-                    alert_prices = [float(e) if e.strip().isdigit() else 0 for e in alert_price_list.split(',')]
+                    #alert_prices = [float(e) if e.strip().isdigit() else 0 for e in alert_prices.split(',')]
             else:
                 continue
 
-            stock = Stock(name=stock_name, ticker=stock_code,
+            stock = StockInfo(name=stock_name, ticker=stock_code,
                         created_at=created_at, nation=nation,
                         alert_percent=alert_percent, alert_prices=alert_prices)
 
@@ -70,9 +71,9 @@ def update_all_stock_data():
                 stock, fetch_start_date, fetch_end_date)
 
         if stock.nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
-            calc_stock_volume(stock)
+            old_report += calc_stock_volume(stock)
         elif nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
-            calc_stock_volume(stock)
+            old_report += calc_stock_volume(stock)
     
 # 폴더가 없으면 만든다
 if os.path.exists(DIR) == False:
@@ -82,5 +83,5 @@ if os.path.exists(CALC_DIR) == False:
 
 update_all_stock_data()
 
-report = generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
+report = old_report + generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
 push_to_slack(report)
