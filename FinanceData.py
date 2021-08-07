@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     stock_dic = {}
     make_stock_dic(stock_dic)
-    old_report = update_all_stock_data(stock_dic)
+    update_all_stock_data(stock_dic)
 
-    report = old_report + generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
+    report += generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
     push_to_slack(report)
