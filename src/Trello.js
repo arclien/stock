@@ -27,6 +27,11 @@ class Trello {
         },right=${window.screenY + (window.innerHeight - 470) / 2}`
       );
 
+      if(!popup){
+        window.alert('팝업창이 열리지 않습니다. 팝업을 허용해주세요!');
+        return;
+      }
+
       const timeout = setTimeout(() => {
         popup.close();
         reject(new Error('Trello pop-up closed.'));
