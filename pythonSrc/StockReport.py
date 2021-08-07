@@ -25,8 +25,8 @@ def generate_daily_summary(stock_dic, nation):
     down_count = 0
 
     for stock in stock_dic.values():
-        if stock.today_data is None:
-            print("{} ticker has no data".format(stock.ticker))
+        if stock.today_data is None or stock.today_data.today_close == 0:
+            #print("{} ticker has no data".format(stock.ticker))
             continue
 
         if stock.nation == nation:
