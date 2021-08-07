@@ -16,6 +16,9 @@ def generate_stock_report(stock_dic, nation):
 
 
 def generate_daily_summary(stock_dic, nation):
+    if len(stock_dic) == 0:
+        return
+
     summary = "\n===== daily summary ====="
     up_count = 0
     even_count = 0
@@ -38,6 +41,9 @@ def generate_daily_summary(stock_dic, nation):
     return summary
 
 def generate_weekly_summary(stock_dic, nation):
+    if len(stock_dic) == 0:
+        return
+
     summary = "\n===== weekly summary ====="
     up_count = 0
     even_count = 0

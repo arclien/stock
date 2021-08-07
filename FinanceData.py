@@ -15,6 +15,8 @@ stock_dic = {}
 old_report = CRAWLING_RESULT_MSG
 
 def update_all_stock_data():
+    global old_report
+    global stock_dic
     my_card_list = get_card_ids()
 
     for cardId in my_card_list:
@@ -67,8 +69,9 @@ def update_all_stock_data():
         # 이미 fetching을 했으면 fetch_start_date가 False 이다.
         if not fetch_start_date == False:
             fetch_and_generate_stock_csv(
-                stock.raw_csv_file, stock.ticker, fetch_start_date, fetch_end_date, stock.nation)
-        global old_report
+                stock.raw_csv_file, stock.ticker, stock.nation,
+                fetch_start_date, fetch_end_date)
+
         if stock.nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
             old_report += calc_stock_volume(stock)
         elif nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
