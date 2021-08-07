@@ -1,4 +1,5 @@
 from pythonSrc.StockReport import generate_stock_report
+from FinanceData import *
 from pythonSrc.Stock import *
 from pythonSrc.Constants import *
 from pythonSrc.Utils import *
@@ -53,11 +54,8 @@ def test_stock_report():
     stock_dic['텔라닥'] = stock3
     stock_dic['모더나'] = stock4
 
-    old_report = ""
-    for stock in stock_dic.values():        
-        old_report += calc_stock_volume(stock)
-
-    report = generate_stock_report(stock_dic, "ko")
+    old_report = update_all_stock_data(stock_dic)
+    report = generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
 
     print(old_report)
     print("\n -------------------------- \n")    

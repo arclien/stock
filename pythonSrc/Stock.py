@@ -44,6 +44,7 @@ class StockInfo:
         self.alert_price_list = [float(e) if e.strip().isdigit() else 0 for e in self.alert_prices.split(',')]
         self.raw_csv_file = "{}{}.csv".format(DIR, self.ticker)
         self.calc_csv_file = "{}{}.csv".format(CALC_DIR, self.ticker)
+        self.today_data = StockData(0, 0, 0)
         self.time_series = []
 
 

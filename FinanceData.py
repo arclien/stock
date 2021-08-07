@@ -11,12 +11,7 @@ from pythonSrc.Utils import *
 from pythonSrc.SlackUtils import *
 from pythonSrc.TrelloUtils import *
 
-stock_dic = {}
-old_report = CRAWLING_RESULT_MSG
-
-def update_all_stock_data():
-    global old_report
-    global stock_dic
+def make_stock_dic(stock_dic):
     my_card_list = get_card_ids()
 
     for cardId in my_card_list:
@@ -55,7 +50,12 @@ def update_all_stock_data():
                     alert_percent=alert_percent, alert_prices=alert_prices)
 
         stock_dic[stock_name] = stock
-        
+
+
+def update_all_stock_data(stock_dic):
+    report = CRAWLING_RESULT_MSG
+
+    for stock in stock_dic.values():
         # csv 파일 매핑
         #raw_csv_file = "{}{}.csv".format(DIR, stock_code)
         #calc_csv_file = "{}{}.csv".format(CALC_DIR, stock_code)
@@ -73,17 +73,20 @@ def update_all_stock_data():
                 fetch_start_date, fetch_end_date)
 
         if stock.nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
-            old_report += calc_stock_volume(stock)
-        elif nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
-            old_report += calc_stock_volume(stock)
-    
-# 폴더가 없으면 만든다
-if os.path.exists(DIR) == False:
-    os.mkdir(DIR)
-if os.path.exists(CALC_DIR) == False:
-    os.mkdir(CALC_DIR)
+            report += calc_stock_volume(stock)
+        elif stock.nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
+            report += calc_stock_volume(stock)
 
-update_all_stock_data()
+if __name__ == "__main__":
+    # 폴더가 없으면 만든다
+    if os.path.exists(DIR) == False:
+        os.mkdir(DIR)
+    if os.path.exists(CALC_DIR) == False:
+        os.mkdir(CALC_DIR)
 
-report = old_report + generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
-push_to_slack(report)
+    stock_dic = {}
+    make_stock_dic(stock_dic)
+    old_report = update_all_stock_data(stock_dic)
+
+    report = old_report + generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
+    push_to_slack(report)
