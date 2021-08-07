@@ -11,10 +11,10 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, nation, fetch_start_d
     df_list = fdr.DataReader(stock_code, fetch_start_date, fetch_end_date)
   except ValueError as ex:
     print("ValueError: {} is not correct ticker".format(stock_code))
-    print(str(ex))
+    print("  => " + str(ex))
   except KeyError as ex:
     print("KeyError: {} is not correct ticker".format(stock_code))
-    print(str(ex))
+    print("  => " + str(ex))
   else:  
     with open(raw_csv_file, "a") as csvfile:
       writer = csv.writer(csvfile)

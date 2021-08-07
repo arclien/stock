@@ -53,8 +53,6 @@ def make_stock_dic(stock_dic):
 
 
 def update_all_stock_data(stock_dic):
-    report = CRAWLING_RESULT_MSG
-
     for stock in stock_dic.values():
         # csv 파일 매핑
         #raw_csv_file = "{}{}.csv".format(DIR, stock_code)
@@ -85,6 +83,8 @@ if __name__ == "__main__":
         os.mkdir(CALC_DIR)
 
     stock_dic = {}
+    report = CRAWLING_RESULT_MSG
+
     make_stock_dic(stock_dic)
     update_all_stock_data(stock_dic)
 
