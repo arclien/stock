@@ -10,9 +10,11 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, nation, fetch_start_d
     # fetch_start_date 기준으로 stock_code(종목코드)에 대한 데이터를 불러옴
     df_list = fdr.DataReader(stock_code, fetch_start_date, fetch_end_date)
   except ValueError as ex:
-    pass
-    # print("{} is not correct ticker".format(stock_code))
-    # print(str(ex))
+    print("ValueError: {} is not correct ticker".format(stock_code))
+    print(str(ex))
+  except KeyError as ex:
+    print("KeyError: {} is not correct ticker".format(stock_code))
+    print(str(ex))
   else:  
     with open(raw_csv_file, "a") as csvfile:
       writer = csv.writer(csvfile)
