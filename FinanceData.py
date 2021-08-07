@@ -74,6 +74,7 @@ def update_all_stock_data(stock_dic):
             report += calc_stock_volume(stock)
         elif stock.nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
             report += calc_stock_volume(stock)
+    return report
 
 if __name__ == "__main__":
     # 폴더가 없으면 만든다
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     report = CRAWLING_RESULT_MSG
 
     make_stock_dic(stock_dic)
-    update_all_stock_data(stock_dic)
+    report += update_all_stock_data(stock_dic)
 
     report += generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
     push_to_slack(report)
