@@ -3,6 +3,7 @@ import time
 from pythonSrc.Constants import *
 
 def generate_stock_report(stock_dic, nation):
+    print("generate stock report for {} stocks, target nation = {}".format(len(stock_dic), nation))
     stock_report = CRAWLING_RESULT_MSG
 
     if time.localtime().tm_wday == 5 and nation == "ko":
@@ -16,6 +17,7 @@ def generate_stock_report(stock_dic, nation):
 
 
 def generate_daily_summary(stock_dic, nation):
+    print("generate_daily_summary")
     if len(stock_dic) == 0:
         return
 
@@ -41,6 +43,7 @@ def generate_daily_summary(stock_dic, nation):
     return summary
 
 def generate_weekly_summary(stock_dic, nation):
+    print("generate_weekly_summary for {} nation, weekday {}".format(nation, time.localtime().tm_wday))
     if len(stock_dic) == 0:
         return
 
