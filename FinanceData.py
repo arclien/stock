@@ -53,8 +53,12 @@ def make_stock_dic(stock_dic):
 
 
 def update_all_stock_data(stock_dic):
+    print("update_all_stock, cur time = {}".format(CURRENT_TIME))
+    count = 0
+    update_count = 0
     report = ""
     for stock in stock_dic.values():
+        print("update {} stock".format(stock.name))
         # csv 파일 매핑
         #raw_csv_file = "{}{}.csv".format(DIR, stock_code)
         #calc_csv_file = "{}{}.csv".format(CALC_DIR, stock_code)
@@ -65,8 +69,11 @@ def update_all_stock_data(stock_dic):
         fetch_start_date = get_fetch_start_date(stock.raw_csv_file)
         fetch_end_date = get_fetch_end_date(stock)
 
+        print("{} stock fetch start {}, end {}".format(stock.name, fetch_start_date, fetch_end_date))
+
         # 이미 fetching을 했으면 fetch_start_date가 False 이다.
         if not fetch_start_date == False:
+            update_count += 1
             fetch_and_generate_stock_csv(
                 stock.raw_csv_file, stock.ticker, stock.nation,
                 fetch_start_date, fetch_end_date)
@@ -75,6 +82,9 @@ def update_all_stock_data(stock_dic):
             report += calc_stock_volume(stock)
         elif stock.nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
             report += calc_stock_volume(stock)
+        count += 1
+
+    print("{} stock listed, {} updated".format(count, update_count))
     return report
 
 if __name__ == "__main__":
