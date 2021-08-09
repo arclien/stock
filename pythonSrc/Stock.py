@@ -23,7 +23,7 @@ class StockData:
     today_alert: str = field(init=False)
 
     def __post_init__(self):
-        self.today_price_percent = 0 if self.today_open <= 0 else (self.today_close - self.today_open) / self.today_open
+        self.today_price_percent = 0 if self.today_open <= 0 else (self.today_close - self.today_open) / self.today_open * 100
 
 @dataclass
 class StockInfo:

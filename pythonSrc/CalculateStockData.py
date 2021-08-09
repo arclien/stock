@@ -54,11 +54,11 @@ def calc_stock_volume(stock):
                 calculated_row, alert_result, stock)
 
         # 파일에 데이터 추가
-        write_calc_data = get_fetch_start_date(stock.calc_csv_file)
-        if write_calc_data:
-            with open(stock.calc_csv_file, "a") as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(calculated_row)
+        #write_calc_data = get_fetch_start_date(stock.calc_csv_file)
+        #if write_calc_data:
+        with open(stock.calc_csv_file, "a") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(calculated_row)
 
         alert_message = ""
 
