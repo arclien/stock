@@ -9,7 +9,7 @@ STOCK_LIST_HEADER = ["code","name","nation","user_id","created_at","updated_at",
 STOCK_CALC_LIST_HEADER = ['date','max_180','min_180','mean_180','adjusted_mean_180','max_90','min_90','mean_90','adjusted_mean_90','max_60','min_60','mean_60','adjusted_mean_60','max_30','min_30','mean_30','adjusted_mean_30']
 START_DATE = "2015-01-02"
 AUTO_CRAWLING_TIME = "16"
-US_CRAWLING_TIME = "07"
+US_CRAWLING_TIME = "08"
 VOLUME_CALC_LENGTH = [180,90,60,30,5]
 DATE_FORMAT = "%Y-%m-%d"
 # stock_list csv를 새롭게 업데이트 하기 위한 list
