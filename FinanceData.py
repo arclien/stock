@@ -53,7 +53,7 @@ def make_stock_dic(stock_dic):
 
 
 def update_all_stock_data(stock_dic):
-    print("update_all_stock, cur time = {}".format(CURRENT_TIME))
+    print("update_all_stock, cur time = {}({})".format(CURRENT_TIME2, CURRENT_TIME))
     count = 0
     update_count = 0
     report = ""
@@ -80,7 +80,7 @@ def update_all_stock_data(stock_dic):
 
         if stock.nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
             report += calc_stock_volume(stock)
-        elif stock.nation == 'us'and CURRENT_TIME == US_CRAWLING_TIME:
+        elif stock.nation == 'us'and (CURRENT_TIME == US_CRAWLING_TIME or CURRENT_TIME == US_CRAWLING_TIME + 1):
             report += calc_stock_volume(stock)
         count += 1
 
