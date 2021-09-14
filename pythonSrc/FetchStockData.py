@@ -8,6 +8,8 @@ from pythonSrc.Utils import *
 def fetch_and_generate_stock_csv(raw_csv_file, stock_code, nation, fetch_start_date, fetch_end_date):
   try:
     # fetch_start_date 기준으로 stock_code(종목코드)에 대한 데이터를 불러옴
+    if nation == 'coin':
+      stock_code = stock_code + "/USD"
     df_list = fdr.DataReader(stock_code, fetch_start_date, fetch_end_date)
   except ValueError as ex:
     print("ValueError: {} is not correct ticker".format(stock_code))
@@ -28,8 +30,13 @@ def fetch_and_generate_stock_csv(raw_csv_file, stock_code, nation, fetch_start_d
           item[0] = item[0].strftime(DATE_FORMAT)
           if item[0] == _today:
             if nation == 'ko':
+              # date, open, hight, low, close, volume, change
               writer.writerow(item)
             elif nation == 'us':
+              # date, close, open, high, low, volume, change
+              writer.writerow([item[0], item[2], item[3], item[4], item[1], item[5], item[6]])
+            elif nation == 'coin':
+              # date, close, open, high, low, volume, change
               writer.writerow([item[0], item[2], item[3], item[4], item[1], item[5], item[6]])
             has_data = True
             break

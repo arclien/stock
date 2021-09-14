@@ -219,5 +219,8 @@ def get_link_by_nation(nation, stock_code):
         additional_link += f'> ' + \
             '<{}|{}>'.format(
                 f'https://finviz.com/quote.ashx?t={stock_code}', 'finviz') + f'\n'
+    elif nation == 'coin':
+        additional_link = '<{}|{}>'.format(
+            f'https://coinmarketcap.com/ko/currencies/{stock_code}', '코인마켓캡') + f'\n'
 
     return additional_link

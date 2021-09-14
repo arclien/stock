@@ -62,6 +62,36 @@ def test_stock_report():
     print(report)
     
 
+def test_coin_update_and_report():
+    stock_dic = {}
+    stock1 = StockInfo(name="비트코인", ticker="BTC",
+                created_at="2020-11-20", nation="coin",
+                alert_percent=50, alert_prices="45000, 44000")
+
+    stock2 = StockInfo(name="SOL", ticker="SOL",
+                created_at="2020-10-12", nation="coin",
+                alert_percent=50, alert_prices="")
+
+    stock3 = StockInfo(name="AAVE", ticker="AAVE",
+                created_at="2019-05-06", nation="coin",
+                alert_percent=50, alert_prices="")
+
+    stock4 = StockInfo(name="폴카닷", ticker="DOT",
+                created_at="2020-01-12", nation="coin",
+                alert_percent=50, alert_prices="")
+
+    stock_dic['비트코인'] = stock1
+    stock_dic['SOL'] = stock2
+    stock_dic['AAVE'] = stock3
+    stock_dic['DOT'] = stock4
+
+    old_report = update_all_stock_data(stock_dic)
+    report = generate_stock_report(stock_dic, "coin")
+
+    print(old_report)
+    print("\n -------------------------- \n")    
+    print(report)
+    
 # 테스트할 함수를 여기에서 수정한다.
 if __name__ == "__main__":
-    test_stock_report()
+    test_coin_update_and_report()
