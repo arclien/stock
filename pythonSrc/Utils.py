@@ -63,7 +63,8 @@ def get_fetch_end_date(stock):
       return prev_date
     else:
       return prev_date
-
+  elif stock.nation == 'coin':
+    return prev_date 
 
 def get_diff_percent(origin, target):
   if target > origin:
