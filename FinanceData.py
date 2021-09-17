@@ -1,3 +1,4 @@
+from json.decoder import JSONDecodeError
 import os
 from datetime import timedelta, datetime
 
@@ -17,39 +18,43 @@ def make_stock_dic(stock_dic):
     for cardId in my_card_list:
         # cardId에 대한 정보를 trello에서 가져옴
         res = get_card_by_id(cardId)
-        card_json = json.loads(res)
-        # print(card_json)
+        try:
+            card_json = json.loads(res)
+        except JSONDecodeError as ex:
+            print("JSONDecodeError: {} is not correct card, value = {}".format(cardId, res))
+        else:
+            # print(card_json)
 
-        # card desc에서 정보 파싱
-        stock_name = ""
-        stock_code = ""
-        created_at = ""
-        nation = ""
-        alert_percent = "50"
-        alert_prices = ""
-        if 'desc' in card_json:
-            if card_json['desc'] != '':
-                if 'code' in json.loads(card_json["desc"]):
-                    stock_code = json.loads(card_json["desc"])['code']
-                if 'name' in json.loads(card_json["desc"]):
-                    stock_name = json.loads(card_json["desc"])['name']
-                if 'created_at' in json.loads(card_json["desc"]):
-                    created_at = json.loads(card_json["desc"])['created_at']
-                if 'nation' in json.loads(card_json["desc"]):
-                    nation = json.loads(card_json["desc"])['nation']
-                if 'alert_percent' in json.loads(card_json["desc"]):
-                    alert_percent = int(json.loads(card_json["desc"])['alert_percent'])
-                if 'alert_price' in json.loads(card_json["desc"]):
-                    alert_prices = json.loads(card_json["desc"])['alert_price']
-                    #alert_prices = [float(e) if e.strip().isdigit() else 0 for e in alert_prices.split(',')]
-            else:
-                continue
+            # card desc에서 정보 파싱
+            stock_name = ""
+            stock_code = ""
+            created_at = ""
+            nation = ""
+            alert_percent = "50"
+            alert_prices = ""
+            if 'desc' in card_json:
+                if card_json['desc'] != '':
+                    if 'code' in json.loads(card_json["desc"]):
+                        stock_code = json.loads(card_json["desc"])['code']
+                    if 'name' in json.loads(card_json["desc"]):
+                        stock_name = json.loads(card_json["desc"])['name']
+                    if 'created_at' in json.loads(card_json["desc"]):
+                        created_at = json.loads(card_json["desc"])['created_at']
+                    if 'nation' in json.loads(card_json["desc"]):
+                        nation = json.loads(card_json["desc"])['nation']
+                    if 'alert_percent' in json.loads(card_json["desc"]):
+                        alert_percent = int(json.loads(card_json["desc"])['alert_percent'])
+                    if 'alert_price' in json.loads(card_json["desc"]):
+                        alert_prices = json.loads(card_json["desc"])['alert_price']
+                        #alert_prices = [float(e) if e.strip().isdigit() else 0 for e in alert_prices.split(',')]
+                else:
+                    continue
 
-        stock = StockInfo(name=stock_name, ticker=stock_code,
-                    created_at=created_at, nation=nation,
-                    alert_percent=alert_percent, alert_prices=alert_prices)
+            stock = StockInfo(name=stock_name, ticker=stock_code,
+                        created_at=created_at, nation=nation,
+                        alert_percent=alert_percent, alert_prices=alert_prices)
 
-        stock_dic[stock_name] = stock
+            stock_dic[stock_name] = stock
 
 
 def update_all_stock_data(stock_dic):
