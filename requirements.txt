@@ -1,4 +1,4 @@
-finance_datareader==0.9.10
+finance_datareader==0.9.31
 beautifulsoup4==4.8.2
 requests==2.23.0
 bs4==0.0.1
