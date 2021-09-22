@@ -9,6 +9,8 @@ from pythonSrc.Stock import *
 
 
 def calc_stock_volume(stock):
+    alert_message = ""
+
     if os.path.exists(stock.raw_csv_file):
 
         # 새로운 종목의 경우 파일 만들고, headaer 생성
@@ -40,6 +42,8 @@ def calc_stock_volume(stock):
 
         # 전날 데이터와 비교를 위해서 캐싱( 오늘이 월요일이면, 지난주 금요일로( 0의 날짜를 모두 제거 했기 때문 ))
         df_prev_day = df.tail(1)
+        if df_prev_day.empty == True:
+            return alert_message
         df_prev_price = df_prev_day.iloc[0]['Close']
 
         calculated_row = ([TODAY])
@@ -60,8 +64,6 @@ def calc_stock_volume(stock):
             writer = csv.writer(csvfile)
             writer.writerow(calculated_row)
 
-        alert_message = ""
-
         for alert_price in stock.alert_price_list:
             alert_message += check_alert_price(stock.nation,
                                             df_prev_day, df_today, alert_price)
@@ -76,6 +78,8 @@ def calc_stock_volume(stock):
             return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{get_diff_percent(df_prev_price, df_today_price)}%)`\n' + alert_message + f'> {additional_link}\n\n'
         else:
             return alert_message
+            
+    return alert_message
 
 
 # 새로운 종목의 경우, 새로운 csv 파일 생성 후 header 추가
