@@ -10,6 +10,7 @@ def generate_stock_report(stock_dic, nation):
         stock_report += generate_weekly_summary(stock_dic, nation)
     elif time.localtime().tm_wday == 6 and nation == "us":
         stock_report += generate_weekly_summary(stock_dic, nation)
+        stock_report += generate_weekly_summary(stock_dic, "coin")
     else:
         stock_report += generate_daily_summary(stock_dic, nation)
     
@@ -39,11 +40,11 @@ def generate_daily_summary(stock_dic, nation):
             else:
                 even_count += 1
 
-    summary += "\n> 상승종목 {}, 하락종목 {}, 횡보종목 {}".format(up_count, down_count, even_count)
+    summary += "\n> 상승종목 *{}*, 하락종목 *{}*, 횡보종목 *{}*".format(up_count, down_count, even_count)
     return summary
 
 def generate_weekly_summary(stock_dic, nation):
-    print("generate_weekly_summary for {} nation, weekday {}".format(nation, time.localtime().tm_wday))
+    print("generate_weekly_summary for *{}* nation, weekday {}".format(nation, time.localtime().tm_wday))
     if len(stock_dic) == 0:
         return
 
@@ -65,7 +66,7 @@ def generate_weekly_summary(stock_dic, nation):
             else:
                 even_count += 1
 
-    summary += "\n> 상승종목 {}, 하락종목 {}, 횡보종목 {}".format(up_count, down_count, even_count)
+    summary += "\n> 상승종목 *{}*, 하락종목 *{}*, 횡보종목 *{}*".format(up_count, down_count, even_count)
     return summary
 
 

@@ -1,3 +1,4 @@
+from pythonSrc.StockReport import format_ext_link
 import pandas as pd
 import math
 import os
@@ -6,6 +7,7 @@ import csv
 from pythonSrc.Constants import *
 from pythonSrc.Utils import *
 from pythonSrc.Stock import *
+from pythonSrc.StockReport import *
 
 
 def calc_stock_volume(stock):
@@ -73,7 +75,7 @@ def calc_stock_volume(stock):
         if alert_message:
             main_link = f'> ' + '<{}|{}>'.format(
                 f'https://arclien.github.io/stock/code/{stock.ticker}', f'{stock.name}:{stock.ticker}') + f'\n'
-            additional_link = get_link_by_nation(stock.nation, stock.ticker)
+            additional_link = format_ext_link(stock.nation, stock.ticker)
             diff_symbol = "+" if df_today_price > df_prev_price else "-"
             return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{get_diff_percent(df_prev_price, df_today_price)}%)`\n' + alert_message + f'> {additional_link}\n\n'
         else:
@@ -171,13 +173,13 @@ def check_alert_price(nation, df_yesterday, df_today, alert_price):
     # 3. 전날/오늘 종가가 다 35000 초과인데, 장중 최저가가 35000이하면 35000 (지지)
     # 4. 전날/오늘 종가가 다 35000 미만인데, 장중 최고가가 35000이상이면 35000 (저항)
     if yesterday_price < alert_price and today_price >= alert_price:
-        inner_alarm_message += f'> 가격알림: {alert_price} 돌파 \n'
+        inner_alarm_message += f'> *가격알림:* *{alert_price}* *돌파* \n'
     elif yesterday_price > alert_price and today_price <= alert_price:
-        inner_alarm_message += f'> 가격알림: {alert_price} 하향돌파 \n'
+        inner_alarm_message += f'> *가격알림: {alert_price} 하향돌파* \n'
     elif yesterday_price > alert_price and today_price > alert_price and today_low <= alert_price:
-        inner_alarm_message += f'> 가격알림: {alert_price} 지지 \n'
+        inner_alarm_message += f'> *가격알림: {alert_price} 지지* \n'
     elif yesterday_price < alert_price and today_price < alert_price and today_high >= alert_price:
-        inner_alarm_message += f'> 가격알림: {alert_price} 저항 \n'
+        inner_alarm_message += f'> *가격알림: {alert_price} 저항* \n'
 
     return inner_alarm_message
 
@@ -190,7 +192,7 @@ def format_alert_message(alert_result):
         alert_message += "> "
         alert_message += "/".join(
             map(str, alert_result["max_price_over_alert"]["days"]))
-        alert_message += f'일 최대가격갱신 (+{alert_result["max_price_over_alert"]["%"][0]}%, +{alert_result["max_price_over_alert"]["over"][0]}) \n'
+        alert_message += f'일 최대*가격*갱신 (+{alert_result["max_price_over_alert"]["%"][0]}%, +{alert_result["max_price_over_alert"]["over"][0]}) \n'
 
     if len(alert_result["max_volume_over_alert"]["days"]) > 0:
         alert_message += "> "
@@ -205,26 +207,3 @@ def format_alert_message(alert_result):
         alert_message += f'일 평균거래량갱신 (+{alert_result["mean_volume_over_alert"]["%"][0]}%, +{alert_result["mean_volume_over_alert"]["over"][0]}) \n'
 
     return alert_message
-
-
-def get_link_by_nation(nation, stock_code):
-    additional_link = ""
-
-    if nation == 'ko':
-        additional_link = '<{}|{}>'.format(
-            f'https://finance.naver.com/item/main.nhn?code={stock_code}', '네이버') + f'\n'
-        additional_link += f'> ' + '<{}|{}>'.format(
-            f'http://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?pGB=1&cID=&MenuYn=Y&ReportGB=&NewMenuID=11&stkGb=701&gicode=A{stock_code}', '에프엔가이드') + f'\n'
-        additional_link += f'> ' + '<{}|{}>'.format(
-            f'https://m.comp.wisereport.co.kr:44302/CompanyInfo/Summary/{stock_code}', '와이즈에프엔') + f'\n'
-    elif nation == 'us':
-        additional_link = '<{}|{}>'.format(
-            f'https://finance.yahoo.com/quote/{stock_code}', '야후') + f'\n'
-        additional_link += f'> ' + \
-            '<{}|{}>'.format(
-                f'https://finviz.com/quote.ashx?t={stock_code}', 'finviz') + f'\n'
-    elif nation == 'coin':
-        additional_link = '<{}|{}>'.format(
-            f'https://coinmarketcap.com/ko/currencies/{stock_code}', '코인마켓캡') + f'\n'
-
-    return additional_link
