@@ -56,18 +56,18 @@ def get_fetch_start_date(stock_csv_file):
 # 		Fetch : (마지막 날짜 + 1 ) - (Today -1)
 def get_fetch_end_date(stock):
     prev_date = (datetime.strptime(TODAY, DATE_FORMAT) - timedelta(days=1)).strftime(DATE_FORMAT)
-       if stock.nation == 'ko':
-            if CURRENT_TIME == AUTO_CRAWLING_TIME:
-                return TODAY
-            else:
-                return prev_date
-        elif stock.nation == 'us':
-            if CURRENT_TIME == US_CRAWLING_TIME:
-                return prev_date
-            else:
-                return prev_date
-        elif stock.nation == 'coin':
+    if stock.nation == 'ko':
+        if CURRENT_TIME == AUTO_CRAWLING_TIME:
+            return TODAY
+        else:
             return prev_date
+    elif stock.nation == 'us':
+        if CURRENT_TIME == US_CRAWLING_TIME:
+            return prev_date
+        else:
+            return prev_date
+    elif stock.nation == 'coin':
+        return prev_date
 
 def get_diff_percent(origin, target):
     if target > origin:
