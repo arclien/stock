@@ -105,5 +105,9 @@ if __name__ == "__main__":
     make_stock_dic(stock_dic)
     report += update_all_stock_data(stock_dic)
 
-    report += generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
+    if CURRENT_TIME == AUTO_CRAWLING_TIME: # kr
+        report += generate_stock_report(stock_dic, "ko")
+    else:
+        report += generate_stock_report(stock_dic, "us")
+        report += generate_stock_report(stock_dic, "coin")
     push_to_slack(report)
