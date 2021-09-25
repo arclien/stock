@@ -13,6 +13,8 @@ class StockStatistics:
     average_volume: float #= field(init=False)    
     min_volume: int #= field(init=False)
     adjust_average_volume: float #= field(init=False)
+    start_price: float
+    end_price: float
 @dataclass
 class StockData:
     today_open: float

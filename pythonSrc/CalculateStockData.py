@@ -106,6 +106,8 @@ def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_perce
     _max_volume = math.ceil(df.describe().loc['max']['Volume'])
     _average_volume = math.ceil(df.describe().loc['mean']['Volume'])
     _min_volume = math.ceil(df.describe().loc['min']['Volume'])    
+    _start_price = df.head(1).iloc[0]['Close']
+    _end_price = df.tail(1).iloc[0]['Close']
 
     # dataframe 정렬 by volume
     df_sorted = df.sort_values(['Volume'], ascending=True)
@@ -123,7 +125,8 @@ def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_perce
     calculated_row.append(_adjusted_mean)
 
     stock_stat = StockStatistics(day, _max_price, _average_price, _min_price,
-                            _max_volume, _average_volume, _min_volume, _adjusted_mean)
+                            _max_volume, _average_volume, _min_volume, _adjusted_mean,
+                            _start_price, _end_price)
 
     stock.time_series.append(stock_stat)
 
