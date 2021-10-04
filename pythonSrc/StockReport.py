@@ -3,8 +3,8 @@ import time
 from pythonSrc.Constants import *
 
 def generate_stock_report(stock_dic, nation):
-    print("generate stock report for {} stocks, target nation = {}".format(len(stock_dic), nation))
-    stock_report = CRAWLING_RESULT_MSG
+    print("generate stock report for {} stocks, target nation = {}, wday={}".format(len(stock_dic), nation, time.localtime().tm_wday))
+    stock_report = ""
 
     if nation == "ko":
         if time.localtime().tm_wday == 5:
@@ -60,11 +60,11 @@ def generate_daily_summary(stock_dic, nation):
     top3 = list(sdiff_dic)[:3]
     bottom3 = list(sdiff_dic)[-3:]
     
-    summary += "상승률 상위 3종목 - "
+    summary += "\n> 상승률 상위 3종목 - "
     for item in top3:
         summary += "{}(+{}%) ".format(item[0], item[1])
 
-    summary += "\n상승률 하위 3종목 - "
+    summary += "\n> 상승률 하위 3종목 - "
     for item in bottom3:
         summary += "{}({}%) ".format(item[0], item[1])
     return summary
@@ -105,14 +105,14 @@ def generate_weekly_summary(stock_dic, nation):
     top3 = list(sdiff_dic)[:3]
     bottom3 = list(sdiff_dic)[-3:]
 
-    summary += "\n> 상승종목 *{}*, 하락종목 *{}*, 횡보종목 *{}*\n".format(
+    summary += "\n> 상승종목 *{}*, 하락종목 *{}*, 횡보종목 *{}*".format(
         up_count, down_count, even_count)
 
-    summary += "상승률 상위 3종목 - "
+    summary += "\n> 상승률 상위 3종목 - "
     for item in top3:
         summary += "{}(+{}) ".format(item[0], item[1])
 
-    summary += "\n상승률 하위 3종목 - "
+    summary += "\n> 상승률 하위 3종목 - "
     for item in bottom3:
         summary += "{}({}) ".format(item[0], item[1])
     #summary += "{} : {}, {} : {}, {} : {}".format(top3[0][0], top3[0][1], top3[1][0], top3[1][1], top3[2][0], top3[2][1])
