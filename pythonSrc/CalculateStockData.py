@@ -77,7 +77,10 @@ def calc_stock_volume(stock):
                 f'https://arclien.github.io/stock/code/{stock.ticker}', f'{stock.name}:{stock.ticker}') + f'\n'
             additional_link = format_ext_link(stock.nation, stock.ticker)
             diff_symbol = "+" if df_today_price > df_prev_price else "-"
-            return f'{main_link}' + f'> `{TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{get_diff_percent(df_prev_price, df_today_price)}%)`\n' + alert_message + f'> {additional_link}\n\n'
+            diff_value = get_diff_percent(df_prev_price, df_today_price)
+            if abs(diff_value) > 5:
+                diff_value = "`{}`".format(diff_value)
+            return f'{main_link}' + f'> {TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{diff_value}%)\n' + alert_message + f'> {additional_link}\n\n'
         else:
             return alert_message
             
@@ -176,9 +179,9 @@ def check_alert_price(nation, df_yesterday, df_today, alert_price):
     # 3. 전날/오늘 종가가 다 35000 초과인데, 장중 최저가가 35000이하면 35000 (지지)
     # 4. 전날/오늘 종가가 다 35000 미만인데, 장중 최고가가 35000이상이면 35000 (저항)
     if yesterday_price < alert_price and today_price >= alert_price:
-        inner_alarm_message += f'> *가격알림:* *{alert_price}* *돌파* \n'
+        inner_alarm_message += f'> *가격알림: `{alert_price}` 돌파* \n'
     elif yesterday_price > alert_price and today_price <= alert_price:
-        inner_alarm_message += f'> *가격알림: {alert_price} 하향돌파* \n'
+        inner_alarm_message += f'> *가격알림: `{alert_price}` 하향돌파* \n'
     elif yesterday_price > alert_price and today_price > alert_price and today_low <= alert_price:
         inner_alarm_message += f'> *가격알림: {alert_price} 지지* \n'
     elif yesterday_price < alert_price and today_price < alert_price and today_high >= alert_price:
@@ -195,7 +198,7 @@ def format_alert_message(alert_result):
         alert_message += "> "
         alert_message += "/".join(
             map(str, alert_result["max_price_over_alert"]["days"]))
-        alert_message += f'일 최대*가격*갱신 (+{alert_result["max_price_over_alert"]["%"][0]}%, +{alert_result["max_price_over_alert"]["over"][0]}) \n'
+        alert_message += f'일 최대 *가격* 갱신 (+{alert_result["max_price_over_alert"]["%"][0]}%, +{alert_result["max_price_over_alert"]["over"][0]}) \n'
 
     if len(alert_result["max_volume_over_alert"]["days"]) > 0:
         alert_message += "> "

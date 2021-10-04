@@ -33,17 +33,19 @@ def generate_daily_summary(stock_dic, nation):
     if len(stock_dic) == 0:
         return
 
-    summary = "\n===== daily summary ====="
+    summary = "\n===== daily summary for {} =====".format(nation)
     up_count = 0
     even_count = 0
     down_count = 0
+    stockdiff_dic = {}
 
     for stock in stock_dic.values():
         if stock.today_data is None or stock.today_data.today_close == 0:
-            #print("{} ticker has no data".format(stock.ticker))
+            print("{} ticker has no data".format(stock.ticker))
             continue
 
         if stock.nation == nation:
+            stockdiff_dic[stock.name] = round(stock.today_data.today_price_percent, 2)
             if stock.today_data.today_price_percent > 1.0:
                 up_count += 1
             elif stock.today_data.today_price_percent < -1.0:
@@ -52,6 +54,19 @@ def generate_daily_summary(stock_dic, nation):
                 even_count += 1
 
     summary += "\n> 상승종목 *{}*, 하락종목 *{}*, 횡보종목 *{}*".format(up_count, down_count, even_count)
+    
+    sdiff_dic = sorted(stockdiff_dic.items(), reverse=True,
+                       key=lambda x: x[1])  # 오름차순 정렬
+    top3 = list(sdiff_dic)[:3]
+    bottom3 = list(sdiff_dic)[-3:]
+    
+    summary += "상승률 상위 3종목 - "
+    for item in top3:
+        summary += "{}(+{}%) ".format(item[0], item[1])
+
+    summary += "\n상승률 하위 3종목 - "
+    for item in bottom3:
+        summary += "{}({}%) ".format(item[0], item[1])
     return summary
 
 def generate_weekly_summary(stock_dic, nation):
@@ -59,7 +74,7 @@ def generate_weekly_summary(stock_dic, nation):
     if len(stock_dic) == 0:
         return
 
-    summary = "\n===== weekly summary ====="
+    summary = "\n===== weekly summary for {} =====".format(nation)
     up_count = 0
     even_count = 0
     down_count = 0
@@ -77,7 +92,7 @@ def generate_weekly_summary(stock_dic, nation):
                 price_diff = stockstat.end_price - stockstat.start_price
 
         if stock.nation == nation:
-            stockdiff_dic[stock.name] = price_diff
+            stockdiff_dic[stock.name] = round(price_diff, 2)
             if price_diff > 0:
                 up_count += 1
             elif price_diff < 0:
@@ -95,7 +110,7 @@ def generate_weekly_summary(stock_dic, nation):
 
     summary += "상승률 상위 3종목 - "
     for item in top3:
-        summary += "{}({}) ".format(item[0], item[1])
+        summary += "{}(+{}) ".format(item[0], item[1])
 
     summary += "\n상승률 하위 3종목 - "
     for item in bottom3:

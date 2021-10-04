@@ -100,7 +100,7 @@ if __name__ == "__main__":
         os.mkdir(CALC_DIR)
 
     stock_dic = {}
-    report = CRAWLING_RESULT_MSG
+    report = ""
 
     make_stock_dic(stock_dic)
     report += update_all_stock_data(stock_dic)
