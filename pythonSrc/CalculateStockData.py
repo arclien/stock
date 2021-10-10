@@ -66,9 +66,9 @@ def calc_stock_volume(stock):
             writer = csv.writer(csvfile)
             writer.writerow(calculated_row)
 
-        for alert_price in stock.alert_price_list:
+        for alert_info in stock.alert_price_list:
             alert_message += check_alert_price(stock.nation,
-                                            df_prev_day, df_today, alert_price)
+                                            df_prev_day, df_today, alert_info)
         
         alert_message += format_alert_message(alert_result)
 
@@ -158,7 +158,8 @@ def calculate_daily_values(df, day, df_today_volume, df_today_price, alert_perce
             round(df_today_price - _max_price, 2))
 
 
-def check_alert_price(nation, df_yesterday, df_today, alert_price):
+def check_alert_price(nation, df_yesterday, df_today, alert_info):
+    alert_price = alert_info[0]
     if alert_price == 0 or df_today.iloc[0]['Volume'] == 0 or df_yesterday.iloc[0]['Volume'] == 0:
         return ""
 
@@ -179,13 +180,13 @@ def check_alert_price(nation, df_yesterday, df_today, alert_price):
     # 3. 전날/오늘 종가가 다 35000 초과인데, 장중 최저가가 35000이하면 35000 (지지)
     # 4. 전날/오늘 종가가 다 35000 미만인데, 장중 최고가가 35000이상이면 35000 (저항)
     if yesterday_price < alert_price and today_price >= alert_price:
-        inner_alarm_message += f'> *가격알림: `{alert_price}` 돌파* \n'
+        inner_alarm_message += f'> *가격알림: `{alert_price}{alert_info[1]}` 돌파* \n'
     elif yesterday_price > alert_price and today_price <= alert_price:
-        inner_alarm_message += f'> *가격알림: `{alert_price}` 하향돌파* \n'
+        inner_alarm_message += f'> *가격알림: `{alert_price}{alert_info[1]}` 하향돌파* \n'
     elif yesterday_price > alert_price and today_price > alert_price and today_low <= alert_price:
-        inner_alarm_message += f'> *가격알림: {alert_price} 지지* \n'
+        inner_alarm_message += f'> *가격알림: {alert_price}{alert_info[1]} 지지* \n'
     elif yesterday_price < alert_price and today_price < alert_price and today_high >= alert_price:
-        inner_alarm_message += f'> *가격알림: {alert_price} 저항* \n'
+        inner_alarm_message += f'> *가격알림: {alert_price}{alert_info[1]} 저항* \n'
 
     return inner_alarm_message
 

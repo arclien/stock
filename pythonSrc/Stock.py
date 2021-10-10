@@ -1,7 +1,15 @@
+import re
 from dataclasses import dataclass, field
 
 from pythonSrc.Constants import *
 #from Constants import *
+
+def is_number(str):
+    try:
+        temp = float(str.strip())
+        return True
+    except ValueError:
+        return False
 
 @dataclass
 class StockStatistics:
@@ -43,7 +51,9 @@ class StockInfo:
 
     def __post_init__(self):
         #self.alert_price_list = self.alert_prices.split(',')
-        self.alert_price_list = [float(e) if e.strip().isdigit() else 0 for e in self.alert_prices.split(',')]
+        split = re.findall("(\d+\.*\d*)+\s*(\([^)]*\))*", self.alert_prices)
+        self.alert_price_list = [(float(elem[0].strip()), elem[1]) for index, elem in enumerate(split) if is_number(elem[0])] 
+        #self.alert_price_list = [float(e) if e.strip().isdigit() else 0 for e in self.alert_prices.split(',')]
         self.raw_csv_file = "{}{}.csv".format(DIR, self.ticker)
         self.calc_csv_file = "{}{}.csv".format(CALC_DIR, self.ticker)
         self.today_data = StockData(0, 0, 0)
