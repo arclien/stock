@@ -14,7 +14,9 @@ from pythonSrc.TrelloUtils import *
 
 def make_stock_dic(stock_dic):
     my_card_list = get_card_ids()
+    print("get_card_ids returns {} id".format(len(my_card_list)))
 
+    country_count = {}
     for cardId in my_card_list:
         # cardId에 대한 정보를 trello에서 가져옴
         res = get_card_by_id(cardId)
@@ -48,6 +50,7 @@ def make_stock_dic(stock_dic):
                         alert_prices = json.loads(card_json["desc"])['alert_price']
                         #alert_prices = [float(e) if e.strip().isdigit() else 0 for e in alert_prices.split(',')]
                 else:
+                    print("{} card({}) doesn't have desc value".format(cardId, res))
                     continue
 
             stock = StockInfo(name=stock_name, ticker=stock_code,
@@ -55,6 +58,10 @@ def make_stock_dic(stock_dic):
                         alert_percent=alert_percent, alert_prices=alert_prices)
 
             stock_dic[stock_name] = stock
+
+            country_count[nation] = country_count.get(nation, 0) + 1
+    
+    print(country_count)
 
 
 def update_all_stock_data(stock_dic):
