@@ -16,5 +16,4 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "python.formatting.provider": "black"
 }

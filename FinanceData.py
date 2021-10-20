@@ -60,7 +60,6 @@ def make_stock_dic(stock_dic):
             stock_dic[stock_name] = stock
 
             country_count[nation] = country_count.get(nation, 0) + 1
-    
     print(country_count)
 
 

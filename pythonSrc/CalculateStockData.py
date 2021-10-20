@@ -197,20 +197,17 @@ def format_alert_message(alert_result):
     # 가격, 최대 거래량, 평균 거래량 순으로 출력
     if len(alert_result["max_price_over_alert"]["days"]) > 0:
         alert_message += "> "
-        alert_message += "/".join(
-            map(str, alert_result["max_price_over_alert"]["days"]))
+        alert_message += "/".join(map(lambda x: "`{}`".format(x) if x >= 90 else str(x), alert_result["max_price_over_alert"]["days"]))
         alert_message += f'일 최대 *가격* 갱신 (+{alert_result["max_price_over_alert"]["%"][0]}%, +{alert_result["max_price_over_alert"]["over"][0]}) \n'
 
     if len(alert_result["max_volume_over_alert"]["days"]) > 0:
         alert_message += "> "
-        alert_message += "/".join(
-            map(str, alert_result["max_volume_over_alert"]["days"]))
+        alert_message += "/".join(map(lambda x: "`{}`".format(x) if x >= 90 else str(x), alert_result["max_volume_over_alert"]["days"]))
         alert_message += f'일 최대거래량갱신 (+{alert_result["max_volume_over_alert"]["%"][0]}%, +{alert_result["max_volume_over_alert"]["over"][0]}) \n'
 
     if len(alert_result["mean_volume_over_alert"]["days"]) > 0:
         alert_message += "> "
-        alert_message += "/".join(
-            map(str, alert_result["mean_volume_over_alert"]["days"]))
+        alert_message += "/".join(map(lambda x: "`{}`".format(x) if x >= 90 else str(x), alert_result["mean_volume_over_alert"]["days"]))
         alert_message += f'일 평균거래량갱신 (+{alert_result["mean_volume_over_alert"]["%"][0]}%, +{alert_result["mean_volume_over_alert"]["over"][0]}) \n'
 
     return alert_message

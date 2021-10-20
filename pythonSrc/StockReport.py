@@ -105,7 +105,7 @@ def generate_weekly_summary(stock_dic, nation):
     sdiff_dic = sorted(stockdiff_dic.items(), reverse=True,
                        key=lambda x: x[1])  # 오름차순 정렬
     top3 = list(sdiff_dic)[:3]
-    bottom3 = list(sdiff_dic)[:-3:-1]
+    bottom3 = list(sdiff_dic)[:-4:-1]
 
     summary += "\n> 상승종목 *{}*, 하락종목 *{}*, 횡보종목 *{}*".format(
         up_count, down_count, even_count)
