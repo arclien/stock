@@ -3,7 +3,7 @@ import time
 from pythonSrc.Constants import *
 
 def generate_stock_report(stock_dic, nation):
-    print("generate stock report for {} stocks, target nation = {}, wday={}".format(len(stock_dic), nation, time.localtime().tm_wday))
+    print("generate stock report for {} stocks, target nation = {}, wday={}, cur time = {}({}".format(len(stock_dic), nation, time.localtime().tm_wday, CURRENT_TIME2, CURRENT_TIME))
     stock_report = ""
 
     if nation == "ko":
@@ -40,15 +40,15 @@ def generate_daily_summary(stock_dic, nation):
     stockdiff_dic = {}
 
     for stock in stock_dic.values():
-        if stock.today_data is None or stock.today_data.today_close == 0:
+        if stock.today_data is None or stock.today_data.close == 0:
             print("{} ticker has no data".format(stock.ticker))
             continue
 
         if stock.nation == nation:
-            stockdiff_dic[stock.name] = round(stock.today_data.today_price_percent, 2)
-            if stock.today_data.today_price_percent > 1.0:
+            stockdiff_dic[stock.name] = round(stock.today_data.price_percent, 2)
+            if stock.today_data.price_percent > 1.0:
                 up_count += 1
-            elif stock.today_data.today_price_percent < -1.0:
+            elif stock.today_data.price_percent < -1.0:
                 down_count += 1
             else:
                 even_count += 1

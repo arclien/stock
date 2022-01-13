@@ -26,7 +26,6 @@ def make_stock_dic(stock_dic):
             print("JSONDecodeError: {} is not correct card, value = {}".format(cardId, res))
         else:
             # print(card_json)
-
             # card desc에서 정보 파싱
             stock_name = ""
             stock_code = ""
@@ -60,14 +59,23 @@ def make_stock_dic(stock_dic):
             stock_dic[stock_name] = stock
 
             country_count[nation] = country_count.get(nation, 0) + 1
+    
+    save_stock_list(stock_dic)
     print(country_count)
 
+def save_stock_list(stock_dic):
+    with open("{}stock_list.csv".format(DIR), "w") as csvfile:
+        writer = csv.writer(csvfile)
+        
+        for stock in stock_dic.values():
+            row = (stock.name, stock.ticker, stock.created_at, stock.nation, stock.alert_percent, stock.alert_prices)
+            writer.writerow(row)
 
 def update_all_stock_data(stock_dic):
     print("update_all_stock, cur time = {}({})".format(CURRENT_TIME2, CURRENT_TIME))
     count = 0
     update_count = 0
-    report = ""
+
     for stock in stock_dic.values():
         print("update {} stock".format(stock.name))
         # csv 파일 매핑
@@ -88,14 +96,19 @@ def update_all_stock_data(stock_dic):
             fetch_and_generate_stock_csv(
                 stock.raw_csv_file, stock.ticker, stock.nation,
                 fetch_start_date, fetch_end_date)
+        count += 1
 
+    print("{} stock listed, {} updated".format(count, update_count))
+
+def generate_stock_alert_message(stock_dic):
+    print("generate_stock_alert_message, cur time = {}({})".format(CURRENT_TIME2, CURRENT_TIME))
+    report = ""
+    for stock in stock_dic.values():
         if stock.nation == 'ko' and CURRENT_TIME == AUTO_CRAWLING_TIME:
             report += calc_stock_volume(stock)
         elif (stock.nation == 'us' or stock.nation == 'coin') and (CURRENT_TIME == US_CRAWLING_TIME or CURRENT_TIME == str(int(US_CRAWLING_TIME) + 1)):
             report += calc_stock_volume(stock)
-        count += 1
 
-    print("{} stock listed, {} updated".format(count, update_count))
     return report
 
 if __name__ == "__main__":
@@ -109,7 +122,8 @@ if __name__ == "__main__":
     report = CRAWLING_RESULT_MSG
 
     make_stock_dic(stock_dic)
-    report += update_all_stock_data(stock_dic)
+    update_all_stock_data(stock_dic)
+    report += generate_stock_alert_message(stock_dic)
 
     if CURRENT_TIME == AUTO_CRAWLING_TIME: # kr
         report += generate_stock_report(stock_dic, "ko")
