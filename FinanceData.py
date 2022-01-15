@@ -6,7 +6,7 @@ from pythonSrc.Stock import *
 from pythonSrc.Constants import *
 from pythonSrc.FetchStockData import fetch_and_generate_stock_csv
 from pythonSrc.CalculateStockData import calc_stock_volume
-from pythonSrc.StockReport import generate_stock_report
+from pythonSrc.StockReport import generate_new_stock_report, generate_stock_summary_report
 
 from pythonSrc.Utils import *
 from pythonSrc.SlackUtils import *
@@ -126,8 +126,10 @@ if __name__ == "__main__":
     report += generate_stock_alert_message(stock_dic)
 
     if CURRENT_TIME == AUTO_CRAWLING_TIME: # kr
-        report += generate_stock_report(stock_dic, "ko")
+        report += generate_new_stock_report(stock_dic, "ko")
+        report += generate_stock_summary_report(stock_dic, "ko")
     else:
-        report += generate_stock_report(stock_dic, "us")
-        report += generate_stock_report(stock_dic, "coin")
+        report += generate_new_stock_report(stock_dic, "us")
+        report += generate_stock_summary_report(stock_dic, "us")
+        report += generate_stock_summary_report(stock_dic, "coin")
     push_to_slack(report)

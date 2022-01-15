@@ -33,7 +33,8 @@ def calc_stock_volume(stock):
         df_today_price = df_today.iloc[0]['Close']
 
         stock.today_data = StockData(open=df_today.iloc[0]['Open'],
-            close=df_today_price, volume=df_today_volume)
+            close=df_today_price, volume=df_today_volume,
+            high=df_today.iloc[0]['High'], low=df_today.iloc[0]['Low'])
 
         # 오늘 날짜를 제외( 평균에서 오늘 값을 제외하기 위해서 )
         df = df[:-1]
@@ -50,7 +51,9 @@ def calc_stock_volume(stock):
         
         stock.prev_data = StockData(open=df_prev_day.iloc[0]['Open'],
                                     close=df_prev_price,
-                                    volume=df_prev_day.iloc[0]['Volume'])
+                                    volume=df_prev_day.iloc[0]['Volume'],
+                                    high=df_prev_day.iloc[0]['High'],
+                                    low=df_prev_day.iloc[0]['Low'])
 
         calculated_row = ([TODAY])
         alert_result = {"mean_volume_over_alert": {"days": [], "%": [], "over": []},
@@ -84,7 +87,7 @@ def calc_stock_volume(stock):
             diff_value = get_diff_percent(df_prev_price, df_today_price)
             if abs(diff_value) > 5:
                 diff_value = "`{}`".format(diff_value)
-            return f'{main_link}' + f'> {TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{diff_value}%)\n' + alert_message + f'> {additional_link}\n\n'
+            return f'{main_link}' + f'> {TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{diff_value}%)\n' + alert_message + f'> {additional_link}\n'
         else:
             return alert_message
             

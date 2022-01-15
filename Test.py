@@ -1,4 +1,4 @@
-from pythonSrc.StockReport import generate_stock_report
+from pythonSrc.StockReport import *
 from FinanceData import *
 from pythonSrc.Stock import *
 from pythonSrc.Constants import *
@@ -37,7 +37,8 @@ def test_new_stock_report():
 
     #update_all_stock_data(stock_dic)
     report = generate_stock_alert_message(stock_dic)
-    report += generate_stock_report(stock_dic, "ko")
+    report += generate_new_stock_report(stock_dic, "us")
+    report += generate_stock_summary_report(stock_dic, "ko")
 
     print(report)
 
@@ -67,7 +68,7 @@ def test_stock_report():
 
     #update_all_stock_data(stock_dic)
     report = generate_stock_alert_message(stock_dic)
-    report += generate_stock_report(stock_dic, "us")
+    report += generate_stock_summary_report(stock_dic, "us")
 
     print(report)  
 
@@ -101,7 +102,7 @@ def test_coin_update_and_report():
 
     # update_all_stock_data(stock_dic)
     report = generate_stock_alert_message(stock_dic)
-    report += generate_stock_report(stock_dic, "us")
+    report += generate_stock_summary_report(stock_dic, "us")
 
     print(report)
     
