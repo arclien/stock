@@ -2,8 +2,82 @@ import time
 
 from pythonSrc.Constants import *
 
-def generate_stock_report(stock_dic, nation):
-    print("generate stock report for {} stocks, target nation = {}, wday={}".format(len(stock_dic), nation, time.localtime().tm_wday))
+def generate_new_stock_report(stock_dic, nation):
+    # stock_dic 안에 StockData, StockStatistics 데이터가 다 차있어야 한다.
+    print("generate new stock report for {} stocks, target nation = {}, wday={}, cur time = {}({}".format(len(stock_dic), nation, time.localtime().tm_wday, CURRENT_TIME2, CURRENT_TIME))
+    stock_report = ""
+    
+    alert_price_message = ""
+    price_alert_level1 = []
+    price_alert_level2 = []
+    volume_alert_level1 = []
+    volume_alert_level2 = []
+    
+    # 계산하기
+    for stock in stock_dic.values():
+        if not stock.nation == nation: 
+            continue
+        
+        if len(stock.time_series) <= 0 or stock.today_data.volume == 0:
+            continue
+        
+        alert_price_message += check_alert_price(stock)
+        volume_added = False
+        price_added = False
+        
+        for days_data in stock.time_series:
+            if stock.today_data.close > days_data.max_price:
+                if days_data.day_range >= 90 and not price_added:
+                    price_alert_level1.append(stock.name)
+                else:
+                    price_alert_level2.append(stock.name)
+                price_added = True
+                
+            if stock.today_data.volume > days_data.max_volume:
+                if days_data.day_range >= 90 and not volume_added:
+                    volume_alert_level1.append(stock.name)
+                else:
+                    volume_alert_level2.append(stock.name)
+                volume_added = True
+        
+    # 출력
+    if alert_price_message:
+        stock_report += "가격알림:\n"
+        stock_report += alert_price_message
+        stock_report += "\n"
+        
+    if len(price_alert_level1) > 0:
+        stock_report += "가격알림(90이상 최고가)): \n> "
+        for s in price_alert_level1:
+            stock_report += s
+            stock_report += ","
+        stock_report += "\n"
+            
+    if len(price_alert_level2) > 0:
+        stock_report += "가격알림(90이하 최고가)): \n> "
+        for s in price_alert_level2:
+            stock_report += s
+            stock_report += ","
+        stock_report += "\n"
+            
+    if len(volume_alert_level1) > 0:
+        stock_report += "거래량알림(90이상)): \n> "
+        for s in volume_alert_level1:
+            stock_report += s
+            stock_report += ","
+        stock_report += "\n"
+            
+    if len(volume_alert_level2) > 0:
+        stock_report += "거래량알림(90이하)): \n> "
+        for s in volume_alert_level2:
+            stock_report += s
+            stock_report += ","
+        stock_report += "\n"
+    
+    return stock_report
+
+def generate_stock_summary_report(stock_dic, nation):
+    print("generate stock summary report for {} stocks, target nation = {}, wday={}, cur time = {}({}".format(len(stock_dic), nation, time.localtime().tm_wday, CURRENT_TIME2, CURRENT_TIME))
     stock_report = ""
 
     if nation == "ko":
@@ -40,15 +114,15 @@ def generate_daily_summary(stock_dic, nation):
     stockdiff_dic = {}
 
     for stock in stock_dic.values():
-        if stock.today_data is None or stock.today_data.today_close == 0:
+        if stock.today_data is None or stock.today_data.close == 0:
             print("{} ticker has no data".format(stock.ticker))
             continue
 
         if stock.nation == nation:
-            stockdiff_dic[stock.name] = round(stock.today_data.today_price_percent, 2)
-            if stock.today_data.today_price_percent > 1.0:
+            stockdiff_dic[stock.name] = round(stock.today_data.price_percent, 2)
+            if stock.today_data.price_percent > 1.0:
                 up_count += 1
-            elif stock.today_data.today_price_percent < -1.0:
+            elif stock.today_data.price_percent < -1.0:
                 down_count += 1
             else:
                 even_count += 1
@@ -144,3 +218,38 @@ def format_ext_link(nation, stock_code):
 
 
     return additional_link
+
+
+def check_alert_price(stock):
+    inner_alarm_message = ""
+    
+    for alert_info in stock.alert_price_list:
+        alert_price = alert_info[0]
+        if alert_price == 0 or stock.today_data.volume == 0 or stock.prev_data.volume == 0:
+            continue
+
+        today_price = stock.today_data.close
+        today_high = stock.today_data.high
+        today_low = stock.today_data.low
+        yesterday_price = stock.prev_data.close
+
+        if stock.nation == 'ko':
+            alert_price = int(alert_price)
+        else:
+            alert_price = float(alert_price)
+
+        # https://trello.com/c/Dx9Q0IOy
+        # 1. 전날 종가가 35000미만이고 오늘 종가가 35000이상이면, 35000 (돌파) (혹은 위쪽 화살표)
+        # 2. 전날 종가가 35000초과이고 오늘 종가가 35000이하이면 35000 (하향돌파) (혹은 아래쪽 화살표)
+        # 3. 전날/오늘 종가가 다 35000 초과인데, 장중 최저가가 35000이하면 35000 (지지)
+        # 4. 전날/오늘 종가가 다 35000 미만인데, 장중 최고가가 35000이상이면 35000 (저항)
+        if yesterday_price < alert_price and today_price >= alert_price:
+            inner_alarm_message += f'> {stock.name} : *가격알림: `{alert_price}{alert_info[1]}` 돌파* \n'
+        elif yesterday_price > alert_price and today_price <= alert_price:
+            inner_alarm_message += f'> {stock.name} : *가격알림: `{alert_price}{alert_info[1]}` 하향돌파* \n'
+        elif yesterday_price > alert_price and today_price > alert_price and today_low <= alert_price:
+            inner_alarm_message += f'> {stock.name} : *가격알림: {alert_price}{alert_info[1]} 지지* \n'
+        elif yesterday_price < alert_price and today_price < alert_price and today_high >= alert_price:
+            inner_alarm_message += f'> {stock.name} : *가격알림: {alert_price}{alert_info[1]} 저항* \n'
+
+    return inner_alarm_message

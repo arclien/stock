@@ -14,6 +14,7 @@ def is_number(str):
 
 @dataclass
 class StockStatistics:
+    # 특정 day_range안에서의 min/max/avg를 계산한 값을 넣어두는 데이터 클래스
     day_range: int
     max_price: float #= field(init=False)
     average_price: float #= field(init=False)    
@@ -26,15 +27,15 @@ class StockStatistics:
     end_price: float
 @dataclass
 class StockData:
-    today_open: float
-    today_close: float
-    today_volume: int
-    today_price_percent: float = field(init=False)
-    today_volume_percent: float = field(init=False)
-    today_alert: str = field(init=False)
+    open: float
+    close: float
+    volume: int
+    high: float
+    low: float
+    price_percent: float = field(init=False)
 
     def __post_init__(self):
-        self.today_price_percent = 0 if self.today_open <= 0 else (self.today_close - self.today_open) / self.today_open * 100
+        self.price_percent = 0 if self.open <= 0 else (self.close - self.open) / self.open * 100
 
 @dataclass
 class StockInfo:
@@ -48,6 +49,7 @@ class StockInfo:
     raw_csv_file: str = field(init=False)
     calc_csv_file: str = field(init=False)
     today_data: StockData = field(init=False)
+    prev_data: StockData = field(init=False)
     time_series: list = field(init=False)
 
     def __post_init__(self):
@@ -57,7 +59,8 @@ class StockInfo:
         #self.alert_price_list = [float(e) if e.strip().isdigit() else 0 for e in self.alert_prices.split(',')]
         self.raw_csv_file = "{}{}.csv".format(DIR, self.ticker)
         self.calc_csv_file = "{}{}.csv".format(CALC_DIR, self.ticker)
-        self.today_data = StockData(0, 0, 0)
+        self.today_data = StockData(0, 0, 0, 0, 0)
+        self.prev_data = StockData(0, 0, 0, 0, 0)
         self.time_series = []
 
     def toDictObject(self):

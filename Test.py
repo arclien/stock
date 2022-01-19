@@ -1,4 +1,4 @@
-from pythonSrc.StockReport import generate_stock_report
+from pythonSrc.StockReport import *
 from FinanceData import *
 from pythonSrc.Stock import *
 from pythonSrc.Constants import *
@@ -8,19 +8,11 @@ from pythonSrc.CalculateStockData import calc_stock_volume
 
 def test_stock_volume_calculate():
     global CRAWLING_RESULT_MSG
-    STOCK_CODE = '005930'
-    ALERT_PERCENT = 30
-    ALERT_PRICE_LIST = [80000.0, 85000.0,  86000.0, 87000.0, 88000.0, 90000.0]
+    stock1 = StockInfo(name="삼성전자", ticker="005930",
+                created_at="2020-11-20", nation="ko",
+                alert_percent=50, alert_prices="71000(진바닥),72000(지지1),73000(지지2),74000(지지3),80000,85000")
 
-    CRAWLING_RESULT_MSG += calc_stock_volume(
-        "{}{}.csv".format(DIR, STOCK_CODE),
-        "{}{}.csv".format(CALC_DIR, STOCK_CODE),
-        STOCK_CODE,
-        'TEST_STOCK_NAME',
-        'ko',
-        ALERT_PERCENT,
-        ALERT_PRICE_LIST
-    )
+    CRAWLING_RESULT_MSG += calc_stock_volume(stock1)
 
     CRAWLING_RESULT_MSG += '====================================================='
 
@@ -29,6 +21,26 @@ def test_stock_volume_calculate():
 def test_push_to_slack():
     push_to_slack("test")
 
+
+def make_stock_dic_from_csv():
+    stock_dic = {}
+    with open("{}stock_list.csv".format(DIR), "r") as csvfile:
+        for content in list(csv.reader(csvfile)):
+            stock = StockInfo(name=content[0], ticker=content[1],
+                        created_at=content[2], nation=content[3],
+                        alert_percent=int(content[4]), alert_prices=content[5])
+            stock_dic[content[0]] = stock
+    return stock_dic
+
+def test_new_stock_report():
+    stock_dic = make_stock_dic_from_csv()
+
+    #update_all_stock_data(stock_dic)
+    report = generate_stock_alert_message(stock_dic)
+    report += generate_new_stock_report(stock_dic, "us")
+    report += generate_stock_summary_report(stock_dic, "ko")
+
+    print(report)
 
 def test_stock_report():
     stock_dic = {}
@@ -54,13 +66,11 @@ def test_stock_report():
     stock_dic['텔라닥'] = stock3
     stock_dic['모더나'] = stock4
 
-    old_report = update_all_stock_data(stock_dic)
-    report = generate_stock_report(stock_dic, "ko" if CURRENT_TIME == AUTO_CRAWLING_TIME else "us")
+    #update_all_stock_data(stock_dic)
+    report = generate_stock_alert_message(stock_dic)
+    report += generate_stock_summary_report(stock_dic, "us")
 
-    print(old_report)
-    print("\n -------------------------- \n")    
-    print(report)
-    
+    print(report)  
 
 def test_coin_update_and_report():
     stock_dic = {}
@@ -80,16 +90,20 @@ def test_coin_update_and_report():
                 created_at="2020-01-12", nation="coin",
                 alert_percent=50, alert_prices="")
 
+    stock5 = StockInfo(name="STRK", ticker="STRK",
+                created_at="2020-11-20", nation="coin",
+                alert_percent=50, alert_prices="45000, 44000")                
+
     stock_dic['비트코인'] = stock1
     stock_dic['SOL'] = stock2
     stock_dic['AAVE'] = stock3
     stock_dic['DOT'] = stock4
+    stock_dic['STRK'] = stock5
 
-    old_report = update_all_stock_data(stock_dic)
-    report = generate_stock_report(stock_dic, "coin")
+    # update_all_stock_data(stock_dic)
+    report = generate_stock_alert_message(stock_dic)
+    report += generate_stock_summary_report(stock_dic, "us")
 
-    print(old_report)
-    print("\n -------------------------- \n")    
     print(report)
 
 def test_save_stock_list():
@@ -134,4 +148,6 @@ def test_save_stock_list():
     
 # 테스트할 함수를 여기에서 수정한다.
 if __name__ == "__main__":
-    test_save_stock_list()
+    #test_coin_update_and_report()
+    test_new_stock_report()
+    #test_stock_volume_calculate()

@@ -24,7 +24,10 @@ def get_fetch_start_date(stock_csv_file):
                     fetch_start_date = False
                     break
                 else:
-                    fetch_start_date = (datetime.strptime(content[0], DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
+                    try:
+                        fetch_start_date = (datetime.strptime(content[0], DATE_FORMAT) + timedelta(days=1)).strftime(DATE_FORMAT)
+                    except ValueError as ex:
+                        fetch_start_date = True
                     break
         return fetch_start_date
     else:

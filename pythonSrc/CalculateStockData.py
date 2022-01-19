@@ -32,8 +32,9 @@ def calc_stock_volume(stock):
         df_today_volume = df_today.iloc[0]['Volume']
         df_today_price = df_today.iloc[0]['Close']
 
-        stock.today_data = StockData(today_open=df_today.iloc[0]['Open'],
-            today_close=df_today_price, today_volume=df_today_volume)
+        stock.today_data = StockData(open=df_today.iloc[0]['Open'],
+            close=df_today_price, volume=df_today_volume,
+            high=df_today.iloc[0]['High'], low=df_today.iloc[0]['Low'])
 
         # 오늘 날짜를 제외( 평균에서 오늘 값을 제외하기 위해서 )
         df = df[:-1]
@@ -47,6 +48,12 @@ def calc_stock_volume(stock):
         if df_prev_day.empty == True:
             return alert_message
         df_prev_price = df_prev_day.iloc[0]['Close']
+        
+        stock.prev_data = StockData(open=df_prev_day.iloc[0]['Open'],
+                                    close=df_prev_price,
+                                    volume=df_prev_day.iloc[0]['Volume'],
+                                    high=df_prev_day.iloc[0]['High'],
+                                    low=df_prev_day.iloc[0]['Low'])
 
         calculated_row = ([TODAY])
         alert_result = {"mean_volume_over_alert": {"days": [], "%": [], "over": []},
@@ -60,11 +67,11 @@ def calc_stock_volume(stock):
                 calculated_row, alert_result, stock)
 
         # 파일에 데이터 추가
-        #write_calc_data = get_fetch_start_date(stock.calc_csv_file)
-        #if write_calc_data:
-        with open(stock.calc_csv_file, "a") as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(calculated_row)
+        write_calc_data = get_fetch_start_date(stock.calc_csv_file)
+        if write_calc_data == True:
+            with open(stock.calc_csv_file, "a") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(calculated_row)
 
         for alert_info in stock.alert_price_list:
             alert_message += check_alert_price(stock.nation,
@@ -80,7 +87,7 @@ def calc_stock_volume(stock):
             diff_value = get_diff_percent(df_prev_price, df_today_price)
             if abs(diff_value) > 5:
                 diff_value = "`{}`".format(diff_value)
-            return f'{main_link}' + f'> {TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{diff_value}%)\n' + alert_message + f'> {additional_link}\n\n'
+            return f'{main_link}' + f'> {TODAY} 거래량: {df_today_volume} / 가격: {df_today_price} ({diff_symbol}{diff_value}%)\n' + alert_message + f'> {additional_link}\n'
         else:
             return alert_message
             
