@@ -1,4 +1,5 @@
 import re
+import json
 from dataclasses import dataclass, field
 
 from pythonSrc.Constants import *
@@ -59,6 +60,34 @@ class StockInfo:
         self.today_data = StockData(0, 0, 0)
         self.time_series = []
 
+    def toDictObject(self):
+        obj_fields = {}
+        obj_fields["ticker"] = self.ticker
+        obj_fields["name"] = self.name
+        obj_fields["created_at"] = self.created_at
+        obj_fields["nation"] = self.nation
+        obj_fields["alert_percent"] = self.alert_percent
+        obj_fields["alert_prices"] = self.alert_prices
+        return obj_fields
+
+    def fromDictObject(self, dictObj):
+        self.ticker = dictObj["ticker"] 
+        self.name = dictObj["name"]
+        self.created_at = dictObj["created_at"]
+        self.nation = dictObj["nation"]
+        self.alert_percent = dictObj["alert_percent"]
+        self.alert_prices = dictObj["alert_prices"]
+
+def save_stock_list(stock_dic):
+    print("save stock list, count={}".format(len(stock_dic)))
+
+    stock_dic_for_json = {}
+    for stock_name, stock_info in stock_dic.items():
+        stock_dic_for_json[stock_name] = stock_info.toDictObject()
+
+
+    with open('stock_list.json', 'w') as json_file:
+        json.dump(stock_dic_for_json, json_file, indent=4)
 
 if __name__ == "__main__":
     stock1 = StockInfo(name="삼성전자", ticker="005930",
