@@ -10,8 +10,10 @@ def generate_new_stock_report(stock_dic, nation):
     alert_price_message = ""
     price_alert_level1 = []
     price_alert_level2 = []
-    volume_alert_level1 = []
-    volume_alert_level2 = []
+    volume_alert_level1_up = []
+    volume_alert_level1_down = []
+    volume_alert_level2_up = []
+    volume_alert_level2_down = []
     
     # 계산하기
     for stock in stock_dic.values():
@@ -26,18 +28,24 @@ def generate_new_stock_report(stock_dic, nation):
         price_added = False
         
         for days_data in stock.time_series:
-            if stock.today_data.close > days_data.max_price:
-                if days_data.day_range >= 90 and not price_added:
+            if stock.today_data.close > days_data.max_price and not price_added:
+                if days_data.day_range >= 90:
                     price_alert_level1.append(stock.name)
                 else:
                     price_alert_level2.append(stock.name)
                 price_added = True
                 
-            if stock.today_data.volume > days_data.max_volume:
-                if days_data.day_range >= 90 and not volume_added:
-                    volume_alert_level1.append(stock.name)
+            if stock.today_data.volume > days_data.max_volume and not volume_added:
+                if days_data.day_range >= 90:
+                    if stock.today_data.close > stock.today_data.open:
+                        volume_alert_level1_up.append(stock.name)
+                    else:
+                        volume_alert_level1_down.append(stock.name)
                 else:
-                    volume_alert_level2.append(stock.name)
+                    if stock.today_data.close > stock.today_data.open:
+                        volume_alert_level2_up.append(stock.name)
+                    else:
+                        volume_alert_level2_down.append(stock.name)
                 volume_added = True
         
     # 출력
@@ -47,32 +55,42 @@ def generate_new_stock_report(stock_dic, nation):
         stock_report += "\n"
         
     if len(price_alert_level1) > 0:
-        stock_report += "가격알림(90이상 최고가)): \n> "
+        stock_report += "가격알림 (90일 이상 최고가): \n> "
         for s in price_alert_level1:
             stock_report += s
             stock_report += ","
-        stock_report += "\n"
+        stock_report += "\n\n"
             
     if len(price_alert_level2) > 0:
-        stock_report += "가격알림(90이하 최고가)): \n> "
+        stock_report += "가격알림 (90일 미만 최고가): \n> "
         for s in price_alert_level2:
             stock_report += s
             stock_report += ","
-        stock_report += "\n"
+        stock_report += "\n\n"
             
-    if len(volume_alert_level1) > 0:
-        stock_report += "거래량알림(90이상)): \n> "
-        for s in volume_alert_level1:
+    if len(volume_alert_level1_up) > 0 or len(volume_alert_level1_down) > 0:
+        stock_report += "높은 거래량알림 (90이상): \n"
+        stock_report += "> 상승: "
+        for s in volume_alert_level1_up:
             stock_report += s
             stock_report += ","
-        stock_report += "\n"
-            
-    if len(volume_alert_level2) > 0:
-        stock_report += "거래량알림(90이하)): \n> "
-        for s in volume_alert_level2:
+        stock_report += "\n> 하락: "
+        for s in volume_alert_level1_down:
             stock_report += s
             stock_report += ","
-        stock_report += "\n"
+        stock_report += "\n\n"
+            
+    if len(volume_alert_level2_up) > 0 or len(volume_alert_level2_down) > 0:
+        stock_report += "높은 거래량알림 (90미만): \n"
+        stock_report += "> 상승: "
+        for s in volume_alert_level2_up:
+            stock_report += s
+            stock_report += ","
+        stock_report += "\n> 하락: "
+        for s in volume_alert_level2_down:
+            stock_report += s
+            stock_report += ","
+        stock_report += "\n\n"
     
     return stock_report
 
@@ -115,7 +133,7 @@ def generate_daily_summary(stock_dic, nation):
 
     for stock in stock_dic.values():
         if stock.today_data is None or stock.today_data.close == 0:
-            print("{} ticker has no data".format(stock.ticker))
+            #print("{} ticker has no data".format(stock.ticker))
             continue
 
         if stock.nation == nation:
@@ -156,7 +174,7 @@ def generate_weekly_summary(stock_dic, nation):
 
     for stock in stock_dic.values():
         if stock.today_data is None:
-            print("{} ticker has no data".format(stock.ticker))
+            #print("{} ticker has no data".format(stock.ticker))
             continue
 
         # 5일 값변동 찾기

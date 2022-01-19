@@ -34,10 +34,11 @@ def make_stock_dic_from_csv():
 
 def test_new_stock_report():
     stock_dic = make_stock_dic_from_csv()
+    report = ""
 
     #update_all_stock_data(stock_dic)
-    report = generate_stock_alert_message(stock_dic)
-    report += generate_new_stock_report(stock_dic, "us")
+    generate_stock_alert_message(stock_dic)
+    report += generate_new_stock_report(stock_dic, "ko")
     report += generate_stock_summary_report(stock_dic, "ko")
 
     print(report)
