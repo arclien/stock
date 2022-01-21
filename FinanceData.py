@@ -64,7 +64,7 @@ def make_stock_dic(stock_dic):
     print(country_count)
 
 def save_stock_list(stock_dic):
-    with open("{}stock_list.csv".format(DIR), "w") as csvfile:
+    with open("{}stock_list.csv".format(DIR), "w", encoding='UTF-8') as csvfile:
         writer = csv.writer(csvfile)
         
         for stock in stock_dic.values():
