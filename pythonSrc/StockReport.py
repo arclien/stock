@@ -15,7 +15,10 @@ def generate_new_stock_report(stock_dic, nation):
     volume_alert_level1_down = []
     volume_alert_level2_up = []
     volume_alert_level2_down = []
-    price_low_alert = [] # 우선은 180, 90만 체크해본다.
+    low_price_alert_level1 = [] # 우선은 180, 90만 체크해본다.
+    low_price_alert_level2 = [] # 우선은 180, 90만 체크해본다.
+    low_price_alert_new = []
+    low_price_alert_remove = []
     
     # 계산하기
     for stock in stock_dic.values():
@@ -58,11 +61,20 @@ def generate_new_stock_report(stock_dic, nation):
                 volume_added = True
             
             if days_data.day_range >= 90 and not low_price_added:
-                if (stock.today_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price) < 0.2:
-                    price_low_alert.append(stock_name)
+                relative_position = (stock.today_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price)
+                prev_relative_pos = (stock.prev_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price)
+                if relative_position < 0.05:
+                    low_price_alert_level1.append(stock_name)
                     low_price_added = True
-
-        
+                elif relative_position < 0.2:
+                    low_price_alert_level2.append(stock_name)
+                    low_price_added = True
+                    if prev_relative_pos >= 0.2:
+                        low_price_alert_new.append(stock_name)
+                else:
+                    if prev_relative_pos < 0.2:
+                        low_price_alert_remove.append(stock_name)
+                    
     # 출력
     if alert_price_message:
         stock_report += "가격알림:\n"
@@ -73,24 +85,42 @@ def generate_new_stock_report(stock_dic, nation):
         stock_report += "가격알림 (90일 이상 최고가): \n> "
         for s in price_alert_level1:
             stock_report += s
-            stock_report += ","
+            stock_report += " ,"
         stock_report += "\n\n"
             
     if len(price_alert_level2) > 0:
         stock_report += "가격알림 (90일 미만 최고가): \n> "
         for s in price_alert_level2:
             stock_report += s
-            stock_report += ","
+            stock_report += " ,"
         stock_report += "\n\n"
     
-    if len(price_low_alert) > 0:
-        stock_report += "낮은 가격알림: \n> "
-        for s in price_low_alert:
+    if len(low_price_alert_level1) > 0:
+        stock_report += "낮은 가격알림(0.05): \n> "
+        for s in low_price_alert_level1:
             stock_report += s
-            stock_report += ","
+            stock_report += " ,"
+        stock_report += "\n\n"
+        
+    if len(low_price_alert_level2) > 0:
+        stock_report += "낮은 가격알림(0.2): \n> "
+        for s in low_price_alert_level2:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n\n"
+
+    if len(low_price_alert_new) > 0 or len(low_price_alert_remove) > 0:
+        stock_report += "낮은 가격알림 변동: \n"
+        stock_report += "> 진입: "
+        for s in low_price_alert_new:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n> 탈출: "
+        for s in low_price_alert_remove:
+            stock_report += s
+            stock_report += " ,"
         stock_report += "\n\n"
     
-
     if len(volume_alert_level1_up) > 0 or len(volume_alert_level1_down) > 0:
         stock_report += "높은 거래량알림 (90이상): \n"
         stock_report += "> 상승: "
