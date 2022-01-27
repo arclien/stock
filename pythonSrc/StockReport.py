@@ -17,8 +17,10 @@ def generate_new_stock_report(stock_dic, nation):
     volume_alert_level2_down = []
     low_price_alert_level1 = [] # 우선은 180, 90만 체크해본다.
     low_price_alert_level2 = [] # 우선은 180, 90만 체크해본다.
-    low_price_alert_new = []
-    low_price_alert_remove = []
+    low_price_alert_new_1 = []
+    low_price_alert_new_2 = []
+    low_price_alert_remove_1 = []
+    low_price_alert_remove_2 = []
     
     # 계산하기
     for stock in stock_dic.values():
@@ -70,11 +72,14 @@ def generate_new_stock_report(stock_dic, nation):
                     low_price_alert_level2.append(stock_name)
                     low_price_added = True
                     if prev_relative_pos >= 0.2:
-                        low_price_alert_new.append(stock_name)
+                        low_price_alert_new_1.append(stock_name)
                 else:
                     if prev_relative_pos < 0.2:
-                        low_price_alert_remove.append(stock_name)
-                    
+                        low_price_alert_remove_1.append(stock_name)
+                    if prev_relative_pos > 0.5 and relative_position <= 0.5:
+                        low_price_alert_new_2.append(stock_name)
+                    if prev_relative_pos <= 0.5 and relative_position > 0.5:
+                        low_price_alert_remove_2.append(stock_name)
     # 출력
     if alert_price_message:
         stock_report += "가격알림:\n"
@@ -109,17 +114,30 @@ def generate_new_stock_report(stock_dic, nation):
             stock_report += " ,"
         stock_report += "\n\n"
 
-    if len(low_price_alert_new) > 0 or len(low_price_alert_remove) > 0:
-        stock_report += "낮은 가격알림 변동: \n"
+    if len(low_price_alert_new_1) > 0 or len(low_price_alert_remove_1) > 0:
+        stock_report += "낮은 가격알림 변동(0.2): \n"
         stock_report += "> 진입: "
-        for s in low_price_alert_new:
+        for s in low_price_alert_new_1:
             stock_report += s
             stock_report += " ,"
         stock_report += "\n> 탈출: "
-        for s in low_price_alert_remove:
+        for s in low_price_alert_remove_1:
             stock_report += s
             stock_report += " ,"
         stock_report += "\n\n"
+    
+    if len(low_price_alert_new_2) > 0 or len(low_price_alert_remove_2) > 0:
+        stock_report += "낮은 가격알림 변동(0.5): \n"
+        stock_report += "> 진입: "
+        for s in low_price_alert_new_2:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n> 탈출: "
+        for s in low_price_alert_remove_2:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n\n"
+    
     
     if len(volume_alert_level1_up) > 0 or len(volume_alert_level1_down) > 0:
         stock_report += "높은 거래량알림 (90이상): \n"
@@ -159,9 +177,9 @@ def generate_stock_summary_report(stock_dic, nation):
         else:
             stock_report += generate_daily_summary(stock_dic, nation)
     elif nation == "us":
-        if time.localtime().tm_wday == 6:
+        if time.localtime().tm_wday == 5:
             stock_report += generate_weekly_summary(stock_dic, nation)
-        elif time.localtime().tm_wday == 0:
+        elif time.localtime().tm_wday == 6:
             pass
         else:
             stock_report += generate_daily_summary(stock_dic, nation)
