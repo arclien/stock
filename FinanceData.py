@@ -1,5 +1,6 @@
 from json.decoder import JSONDecodeError
 import os
+from time import sleep
 from datetime import timedelta, datetime
 
 from pythonSrc.Stock import *
@@ -124,12 +125,14 @@ if __name__ == "__main__":
     make_stock_dic(stock_dic)
     update_all_stock_data(stock_dic)
     report += generate_stock_alert_message(stock_dic)
+    push_to_slack(report)
+    sleep(10)
 
     if CURRENT_TIME == AUTO_CRAWLING_TIME: # kr
-        report += generate_new_stock_report(stock_dic, "ko")
+        report = generate_new_stock_report(stock_dic, "ko")
         report += generate_stock_summary_report(stock_dic, "ko")
     else:
-        report += generate_new_stock_report(stock_dic, "us")
+        report = generate_new_stock_report(stock_dic, "us")
         report += generate_stock_summary_report(stock_dic, "us")
         report += generate_stock_summary_report(stock_dic, "coin")
     push_to_slack(report)
