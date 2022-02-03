@@ -9,6 +9,7 @@ def generate_new_stock_report(stock_dic, nation):
     stock_report = ""
     
     alert_price_message = ""
+    ## list말고 dictionary를 쓰는 방식이 더 좋을 수 있음.
     price_alert_level1 = []
     price_alert_level2 = []
     volume_alert_level1_up = []
@@ -62,18 +63,26 @@ def generate_new_stock_report(stock_dic, nation):
                         volume_alert_level2_down.append(stock_name)
                 volume_added = True
             
+            stock_append = ""
             if days_data.day_range >= 90 and not low_price_added:
                 relative_position = (stock.today_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price)
                 prev_relative_pos = (stock.prev_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price)
-                if relative_position < 0.05:
-                    low_price_alert_level1.append(stock_name)
+                if relative_position < 0.05:                    
+                    if prev_relative_pos >= 0.05:
+                        stock_append = "(↘)"
+                    low_price_alert_level1.append(stock_name + stock_append)
                     low_price_added = True
                 elif relative_position < 0.2:
-                    low_price_alert_level2.append(stock_name)
+                    if prev_relative_pos >= 0.2:
+                        stock_append = "(↘)"
+                    elif prev_relative_pos < 0.05:
+                        stock_append = "(↗)"
+                    low_price_alert_level2.append(stock_name + stock_append)
                     low_price_added = True
                     if prev_relative_pos >= 0.2:
                         low_price_alert_new_1.append(stock_name)
                 else:
+                    low_price_added = True
                     if prev_relative_pos < 0.2:
                         low_price_alert_remove_1.append(stock_name)
                     if prev_relative_pos > 0.5 and relative_position <= 0.5:
