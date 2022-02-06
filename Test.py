@@ -24,7 +24,7 @@ def test_push_to_slack():
 
 def make_stock_dic_from_csv():
     stock_dic = {}
-    with open("{}stock_list.csv".format(DIR), "r") as csvfile:
+    with open("{}stock_list.csv".format(DIR), "r", encoding='UTF-8') as csvfile:
         for content in list(csv.reader(csvfile)):
             stock = StockInfo(name=content[0], ticker=content[1],
                         created_at=content[2], nation=content[3],
@@ -34,10 +34,11 @@ def make_stock_dic_from_csv():
 
 def test_new_stock_report():
     stock_dic = make_stock_dic_from_csv()
+    report = ""
 
     #update_all_stock_data(stock_dic)
-    report = generate_stock_alert_message(stock_dic)
-    report += generate_new_stock_report(stock_dic, "us")
+    generate_stock_alert_message(stock_dic)
+    report += generate_new_stock_report(stock_dic, "ko")
     report += generate_stock_summary_report(stock_dic, "ko")
 
     print(report)

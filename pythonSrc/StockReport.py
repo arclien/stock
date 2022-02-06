@@ -1,6 +1,7 @@
 import time
 
 from pythonSrc.Constants import *
+from pythonSrc.Utils import *
 
 def generate_new_stock_report(stock_dic, nation):
     # stock_dic 안에 StockData, StockStatistics 데이터가 다 차있어야 한다.
@@ -8,10 +9,19 @@ def generate_new_stock_report(stock_dic, nation):
     stock_report = ""
     
     alert_price_message = ""
+    ## list말고 dictionary를 쓰는 방식이 더 좋을 수 있음.
     price_alert_level1 = []
     price_alert_level2 = []
-    volume_alert_level1 = []
-    volume_alert_level2 = []
+    volume_alert_level1_up = []
+    volume_alert_level1_down = []
+    volume_alert_level2_up = []
+    volume_alert_level2_down = []
+    low_price_alert_level1 = [] # 우선은 180, 90만 체크해본다.
+    low_price_alert_level2 = [] # 우선은 180, 90만 체크해본다.
+    low_price_alert_new_1 = []
+    low_price_alert_new_2 = []
+    low_price_alert_remove_1 = []
+    low_price_alert_remove_2 = []
     
     # 계산하기
     for stock in stock_dic.values():
@@ -24,22 +34,61 @@ def generate_new_stock_report(stock_dic, nation):
         alert_price_message += check_alert_price(stock)
         volume_added = False
         price_added = False
+        low_price_added = False
+        stock_name = stock.name
+        over_5_percent = False
+
+        if abs(get_diff_percent(stock.prev_data.close, stock.today_data.close)) > 5:
+            over_5_percent = True
+            stock_name = f'*{stock.name}*'
         
         for days_data in stock.time_series:
-            if stock.today_data.close > days_data.max_price:
-                if days_data.day_range >= 90 and not price_added:
-                    price_alert_level1.append(stock.name)
+            if stock.today_data.close > days_data.max_price and not price_added:
+                if days_data.day_range >= 90:
+                    price_alert_level1.append(stock_name)
                 else:
-                    price_alert_level2.append(stock.name)
+                    price_alert_level2.append(stock_name)
                 price_added = True
                 
-            if stock.today_data.volume > days_data.max_volume:
-                if days_data.day_range >= 90 and not volume_added:
-                    volume_alert_level1.append(stock.name)
+            if stock.today_data.volume > days_data.max_volume and not volume_added:
+                if days_data.day_range >= 90:
+                    if stock.today_data.close > stock.today_data.open:
+                        volume_alert_level1_up.append(stock_name)
+                    else:
+                        volume_alert_level1_down.append(stock_name)
                 else:
-                    volume_alert_level2.append(stock.name)
+                    if stock.today_data.close > stock.today_data.open:
+                        volume_alert_level2_up.append(stock_name)
+                    else:
+                        volume_alert_level2_down.append(stock_name)
                 volume_added = True
-        
+            
+            stock_append = ""
+            if days_data.day_range >= 90 and not low_price_added:
+                relative_position = (stock.today_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price)
+                prev_relative_pos = (stock.prev_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price)
+                if relative_position < 0.05:                    
+                    if prev_relative_pos >= 0.05:
+                        stock_append = "(↘)"
+                    low_price_alert_level1.append(stock_name + stock_append)
+                    low_price_added = True
+                elif relative_position < 0.2:
+                    if prev_relative_pos >= 0.2:
+                        stock_append = "(↘)"
+                    elif prev_relative_pos < 0.05:
+                        stock_append = "(↗)"
+                    low_price_alert_level2.append(stock_name + stock_append)
+                    low_price_added = True
+                    if prev_relative_pos >= 0.2:
+                        low_price_alert_new_1.append(stock_name)
+                else:
+                    low_price_added = True
+                    if prev_relative_pos < 0.2:
+                        low_price_alert_remove_1.append(stock_name)
+                    if prev_relative_pos > 0.5 and relative_position <= 0.5:
+                        low_price_alert_new_2.append(stock_name)
+                    if prev_relative_pos <= 0.5 and relative_position > 0.5:
+                        low_price_alert_remove_2.append(stock_name)
     # 출력
     if alert_price_message:
         stock_report += "가격알림:\n"
@@ -47,32 +96,81 @@ def generate_new_stock_report(stock_dic, nation):
         stock_report += "\n"
         
     if len(price_alert_level1) > 0:
-        stock_report += "가격알림(90이상 최고가)): \n> "
+        stock_report += "가격알림 (90일 이상 최고가): \n> "
         for s in price_alert_level1:
             stock_report += s
-            stock_report += ","
-        stock_report += "\n"
+            stock_report += " ,"
+        stock_report += "\n\n"
             
     if len(price_alert_level2) > 0:
-        stock_report += "가격알림(90이하 최고가)): \n> "
+        stock_report += "가격알림 (90일 미만 최고가): \n> "
         for s in price_alert_level2:
             stock_report += s
-            stock_report += ","
-        stock_report += "\n"
-            
-    if len(volume_alert_level1) > 0:
-        stock_report += "거래량알림(90이상)): \n> "
-        for s in volume_alert_level1:
+            stock_report += " ,"
+        stock_report += "\n\n"
+    
+    if len(low_price_alert_level1) > 0:
+        stock_report += "낮은 가격알림(0.05): \n> "
+        for s in low_price_alert_level1:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n\n"
+        
+    if len(low_price_alert_level2) > 0:
+        stock_report += "낮은 가격알림(0.2): \n> "
+        for s in low_price_alert_level2:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n\n"
+
+    if len(low_price_alert_new_1) > 0 or len(low_price_alert_remove_1) > 0:
+        stock_report += "낮은 가격알림 변동(0.2): \n"
+        stock_report += "> 진입: "
+        for s in low_price_alert_new_1:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n> 탈출: "
+        for s in low_price_alert_remove_1:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n\n"
+    
+    if len(low_price_alert_new_2) > 0 or len(low_price_alert_remove_2) > 0:
+        stock_report += "낮은 가격알림 변동(0.5): \n"
+        stock_report += "> 진입: "
+        for s in low_price_alert_new_2:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n> 탈출: "
+        for s in low_price_alert_remove_2:
+            stock_report += s
+            stock_report += " ,"
+        stock_report += "\n\n"
+    
+    
+    if len(volume_alert_level1_up) > 0 or len(volume_alert_level1_down) > 0:
+        stock_report += "높은 거래량알림 (90이상): \n"
+        stock_report += "> 상승: "
+        for s in volume_alert_level1_up:
             stock_report += s
             stock_report += ","
-        stock_report += "\n"
-            
-    if len(volume_alert_level2) > 0:
-        stock_report += "거래량알림(90이하)): \n> "
-        for s in volume_alert_level2:
+        stock_report += "\n> 하락: "
+        for s in volume_alert_level1_down:
             stock_report += s
             stock_report += ","
-        stock_report += "\n"
+        stock_report += "\n\n"
+            
+    if len(volume_alert_level2_up) > 0 or len(volume_alert_level2_down) > 0:
+        stock_report += "높은 거래량알림 (90미만): \n"
+        stock_report += "> 상승: "
+        for s in volume_alert_level2_up:
+            stock_report += s
+            stock_report += ","
+        stock_report += "\n> 하락: "
+        for s in volume_alert_level2_down:
+            stock_report += s
+            stock_report += ","
+        stock_report += "\n\n"
     
     return stock_report
 
@@ -88,9 +186,9 @@ def generate_stock_summary_report(stock_dic, nation):
         else:
             stock_report += generate_daily_summary(stock_dic, nation)
     elif nation == "us":
-        if time.localtime().tm_wday == 6:
+        if time.localtime().tm_wday == 5:
             stock_report += generate_weekly_summary(stock_dic, nation)
-        elif time.localtime().tm_wday == 0:
+        elif time.localtime().tm_wday == 6:
             pass
         else:
             stock_report += generate_daily_summary(stock_dic, nation)
@@ -114,15 +212,16 @@ def generate_daily_summary(stock_dic, nation):
     stockdiff_dic = {}
 
     for stock in stock_dic.values():
-        if stock.today_data is None or stock.today_data.close == 0:
-            print("{} ticker has no data".format(stock.ticker))
+        if stock.today_data is None or stock.today_data.close == 0 or stock.prev_data is None or stock.prev_data.close == 0:
+            #print("{} ticker has no data".format(stock.ticker))
             continue
 
         if stock.nation == nation:
-            stockdiff_dic[stock.name] = round(stock.today_data.price_percent, 2)
-            if stock.today_data.price_percent > 1.0:
+            diff_percent = (stock.today_data.close - stock.prev_data.close) / stock.prev_data.close * 100 
+            stockdiff_dic[stock.name] = round(diff_percent, 2)
+            if diff_percent > 1.0:
                 up_count += 1
-            elif stock.today_data.price_percent < -1.0:
+            elif diff_percent < -1.0:
                 down_count += 1
             else:
                 even_count += 1
@@ -131,14 +230,14 @@ def generate_daily_summary(stock_dic, nation):
     
     sdiff_dic = sorted(stockdiff_dic.items(), reverse=True,
                        key=lambda x: x[1])  # 오름차순 정렬
-    top3 = list(sdiff_dic)[:3]
-    bottom3 = list(sdiff_dic)[:-3:-1]
+    top3 = list(sdiff_dic)[:5]
+    bottom3 = list(sdiff_dic)[:-6:-1]
     
-    summary += "\n> 상승률 상위 3종목 - "
+    summary += "\n> 상승률 상위 5종목 - "
     for item in top3:
         summary += "{}({}{}%) ".format(item[0], '+' if item[1] > 0 else '', item[1])
 
-    summary += "\n> 상승률 하위 3종목 - "
+    summary += "\n> 상승률 하위 5종목 - "
     for item in bottom3:
         summary += "{}({}{}%) ".format(item[0], '+' if item[1] > 0 else '', item[1])
     return summary
@@ -156,7 +255,7 @@ def generate_weekly_summary(stock_dic, nation):
 
     for stock in stock_dic.values():
         if stock.today_data is None:
-            print("{} ticker has no data".format(stock.ticker))
+            #print("{} ticker has no data".format(stock.ticker))
             continue
 
         # 5일 값변동 찾기
@@ -178,17 +277,17 @@ def generate_weekly_summary(stock_dic, nation):
 
     sdiff_dic = sorted(stockdiff_dic.items(), reverse=True,
                        key=lambda x: x[1])  # 오름차순 정렬
-    top3 = list(sdiff_dic)[:3]
-    bottom3 = list(sdiff_dic)[:-4:-1]
+    top3 = list(sdiff_dic)[:5]
+    bottom3 = list(sdiff_dic)[:-6:-1]
 
     summary += "\n> 상승종목 *{}*, 하락종목 *{}*, 횡보종목 *{}*".format(
         up_count, down_count, even_count)
 
-    summary += "\n> 상승률 상위 3종목 - "
+    summary += "\n> 상승률 상위 5종목 - "
     for item in top3:
         summary += "{}({}{}%) ".format(item[0], '+' if item[1] > 0 else '', item[1])
 
-    summary += "\n> 상승률 하위 3종목 - "
+    summary += "\n> 상승률 하위 5종목 - "
     for item in bottom3:
         summary += "{}({}{}%) ".format(item[0], '+' if item[1] > 0 else '', item[1])
     #summary += "{} : {}, {} : {}, {} : {}".format(top3[0][0], top3[0][1], top3[1][0], top3[1][1], top3[2][0], top3[2][1])
