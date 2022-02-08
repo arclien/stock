@@ -40,7 +40,7 @@ def generate_new_stock_report(stock_dic, nation):
 
         if abs(get_diff_percent(stock.prev_data.close, stock.today_data.close)) > 5:
             over_5_percent = True
-            stock_name = f'*{stock.name}*'
+            stock_name = f'*{stock.name}* '
         
         for days_data in stock.time_series:
             if stock.today_data.close > days_data.max_price and not price_added:
