@@ -64,7 +64,7 @@ def generate_new_stock_report(stock_dic, nation):
                 volume_added = True
             
             stock_append = ""
-            if days_data.day_range >= 90 and not low_price_added:
+            if days_data.day_range >= 180 and not low_price_added:
                 relative_position = (stock.today_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price)
                 prev_relative_pos = (stock.prev_data.close - days_data.min_price) / (days_data.max_price - days_data.min_price)
                 if relative_position < 0.05:                    

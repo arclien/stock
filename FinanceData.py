@@ -72,6 +72,16 @@ def save_stock_list(stock_dic):
             row = (stock.name, stock.ticker, stock.created_at, stock.nation, stock.alert_percent, stock.alert_prices)
             writer.writerow(row)
 
+def read_stock_list():
+    stock_dic = {}
+    with open("{}stock_list.csv".format(DIR), "r", encoding='UTF-8') as csvfile:
+        for content in list(csv.reader(csvfile)):
+            stock = StockInfo(name=content[0], ticker=content[1],
+                        created_at=content[2], nation=content[3],
+                        alert_percent=int(content[4]), alert_prices=content[5])
+            stock_dic[content[0]] = stock
+    return stock_dic
+
 def update_all_stock_data(stock_dic):
     print("update_all_stock, cur time = {}({})".format(CURRENT_TIME2, CURRENT_TIME))
     count = 0

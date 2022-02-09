@@ -81,7 +81,7 @@ class StockInfo:
         self.alert_percent = dictObj["alert_percent"]
         self.alert_prices = dictObj["alert_prices"]
 
-def save_stock_list(stock_dic):
+def save_stock_list_json(stock_dic):
     print("save stock list, count={}".format(len(stock_dic)))
 
     stock_dic_for_json = {}
