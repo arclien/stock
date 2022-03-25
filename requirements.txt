@@ -1,4 +1,4 @@
-finance_datareader==0.9.31
+finance_datareader==0.9.33
 beautifulsoup4==4.8.2
 html5lib==1.0.1
 requests==2.23.0
